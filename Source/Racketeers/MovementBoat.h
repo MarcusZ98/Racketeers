@@ -113,7 +113,7 @@ private:
 	FVector PredictedPosition;
 
 	// References
-	//UPROPERTY()
+	UPROPERTY()
 	USpringArmComponent* SpringArm;
 
 	UPROPERTY()
