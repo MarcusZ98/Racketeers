@@ -56,11 +56,20 @@ void APC_Lobby::Server_SpawnPlayer_Implementation(APlayerController* PC, ETeams 
 	Cast<APC_Lobby>(PC)->Client_ShowLobbyWidget();
 }
 
+void APC_Lobby::Server_RemovePlayer_Implementation()
+{
+	if (AGM_LobbyHost* GameMode = Cast<AGM_LobbyHost>(GetWorld()->GetAuthGameMode()))
+	{
+		GameMode->RemovePlayer(this);
+	}
+}
+
 void APC_Lobby::Server_ToggleReady_Implementation()
 {
 	if (APS_Lobby* PS = Cast<APS_Lobby>(PlayerState))
 	{
 		PS->LobbyInfo.bIsReady = !PS->LobbyInfo.bIsReady;
+		SpawnPoint->Multicast_ToggleReady(PS->LobbyInfo.bIsReady);
 	}
 
 	if (AGM_LobbyHost* GameMode = Cast<AGM_LobbyHost>(GetWorld()->GetAuthGameMode()))

@@ -52,6 +52,9 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void Server_SpawnPlayer(APlayerController* PC, ETeams Team);
 
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void Server_RemovePlayer();
+
 	// Toggle the player's ready status
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void Server_ToggleReady();

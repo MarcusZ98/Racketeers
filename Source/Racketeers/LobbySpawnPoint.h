@@ -66,6 +66,12 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_RemovePlayer();
 
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_ToggleReady(bool bIsReady);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void ToggleReadyStatus(bool bIsReady);
+
 	void SetPlayerController(APlayerController* PC) { PlayerController = PC; }
 
 protected:

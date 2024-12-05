@@ -119,6 +119,6 @@ private:
 	UPROPERTY()
 	AActor* TeamCamera;
 
-	UPROPERTY()
-	UPrimitiveComponent* BoatMesh;
+	//UPROPERTY()
+	//UPrimitiveComponent* BoatMesh;
 };
