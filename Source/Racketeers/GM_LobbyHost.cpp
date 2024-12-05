@@ -63,19 +63,6 @@ void AGM_LobbyHost::SpawnPlayer(APlayerController* PC, ETeams Team)
 {
 	if (APC_Lobby* PlayerController = Cast<APC_Lobby>(PC))
 	{
-		// Handle the case where the player is already on the team
-		if (PlayerController->SpawnPoint != nullptr && Cast<APS_Lobby>(PlayerController->PlayerState)->LobbyInfo.Team ==
-			Team)
-		{
-			return;
-		}
-
-		// Remove the player from the previous spawn point
-		if (PlayerController->SpawnPoint != nullptr)
-		{
-			PlayerController->SpawnPoint->SetPlayerController(nullptr);
-		}
-
 		// Find the first available spawn point for the team
 		for (const auto SP : SpawnPositions)
 		{
@@ -104,6 +91,20 @@ void AGM_LobbyHost::SpawnPlayer(APlayerController* PC, ETeams Team)
 	}
 }
 
+void AGM_LobbyHost::RemovePlayer(APlayerController* PC)
+{
+	if(ALobbySpawnPoint* SpawnPoint = Cast<ALobbySpawnPoint>(Cast<APC_Lobby>(PC)->SpawnPoint))
+	{
+		SpawnPoint->Server_RemovePlayer();
+		Cast<APS_Lobby>(PC->PlayerState)->LobbyInfo.bIsReady = false;
+		
+		UpdatePlayers();
+		UpdateIfTeamFull();
+		UpdateIfEnoughPlayersToStart();
+	}
+}
+
+
 void AGM_LobbyHost::UpdatePlayers()
 {
 	// Iterate through all spawn points and update the player info
@@ -116,12 +117,6 @@ void AGM_LobbyHost::UpdatePlayers()
 		{
 			APS_Lobby* PS = Cast<APS_Lobby>(CurrentSP->PlayerController->PlayerState);
 			CurrentSP->Multicast_UpdateWidgetInfo(PS->LobbyInfo, PS);
-		}
-
-		// Remove the player info for all unoccupied spawn points
-		if (CurrentSP && !Players.Contains(CurrentSP->PlayerController))
-		{
-			CurrentSP->Server_RemovePlayer();
 		}
 	}
 

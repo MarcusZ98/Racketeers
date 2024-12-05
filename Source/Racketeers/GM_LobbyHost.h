@@ -49,6 +49,9 @@ public:
 	void SpawnPlayer(APlayerController* PC, ETeams Team);
 
 	UFUNCTION(BlueprintCallable)
+	void RemovePlayer(APlayerController* PC);
+
+	UFUNCTION(BlueprintCallable)
 	void UpdatePlayers();
 
 	UFUNCTION()

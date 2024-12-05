@@ -22,4 +22,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "LobbyInfo")
 	void UpdateLobbyInfo(const FLobbyInfo& NewLobbyInfo, APlayerState* PS);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "LobbyInfo")
+	void SetReadyStatus(bool bIsReady);
 };
