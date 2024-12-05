@@ -24,8 +24,8 @@ void ALevelLoadingManager::BeginPlay()
 {
 	Super::BeginPlay();
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "ALevelLoadingManager::BeginPlay");
-	CurrentLevelPath = "Phase1Parent";
-	CurrentSubLevelPath = "Phase1_GamePlay";
+	NextLevelPath = "Phase1Parent";
+	NextSubLevelPath = "Phase1_GamePlay";
 	LoadLevel();
 
 	/*
@@ -44,6 +44,7 @@ void ALevelLoadingManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,FString::FromInt(GetWorld()->IsStreamingLevelBeingConsidered(CurrentLoadedLevel)));
+
 }
 
 
@@ -72,6 +73,7 @@ void ALevelLoadingManager::LoadSubLevel()
 	bLevelIsLoading = true;
 	OnLoadLevel.Broadcast();
 	CurrentLoadedLevel = ULevelStreamingDynamic::LoadLevelInstance(GetWorld(), CurrentSubLevelPath, FVector::ZeroVector,FRotator::ZeroRotator,bLevelLoadSuccessfull);
+
 	if(bLevelLoadSuccessfull)
 	{
 		OnLoadingLevelCompleted.Broadcast();

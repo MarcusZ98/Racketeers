@@ -255,8 +255,9 @@ void ARacketeersGMBase::Transition()
 {
 
 
-	//LoadLevel();
-	
+	LoadLevel();
+
+	/*
 	OnUnloadingMap.Broadcast();
 	
 	FLatentActionInfo ActionInfo;
@@ -268,7 +269,7 @@ void ARacketeersGMBase::Transition()
 	//if(GEngine)
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Unload Level");
 	UnloadLevel((TEXT("%s"), *CurrentPhase->LevelToLoad), ActionInfo);
-	
+	*/
 }
 
 void ARacketeersGMBase::BroadcastOnPlayerPressed(ETeams Team)
@@ -468,13 +469,13 @@ void ARacketeersGMBase::LoadLevel()
 	}
 
 	bool bStreamingSucceded = false;
-	//LevelLoadingManager->MulticastLoadLevel(Phases[GetNextPhaseNumber()]);
-	//LevelLoadingManager->OnLoadingLevelCompleted.AddDynamic(this, &ARacketeersGMBase::RespawnPlayers);
+	LevelLoadingManager->MulticastLoadLevel(Phases[GetNextPhaseNumber()]);
+	LevelLoadingManager->OnLoadingLevelCompleted.AddDynamic(this, &ARacketeersGMBase::RespawnPlayers);
 
 	
 	//ULevelStreamingDynamic::LoadLevelInstance(GetWorld(), *Phases[GetNextPhaseNumber()]->LevelToLoad, FVector::ZeroVector,FRotator::ZeroRotator,bStreamingSucceded);
 	//RespawnPlayers();
-	UGameplayStatics::LoadStreamLevel(GetWorld(), *Phases[GetNextPhaseNumber()]->LevelToLoad, true,false, LoadActionInfo);
+	//UGameplayStatics::LoadStreamLevel(GetWorld(), *Phases[GetNextPhaseNumber()]->LevelToLoad, true,false, LoadActionInfo);
 }
 
 void ARacketeersGMBase::RespawnPlayers()
