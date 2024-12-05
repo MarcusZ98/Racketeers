@@ -4,6 +4,7 @@
 #include "RacketeersGMBase.h"
 
 #include "BaseGameInstance.h"
+#include "EngineUtils.h"
 #include "HeadMountedDisplayTypes.h"
 #include "PS_Base.h"
 #include "RacketeersController.h"
@@ -12,6 +13,7 @@
 #include "WidgetSubsystem.h"
 #include "Engine/LevelStreamingDynamic.h"
 #include "GameFramework/GameStateBase.h"
+#include "GameFramework/PlayerStart.h"
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -319,10 +321,15 @@ void ARacketeersGMBase::AllStagesFinished()
 
 	TransitionComponent->RemoveWidgetsFromPlayers();
 	TransitionComponent->CountPlayersReady = 0;
+
+	RespawnPlayers();
+	
 	if(C->HasAuthority())
 	{
 		C->ServerMultiCastActivateTimer();
 	}
+
+	
 }
 
 int ARacketeersGMBase::GetNextPhaseNumber()
@@ -469,8 +476,19 @@ void ARacketeersGMBase::LoadLevel()
 	}
 
 	bool bStreamingSucceded = false;
-	LevelLoadingManager->MulticastLoadLevel(Phases[GetNextPhaseNumber()]);
+
+	LevelLoadingManager->UnloadLevel();
+	
 	LevelLoadingManager->OnLoadingLevelCompleted.AddDynamic(this, &ARacketeersGMBase::RespawnPlayers);
+	LevelLoadingManager->NextSubLevelPath = Phases[GetNextPhaseNumber()]->LevelToLoad;
+	LevelLoadingManager->LoadLevel();
+	for (TObjectPtr<APlayerState> PlayerState : GameState->PlayerArray) 
+	{
+		ARacketeersController* PC = Cast<ARacketeersController>(PlayerState->GetPlayerController());
+		PC->ClientUnLoadLevel(CurrentPhase->LevelToLoad);
+		PC->ClientLoadLevel(LevelLoadingManager->CurrentSubLevelPath);
+	}
+
 
 	
 	//ULevelStreamingDynamic::LoadLevelInstance(GetWorld(), *Phases[GetNextPhaseNumber()]->LevelToLoad, FVector::ZeroVector,FRotator::ZeroRotator,bStreamingSucceded);
@@ -480,6 +498,10 @@ void ARacketeersGMBase::LoadLevel()
 
 void ARacketeersGMBase::RespawnPlayers()
 {
+	UWorld* World = GetWorld();
+
+	// If incoming start is specified, then just use it
+	
 	
 	for (int i = 0; i < this->GetGameState<AGameState>()->PlayerArray.Num(); ++i)
 	{

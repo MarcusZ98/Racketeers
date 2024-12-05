@@ -163,6 +163,40 @@ void ARacketeersController::GetLifetimeReplicatedProps(TArray<class FLifetimePro
 	
 }
 
+void ARacketeersController::ClientUnLoadLevel_Implementation(const FString& LevelPath)
+{
+	for (ULevelStreaming* StreamingLevel : GetWorld()->GetStreamingLevels())
+	{
+		if(StreamingLevel->GetName() == LevelPath)
+		{
+			StreamingLevel->SetShouldBeVisible(false);
+			StreamingLevel->SetShouldBeLoaded(false);
+			StreamingLevel->SetIsRequestingUnloadAndRemoval(true);
+			return;
+		}
+	}
+}
+
+bool ARacketeersController::ClientUnLoadLevel_Validate(const FString& LevelPath)
+{
+	return true;
+}
+
+void ARacketeersController::ClientLoadLevel_Implementation(const FString& LevelPath)
+{
+	bool bLevelLoadSuccessfull;
+	ULevelStreamingDynamic::LoadLevelInstance(GetWorld(), LevelPath, FVector::ZeroVector,FRotator::ZeroRotator,bLevelLoadSuccessfull);
+	if(!bLevelLoadSuccessfull)
+	{
+		ClientLoadLevel(FString(LevelPath));
+	}
+}
+
+bool ARacketeersController::ClientLoadLevel_Validate(const FString& LevelPath)
+{
+	return true;
+}
+
 void ARacketeersController::ServerRespawnPlayer_Implementation(APlayerState* PSState)
 {
 	if(HasAuthority())

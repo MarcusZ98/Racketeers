@@ -155,6 +155,7 @@ void ARacketeersGameStateBase::UpdateHealth()
 
 bool ARacketeersGameStateBase::CheckTeamAlive(ETeams Team)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Red, FString::FromInt(GetTeamStats(Team).TeamAlive) );
 	if(GetTeamStats(Team).TeamAlive <= 0)
 	{
 		return false;
