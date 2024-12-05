@@ -253,7 +253,10 @@ void ARacketeersGMBase::SwitchState()
 
 void ARacketeersGMBase::Transition()
 {
-
+	if(CurrentPhase->State == EPhaseState::Phase_3)
+	{
+		return;
+	}
 
 	//LoadLevel();
 	
@@ -499,9 +502,13 @@ void ARacketeersGMBase::RespawnPlayers()
 		AActor* PlayerStart = FindPlayerStart(PS->GetPlayerController(),TeamName);
 
 
+		if(PS->GetPawn())
+		{
+			
 		UE_LOG(LogTemp, Warning, TEXT("Player Name: %s"), *TeamName);
 		PS->GetPawn()->SetActorLocation(PlayerStart->GetActorLocation());
-		PS->GetPawn()->SetActorRotation(PlayerStart->GetActorRotation());
+		//PS->GetPawn()->SetActorRotation(PlayerStart->GetActorRotation());
+		}
 	}
 	TransitionComponent->bIsFinished = true;
 	OnloadedMap.Broadcast();
