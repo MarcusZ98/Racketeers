@@ -7,6 +7,8 @@
 #include "RacketeersController.h"
 #include "Engine/LevelStreamingDynamic.h"
 #include "GameFramework/GameModeBase.h"
+#include "GameFramework/GameStateBase.h"
+#include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -53,8 +55,21 @@ void ALevelLoadingManager::Tick(float DeltaTime)
 }
 
 
+
+//Server Calls ever Player to Load a certain level
+//
+
 void ALevelLoadingManager::MulticastLoadLevel_Implementation(const UPhase* LevelPath)
 {
+	for (APlayerState* PS : UGameplayStatics::GetGameState(GetWorld())->PlayerArray)
+	{
+		ARacketeersController* PC = Cast<ARacketeersController>(PS->GetPlayerController());
+		NextSubLevelPath = LevelPath->LevelToLoad;
+		PC->ClientUnLoadLevel(CurrentSubLevelPath);
+		
+		//PC->ClientLoadLevel();
+	}
+	
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "LEVEL LOADING MULTICAST LOADING");
 	NextLevelPath = LevelPath->MainParentLevel;
 	NextSubLevelPath = LevelPath->LevelToLoad;

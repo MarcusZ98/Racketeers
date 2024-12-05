@@ -124,11 +124,8 @@ FTeamGameStats ARacketeersGameStateBase::GetTeamStats(ETeams Team)
 
 void ARacketeersGameStateBase::UpdateTeamAlive()
 {
-	int32 RaccoonStat = GetTeamStats(ETeams::Team_Raccoon).TeamAlive;
-	int32 PandaStat = GetTeamStats(ETeams::Team_Panda).TeamAlive;
-	
-	RaccoonStat = 0;
-	PandaStat = 0;
+	TeamStats.Pandas.TeamAlive = 0;
+	TeamStats.Raccoons.TeamAlive = 0;
 	
 	if(GetLocalRole() == ROLE_Authority)
 	{
