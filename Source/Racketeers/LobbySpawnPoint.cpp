@@ -62,7 +62,11 @@ void ALobbySpawnPoint::Multicast_SpawnVFX_Implementation()
 	// Spawn the VFX for player spawning
 	if (SpawnVFX)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), SpawnVFX, GetActorLocation(), GetActorRotation());
+		FVector SpawnLocation = GetActorLocation();
+		SpawnLocation.Z += 10.0f;
+		
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), SpawnVFX, SpawnLocation, GetActorRotation());
+		
 		LobbyInfoWidget->SetVisibility(true);
 	}
 }

@@ -38,9 +38,6 @@ public:
 	
 	UFUNCTION()
 	virtual void OnPostLogin(AController* NewPlayer) override;
-
-	//UFUNCTION()
-	//virtual void OnLogout(AController* Exiting);
 	
 	UFUNCTION()
 	void SetUpSpawnPositions();
@@ -56,7 +53,7 @@ public:
 
 	UFUNCTION()
 	void UpdateIfTeamFull();
-
+	
 	UFUNCTION()
 	void UpdateIfEnoughPlayersToStart() const;
 
