@@ -256,11 +256,13 @@ void ARacketeersGMBase::SwitchState()
 void ARacketeersGMBase::Transition()
 {
 
+	/*
 	if(CurrentPhase->State == EPhaseState::Phase_3)
 	{
 		return;
 	}
 
+	*/ 
 	//LoadLevel();
 
 	
@@ -275,7 +277,6 @@ void ARacketeersGMBase::Transition()
 	//if(GEngine)
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Unload Level");
 	UnloadLevel((TEXT("%s"), *CurrentPhase->LevelToLoad), ActionInfo);
-	
 }
 
 void ARacketeersGMBase::BroadcastOnPlayerPressed(ETeams Team)
@@ -531,7 +532,14 @@ void ARacketeersGMBase::RespawnPlayers()
 		PS->GetPawn()->SetActorLocation(PlayerStart->GetActorLocation());
 		PS->GetPawn()->SetActorRotation(PlayerStart->GetActorRotation());
 	}
+	
 	TransitionComponent->bIsFinished = true;
+	if(TransitionComponent->bIsFinished && TransitionComponent->CountPlayersReady == GameState->PlayerArray.Num())
+	{
+		TransitionComponent->CountPlayersReady = 0;
+		TransitionComponent->OnFinished.Broadcast();
+	}
+	
 	OnloadedMap.Broadcast();
 	if(GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Respawn Players");
@@ -559,4 +567,13 @@ void ARacketeersGMBase::RespawnPlayer(APlayerState* PState)
 	PS->GetPawn()->SetActorLocation(PlayerStart->GetActorLocation());
 	
 }
+
+/*
+ * CLass Sync
+ *  Send Info about what it should run when finished
+ *  
+ *	
+ *	
+ *	
+ */
 
