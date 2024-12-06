@@ -27,20 +27,6 @@ void AGM_LobbyHost::OnPostLogin(AController* NewPlayer)
 	}
 }
 
-/*void AGM_LobbyHost::OnLogout(AController* Exiting)
-{
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Player Left");
-	
-	if (APC_Lobby* LobbyPC = Cast<APC_Lobby>(Exiting))
-	{
-		Players.Remove(LobbyPC);
-		UpdatePlayers();
-	}
-	
-	UpdatePlayers();
-	UpdateIfTeamFull();
-}*/
-
 void AGM_LobbyHost::SetUpSpawnPositions()
 {
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ALobbySpawnPoint::StaticClass(), SpawnPositions);
@@ -81,13 +67,10 @@ void AGM_LobbyHost::SpawnPlayer(APlayerController* PC, ETeams Team)
 				PlayerController->SpawnPoint = CurrentSP;
 				CurrentSP->SetPlayerController(PlayerController);
 				CurrentSP->Server_SpawnPlayer();
-
-				UpdatePlayers();
 				break;
 			}
 		}
-
-		UpdateIfTeamFull();
+		UpdatePlayers();
 	}
 }
 
@@ -99,8 +82,6 @@ void AGM_LobbyHost::RemovePlayer(APlayerController* PC)
 		Cast<APS_Lobby>(PC->PlayerState)->LobbyInfo.bIsReady = false;
 		
 		UpdatePlayers();
-		UpdateIfTeamFull();
-		UpdateIfEnoughPlayersToStart();
 	}
 }
 
@@ -117,6 +98,7 @@ void AGM_LobbyHost::UpdatePlayers()
 		{
 			APS_Lobby* PS = Cast<APS_Lobby>(CurrentSP->PlayerController->PlayerState);
 			CurrentSP->Multicast_UpdateWidgetInfo(PS->LobbyInfo, PS);
+			CurrentSP->Multicast_ToggleReady(PS->LobbyInfo.bIsReady);
 		}
 	}
 
