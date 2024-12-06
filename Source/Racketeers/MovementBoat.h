@@ -43,16 +43,16 @@ public:
 
 	// Movement Properties
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float MovementSpeed = 600.0f;
+	float MovementSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float RotationSpeed = 5.0f;
+	float RotationSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float DecelerationRate = 50.0f;
+	float DecelerationRate;
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
-	float ScurryAmount = 14.0f;
+	float ScurryAmount;
 
 	// Wave Simulation Properties
 	UPROPERTY(EditAnywhere, Category = "Wave Simulation")

@@ -151,15 +151,9 @@ void UMovementBoat::MoveForward(float DeltaTime, bool bScurryActive)
     if (MovementInput.IsNearlyZero())
     {
         // Reset boat location.z to make z position consistent
-        // Get the current location
         FVector CurrentLocation = GetOwner()->GetActorLocation();
-
-        // Reset only the Z component
         CurrentLocation.Z = DefaultZLocation;
-
-        // Set the new location
         GetOwner()->SetActorLocation(CurrentLocation, true);
-        
         return; // No input, do nothing
     }
 
