@@ -13,11 +13,9 @@
 #include "InputActionValue.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 
 //DEFINE_LOG_CATEGORY(LogTemplateCharacter);
-
-//////////////////////////////////////////////////////////////////////////
-// ARacketeersCharacter
 
 ABoatCharacter::ABoatCharacter()
 {
@@ -36,12 +34,9 @@ ABoatCharacter::ABoatCharacter()
 
 	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
 	// instead of recompiling to adjust them
-	GetCharacterMovement()->JumpZVelocity = 700.f;
-	GetCharacterMovement()->AirControl = 0.35f;
 	GetCharacterMovement()->MaxWalkSpeed = 500.f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
-	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -53,24 +48,14 @@ ABoatCharacter::ABoatCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
-
-	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
-	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
-	
 }
 
 void ABoatCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+	//FindCannons();
 }
-
-
-
-
-
-//////////////////////////////////////////////////////////////////////////
-// Input
 
 void ABoatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -86,16 +71,18 @@ void ABoatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
-		
-		// Jumping
-		//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABoatCharacter::Move);
 
-		// // Looking
-		// EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ABoatCharacter::Look);
+		// Scurrying
+		EnhancedInputComponent->BindAction(ScurryAction, ETriggerEvent::Started, this, &ABoatCharacter::Scurry);
+
+		// Cannon
+		// EnhancedInputComponent->BindAction(ShootLeftAction, ETriggerEvent::Started, this, &ABoatCharacter::OnShootLeftStarted);
+		// EnhancedInputComponent->BindAction(ShootLeftAction, ETriggerEvent::Completed, this, &ABoatCharacter::OnShootLeftCompleted);
+		// EnhancedInputComponent->BindAction(ShootRightAction, ETriggerEvent::Started, this, &ABoatCharacter::OnShootRightStarted);
+		// EnhancedInputComponent->BindAction(ShootRightAction, ETriggerEvent::Completed, this, &ABoatCharacter::OnShootRightCompleted);
+		
 	}
 	else
 	{
@@ -105,16 +92,12 @@ void ABoatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void ABoatCharacter::Move(const FInputActionValue& Value)
 {
-	// input is a Vector2D
+	// Input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
-	if (bIsPushed)
-	{
-		return;
-	}
 	if (Controller != nullptr)
 	{
-		// find out which way is forward
+		// Find out which way is forward
 		APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(this, 0);
 
 		if(CameraManager == nullptr)
@@ -125,26 +108,169 @@ void ABoatCharacter::Move(const FInputActionValue& Value)
 		const FRotator Rotation = CameraManager->GetCameraRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-		//get forward vector from camera
+		// Get forward vector from camera
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		//get right vector from camera
+		// Get right vector from camera
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-		// add movement 
+		// Add movement 
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 		AddMovementInput(RightDirection, MovementVector.X);
 	}
 }
 
-/*void ABoatCharacter::Look(const FInputActionValue& Value)
+void ABoatCharacter::Scurry(const FInputActionValue& Value)
 {
-	// input is a Vector2D
-	FVector2D LookAxisVector = Value.Get<FVector2D>();
+	bool bIsScurrying = Value.Get<bool>();
+	ServerStartScurry(bIsScurrying);
+}
 
-	if (Controller != nullptr)
+void ABoatCharacter::ServerStartScurry_Implementation(bool bIsScurrying)
+{
+	if (bIsScurrying && !bScurryActive)
 	{
-		// add yaw and pitch input to controller
-		AddControllerYawInput(LookAxisVector.X);
-		AddControllerPitchInput(LookAxisVector.Y);
+		bScurryActive = true;
+		OriginalMaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
+		GetCharacterMovement()->MaxWalkSpeed *= ScurryAmount;
+
+		PlayScurryEffects();
+
+		GetWorldTimerManager().SetTimer(ScurryTimerHandle, this, &ABoatCharacter::ResetScurrySpeed, 0.5f, false);
 	}
+}
+
+void ABoatCharacter::ResetScurrySpeed()
+{
+	
+		// Reset the speed to the original value
+		GetCharacterMovement()->MaxWalkSpeed = OriginalMaxWalkSpeed;
+
+		// Clear the timer
+		GetWorldTimerManager().ClearTimer(ScurryTimerHandle);
+
+		// Reset the scurry state
+		bScurryActive = false;
+
+		// Stop effects in Blueprint
+		StopScurryEffects();
+}
+
+/*void ABoatCharacter::OnShootLeftStarted()
+{
+	
+}
+
+void ABoatCharacter::OnShootLeftCompleted()
+{
+	if (HasAuthority()) // Server directly updates the variable
+	{
+		bShootLeft = true;
+		ServerStartShooting();
+	}
+}
+
+void ABoatCharacter::OnShootRightStarted()
+{
+	
+}
+
+void ABoatCharacter::OnShootRightCompleted()
+{
+	if (HasAuthority())
+	{
+		bShootLeft = false;
+		ServerStartShooting();
+	}
+}
+
+void ABoatCharacter::StartShooting()
+ {
+ 	// Fire the first cannon immediately
+ 	//ServerStartShooting();
+ }
+
+void ABoatCharacter::ServerStartShooting_Implementation()
+{
+	CurrentCannonIndex = 0;
+
+	// Fire the first cannon immediately
+	ShootCannon();
+
+	// Start firing with delay
+	GetWorldTimerManager().SetTimer(FireTimerHandle, this, &ABoatCharacter::ShootCannon, FireDelay, true);
+}
+
+void ABoatCharacter::StopShooting()
+{
+	// Clear the timer to stop firing
+	GetWorldTimerManager().ClearTimer(FireTimerHandle);
+}
+
+void ABoatCharacter::ShootCannon()
+{
+	if(bShootLeft) { CannonComponents = CannonLeftComponents; }
+	else { CannonComponents = CannonRightComponents; }
+	
+		if (CannonComponents.IsValidIndex(CurrentCannonIndex) && ProjectileClass)
+		{
+			USceneComponent* SelectedCannon = CannonComponents[CurrentCannonIndex];
+
+			if (SelectedCannon)
+			{
+				// Spawn projectile at the cannon's location
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.Owner = this;
+				SpawnParams.Instigator = GetInstigator();
+
+				GetWorld()->SpawnActor<AActor>(
+					ProjectileClass,
+					SelectedCannon->GetComponentLocation(),
+					SelectedCannon->GetComponentRotation(),
+					SpawnParams
+				);
+
+				PlayCannonEffects(SelectedCannon);
+			}
+		}
+	
+	// Increment cannon index for the next shot
+	CurrentCannonIndex++;
+
+	// Stop shooting if all cannons have been fired
+	if (CurrentCannonIndex >= CannonComponents.Num())
+	{
+		StopShooting();
+	}
+}
+
+void ABoatCharacter::FindCannons()
+{
+	// Clear the array to ensure no duplicates
+	CannonLeftComponents.Empty();
+	CannonRightComponents.Empty();
+
+	// Find all components with the "Cannon" tag
+	TArray<USceneComponent*> FoundComponents;
+	GetComponents<USceneComponent>(FoundComponents);
+
+	for (USceneComponent* Component : FoundComponents)
+	{
+		if (Component->ComponentHasTag(FName("CannonLeft")) && CannonLeftComponents.Num() <= CannonCount)
+		{
+			CannonLeftComponents.Add(Component);
+		}
+
+		else if(Component->ComponentHasTag(FName("CannonRight")) && CannonRightComponents.Num() <= CannonCount)
+		{
+			CannonRightComponents.Add(Component);
+		}
+	}
+}
+
+void ABoatCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ABoatCharacter, bShootLeft);
 }*/
+
+	
