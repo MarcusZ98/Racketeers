@@ -22,16 +22,21 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
 	ALobbySpawnPoint* SpawnPoint;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	UUserWidget* LobbyWidgetREF;
+
 private:
 	
-	UPROPERTY(EditAnywhere, Category = "UI")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UUserWidget> TeamSelectionWidgetClass;
 
-	UPROPERTY(EditAnywhere, Category = "UI")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UUserWidget> LobbyWidgetClass;
 
-	UPROPERTY(EditAnywhere, Category = "UI")
-	UUserWidget* LobbyWidgetREF;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UUserWidget> CosmeticWidgetClass;
+
+
 
 	
 	// ----------------------------Functions--------------------------------------------
@@ -44,6 +49,7 @@ public:
 	UFUNCTION(Client, Reliable, BlueprintCallable)
 	void Client_ShowTeamSelectionWidget();
 
+	// Show the lobby widget
 	UFUNCTION(Client, Reliable, BlueprintCallable)
 	void Client_ShowLobbyWidget();
 

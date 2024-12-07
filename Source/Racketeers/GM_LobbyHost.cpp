@@ -19,7 +19,6 @@ void AGM_LobbyHost::OnPostLogin(AController* NewPlayer)
 {
 	if (APC_Lobby* LobbyPC = Cast<APC_Lobby>(NewPlayer))
 	{
-		// Call the client RPC on the specific PlayerController
 		LobbyPC->Client_ShowTeamSelectionWidget();
 		
 		Players.Add(LobbyPC);

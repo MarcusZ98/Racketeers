@@ -43,7 +43,13 @@ void APC_Lobby::Client_ShowLobbyWidget_Implementation()
 
 void APC_Lobby::Client_ShowCosmeticWidget_Implementation()
 {
-  // Create the cosmetic selection widget
+	if(CosmeticWidgetClass)
+	{
+		if(UUserWidget* CosmeticWidget = CreateWidget<UUserWidget>(this, CosmeticWidgetClass))
+		{
+			CosmeticWidget->AddToViewport();
+		}
+	}
 }
 
 void APC_Lobby::Server_SpawnPlayer_Implementation(APlayerController* PC, ETeams Team)
