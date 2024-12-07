@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "NiagaraComponentPool.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "BoatCharacter.generated.h"
@@ -57,9 +58,9 @@ protected:
 	//UFUNCTION(Server, Reliable)
 	//void ServerStopScurry();
 	
-	// // Shooting
-	// UFUNCTION(Server, Reliable)
-	// void ServerStartShooting();
+	// Shooting
+	UFUNCTION(Server, Reliable)
+	void ServerStartShooting(bool bLeft);
 
 	//UFUNCTION(Server, Reliable)
 	//void ServerStopShooting();
@@ -75,7 +76,7 @@ protected:
 	// To add mapping context
 	virtual void BeginPlay();
 
-	/*// Cannon components (assigned in Blueprint)
+	// Cannon components (assigned in Blueprint)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cannons")
 	TArray<USceneComponent*> CannonLeftComponents;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cannons")
@@ -96,25 +97,23 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cannons")
 	int32 CannonCount = 0; // Default value
-	int32 CurrentCannonIndex = 0;*/
+	int32 CurrentCannonIndex = 0;
+	bool bShootLeft;
 
 private:
 	float OriginalMaxWalkSpeed; // To store the original speed
 	FTimerHandle ScurryTimerHandle; // Timer handle for scurry
 
-	// void ShootCannon();
-	// void OnShootLeftStarted();
-	// void OnShootLeftCompleted();
-	// void OnShootRightStarted();
-	// void OnShootRightCompleted();
-	// void FindCannons();
+	void ShootCannon();
+	void OnShootLeftStarted();
+	void OnShootLeftCompleted();
+	void OnShootRightStarted();
+	void OnShootRightCompleted();
+	void FindCannons();
 
 public:
-	// UFUNCTION(BlueprintCallable, Category = "Shooting")
-	// void StartShooting();
-	//
-	// UFUNCTION(BlueprintCallable, Category = "Shooting")
-	// void StopShooting();
+	UFUNCTION(BlueprintCallable, Category = "Shooting")
+	void StopShooting();
 	
 	UFUNCTION(BlueprintImplementableEvent, Category = "Scurry Effects")
 	void PlayScurryEffects();
@@ -122,8 +121,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Scurry Effects")
 	void StopScurryEffects();
 
-	// UFUNCTION(BlueprintImplementableEvent, Category = "Scurry Effects")
-	// void PlayCannonEffects(USceneComponent* Cannon);
+	UFUNCTION(BlueprintImplementableEvent, Category = "Scurry Effects")
+	void PlayCannonEffects(USceneComponent* Cannon, UNiagaraComponent* NiagaraComponent);
 	
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -133,9 +132,6 @@ public:
 	// Scurry Amount
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float ScurryAmount;
-
-	// UPROPERTY(Replicated)
-	// bool bShootLeft;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Movement")
 	bool bScurryActive = false; // Tracks whether scurry is currently active

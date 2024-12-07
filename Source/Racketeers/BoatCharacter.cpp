@@ -54,7 +54,7 @@ void ABoatCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
-	//FindCannons();
+	FindCannons();
 }
 
 void ABoatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -78,10 +78,10 @@ void ABoatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(ScurryAction, ETriggerEvent::Started, this, &ABoatCharacter::Scurry);
 
 		// Cannon
-		// EnhancedInputComponent->BindAction(ShootLeftAction, ETriggerEvent::Started, this, &ABoatCharacter::OnShootLeftStarted);
-		// EnhancedInputComponent->BindAction(ShootLeftAction, ETriggerEvent::Completed, this, &ABoatCharacter::OnShootLeftCompleted);
-		// EnhancedInputComponent->BindAction(ShootRightAction, ETriggerEvent::Started, this, &ABoatCharacter::OnShootRightStarted);
-		// EnhancedInputComponent->BindAction(ShootRightAction, ETriggerEvent::Completed, this, &ABoatCharacter::OnShootRightCompleted);
+		EnhancedInputComponent->BindAction(ShootLeftAction, ETriggerEvent::Started, this, &ABoatCharacter::OnShootLeftStarted);
+		EnhancedInputComponent->BindAction(ShootLeftAction, ETriggerEvent::Completed, this, &ABoatCharacter::OnShootLeftCompleted);
+		EnhancedInputComponent->BindAction(ShootRightAction, ETriggerEvent::Started, this, &ABoatCharacter::OnShootRightStarted);
+		EnhancedInputComponent->BindAction(ShootRightAction, ETriggerEvent::Completed, this, &ABoatCharacter::OnShootRightCompleted);
 		
 	}
 	else
@@ -89,6 +89,12 @@ void ABoatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
 }
+
+
+
+
+
+///// INPUTS /////
 
 void ABoatCharacter::Move(const FInputActionValue& Value)
 {
@@ -118,6 +124,13 @@ void ABoatCharacter::Move(const FInputActionValue& Value)
 		AddMovementInput(RightDirection, MovementVector.X);
 	}
 }
+
+
+
+
+
+
+///// SCURRY /////
 
 void ABoatCharacter::Scurry(const FInputActionValue& Value)
 {
@@ -155,18 +168,22 @@ void ABoatCharacter::ResetScurrySpeed()
 		StopScurryEffects();
 }
 
-/*void ABoatCharacter::OnShootLeftStarted()
+
+
+
+
+
+///// SHOOT /////
+
+void ABoatCharacter::OnShootLeftStarted()
 {
 	
 }
 
 void ABoatCharacter::OnShootLeftCompleted()
 {
-	if (HasAuthority()) // Server directly updates the variable
-	{
-		bShootLeft = true;
-		ServerStartShooting();
-	}
+	bShootLeft = true;
+	ServerStartShooting(true);
 }
 
 void ABoatCharacter::OnShootRightStarted()
@@ -176,21 +193,13 @@ void ABoatCharacter::OnShootRightStarted()
 
 void ABoatCharacter::OnShootRightCompleted()
 {
-	if (HasAuthority())
-	{
-		bShootLeft = false;
-		ServerStartShooting();
-	}
+	bShootLeft = false;
+	ServerStartShooting(false);
 }
 
-void ABoatCharacter::StartShooting()
- {
- 	// Fire the first cannon immediately
- 	//ServerStartShooting();
- }
-
-void ABoatCharacter::ServerStartShooting_Implementation()
+void ABoatCharacter::ServerStartShooting_Implementation(bool bLeft)
 {
+	bShootLeft = bLeft;
 	CurrentCannonIndex = 0;
 
 	// Fire the first cannon immediately
@@ -208,31 +217,53 @@ void ABoatCharacter::StopShooting()
 
 void ABoatCharacter::ShootCannon()
 {
-	if(bShootLeft) { CannonComponents = CannonLeftComponents; }
-	else { CannonComponents = CannonRightComponents; }
-	
-		if (CannonComponents.IsValidIndex(CurrentCannonIndex) && ProjectileClass)
+	if (bShootLeft)
+	{
+		CannonComponents = CannonLeftComponents;
+	}
+	else
+	{
+		CannonComponents = CannonRightComponents;
+	}
+
+	if (CannonComponents.IsValidIndex(CurrentCannonIndex) && ProjectileClass)
+	{
+		USceneComponent* SelectedCannon = CannonComponents[CurrentCannonIndex];
+
+		if (SelectedCannon)
 		{
-			USceneComponent* SelectedCannon = CannonComponents[CurrentCannonIndex];
+			// Initialize variables for projectile spawn location and rotation
+			FVector SpawnLocation = SelectedCannon->GetComponentLocation();
+			FRotator SpawnRotation = SelectedCannon->GetComponentRotation();
 
-			if (SelectedCannon)
+			// Check child components for a specific tag (e.g., "Projectile")
+			for (int32 ChildIndex = 0; ChildIndex < SelectedCannon->GetNumChildrenComponents(); ++ChildIndex)
 			{
-				// Spawn projectile at the cannon's location
-				FActorSpawnParameters SpawnParams;
-				SpawnParams.Owner = this;
-				SpawnParams.Instigator = GetInstigator();
-
-				GetWorld()->SpawnActor<AActor>(
-					ProjectileClass,
-					SelectedCannon->GetComponentLocation(),
-					SelectedCannon->GetComponentRotation(),
-					SpawnParams
-				);
-
-				PlayCannonEffects(SelectedCannon);
+				USceneComponent* ChildComponent = Cast<USceneComponent>(SelectedCannon->GetChildComponent(ChildIndex));
+				if (ChildComponent && ChildComponent->ComponentHasTag(FName("ProjectilePos")))
+				{
+					SpawnLocation = ChildComponent->GetComponentLocation();
+					SpawnRotation = ChildComponent->GetComponentRotation();
+					break; // Found the projectile component, no need to check further
+				} 
 			}
+
+			// Spawn the projectile at the determined location and rotation
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			SpawnParams.Instigator = GetInstigator();
+
+			GetWorld()->SpawnActor<AActor>(
+				ProjectileClass,
+				SpawnLocation,
+				SpawnRotation,
+				SpawnParams
+			);
+
+			//PlayCannonEffects(SelectedCannon, SelectedEffect);
 		}
-	
+	}
+
 	// Increment cannon index for the next shot
 	CurrentCannonIndex++;
 
@@ -266,11 +297,5 @@ void ABoatCharacter::FindCannons()
 		}
 	}
 }
-
-void ABoatCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(ABoatCharacter, bShootLeft);
-}*/
 
 	
