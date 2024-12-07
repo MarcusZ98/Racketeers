@@ -16,24 +16,29 @@ class RACKETEERS_API APC_Lobby : public APlayerController
 {
 	GENERATED_BODY()
 
+	// ----------------------------Variables--------------------------------------------
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	TSubclassOf<UUserWidget> TeamSelectionWidgetClass;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	TSubclassOf<UUserWidget> LobbyWidgetClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	UUserWidget* LobbyWidgetREF;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lobby")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
 	ALobbySpawnPoint* SpawnPoint;
 
+private:
+	
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> TeamSelectionWidgetClass;
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> LobbyWidgetClass;
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	UUserWidget* LobbyWidgetREF;
+
+	
+	// ----------------------------Functions--------------------------------------------
+public:
+	
 	UFUNCTION()
 	virtual void BeginPlay() override;
-
-	// ----------------------------Widget Functions--------------------------------------------
 	
 	// Show the team selection widget
 	UFUNCTION(Client, Reliable, BlueprintCallable)
@@ -45,13 +50,12 @@ public:
 	// Show the cosmetic widget
 	UFUNCTION(Client, Reliable, BlueprintCallable)
 	void Client_ShowCosmeticWidget();
-
-	// --------------------------------------------------------------------------------------------
-
+	
 	// Spawn the player on server
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void Server_SpawnPlayer(APlayerController* PC, ETeams Team);
 
+	// Remove the player on the server
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void Server_RemovePlayer();
 
@@ -59,9 +63,11 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void Server_ToggleReady();
 
+	// Start the match
 	UFUNCTION(Client, Reliable)
 	void Client_OnStartMatch();
 
+	// Pass the start match event to the blueprint
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void OnStartMatch();
 };
