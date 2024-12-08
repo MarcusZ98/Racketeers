@@ -84,14 +84,20 @@ protected:
 	FRotator SpawnRotation;
 
 	/* ---- VARIABLES ----*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 CannonCount = 0;
 	UPROPERTY(EditAnywhere, Category="Cannons")
 	float FireDelay = 0.5f;
 	UPROPERTY(EditAnywhere, Category="Cannons")
 	float ShootCooldown = 1;
 	UPROPERTY(BlueprintReadWrite, Category = "Interaction")
 	bool bIsInteracting;
+
+	// Construction
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 CannonCount = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boat Properties")
+	float Health;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boat Properties")
+	UMaterialInterface* SailMaterial;
 
 	
 private:
@@ -122,6 +128,22 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void FindCannons();
 
+	/* ---- SETTERS ----*/
+	/*UFUNCTION(BlueprintCallable, Category = "Boat Properties")
+	void SetHealth(float NewHealth);
+
+	UFUNCTION(BlueprintCallable, Category = "Boat Properties")
+	void SetCannonAmount(float NewCannonAmount);
+
+	UFUNCTION(BlueprintCallable, Category = "Boat Properties")
+	void SetMovementSpeed(float NewMovementSpeed);
+
+	UFUNCTION(BlueprintCallable, Category = "Boat Properties")
+	void SetRotationSpeed(float NewRotationSpeed);
+
+	UFUNCTION(BlueprintCallable, Category = "Boat Properties")
+	void SetHullAndSailMaterial(UMaterialInterface* NewHullMaterial, UMaterialInterface* NewSailMaterial);
+*/
 	/* ---- SOUNDS & PARTICLES ----*/
 	UFUNCTION(BlueprintImplementableEvent, Category = "Scurry Effects")
 	void PlayScurryEffects();

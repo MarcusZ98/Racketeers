@@ -359,4 +359,53 @@ void ABoatCharacter::AddCannonsInOrder(float Count, USceneComponent* Cannon)
 }
 
 
+
+/* ---- SETTERS ---- */
+/*void ABoatCharacter::SetHealth(float NewHealth)
+{
+	//Health =  // Assuming a max health value of 1000
+}
+
+// Set Cannon Amount
+void ABoatCharacter::SetCannonAmount(float NewCannonAmount)
+{
+	CannonCount = NewCannonAmount;
+}
+
+// Set Movement Speed
+void ABoatCharacter::SetMovementSpeed(float NewMovementSpeed)
+{
+	GetCharacterMovement()->MaxWalkSpeed = NewMovementSpeed;
+}
+
+// Set Rotation Speed
+void ABoatCharacter::SetRotationSpeed(float NewRotationSpeed)
+{
+	//RotationSpeed = NewRotationSpeed;
+}
+
+// Set Sail Material
+void ABoatCharacter::SetHullAndSailMaterial(UMaterialInterface* NewHullMaterial, UMaterialInterface* NewSailMaterial)
+{
+	if (!NewSailMaterial || !NewHullMaterial) return;
+
+	// Get all StaticMeshComponents in this actor
+	TArray<UStaticMeshComponent*> MeshComponents;
+	GetComponents<UStaticMeshComponent>(MeshComponents);
+
+	for (UStaticMeshComponent* MeshComponent : MeshComponents)
+	{
+		// Check if the mesh has a specific tag or name that identifies it as a sail
+		if (MeshComponent->ComponentHasTag(FName("HullAndSail")))
+		{
+			MeshComponent->SetMaterial(0, NewHullMaterial);
+			MeshComponent->SetMaterial(1,  SailMaterial);
+		} 
+	}
+}
+*/
+
+
+
+
 	
