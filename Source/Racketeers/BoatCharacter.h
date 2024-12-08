@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "NiagaraComponentPool.h"
+#include "Projectile.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "BoatCharacter.generated.h"
@@ -19,123 +20,119 @@ class ABoatCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-	/** Camera boom positioning the camera behind the character */
+	/* ---- CAMERA BOOM POSITION ---- */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
 
-	/** Follow camera */
+	/* ---- FOLLOW CAMERA ---- */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
 	
-	/** MappingContext */
+	/* ---- MAPPING CONTEXT ---- */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
 
-	/** Move Input Action */
+	/* ---- INPUT ACTIONS ---- */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* ScurryAction;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* ShootLeftAction;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* ShootRightAction;
 
-	
 
 public:
 	ABoatCharacter();
 	
 
 protected:
-	// Scurry
-	UFUNCTION(Server, Reliable)
-	void ServerStartScurry(bool bIsScurrying);
-
-	//UFUNCTION(Server, Reliable)
-	//void ServerStopScurry();
-	
-	// Shooting
-	UFUNCTION(Server, Reliable)
-	void ServerStartShooting(bool bLeft);
-
-	//UFUNCTION(Server, Reliable)
-	//void ServerStopShooting();
-
-	/** Called for movement input */
+	/* ---- FUNCTIONS ---- */
+	virtual void BeginPlay();
+	virtual void Tick(float DeltaTime) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	void Move(const FInputActionValue& Value);
 	void Scurry(const FInputActionValue& Value);
-	void ResetScurrySpeed();
-	
-	// APawn interface
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
-	// To add mapping context
-	virtual void BeginPlay();
 
-	// Cannon components (assigned in Blueprint)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cannons")
+	/* ---- RPCs ---- */
+	UFUNCTION(Server, Reliable)
+	void ServerStartScurry(bool bIsScurrying);
+	UFUNCTION(Server, Reliable)
+	void ServerStartShooting(bool bLeft);
+	UFUNCTION(Server, Reliable)
+	void ServerHoldShoot();
+
+	/* ---- ACTORS & COMPONENTS ---- */
+	UPROPERTY(EditAnywhere, Category="Projectile")
+	TSubclassOf<AProjectile> ProjectileClass;
+	UPROPERTY()
 	TArray<USceneComponent*> CannonLeftComponents;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cannons")
+	UPROPERTY()
 	TArray<USceneComponent*> CannonRightComponents;
 	UPROPERTY()
 	TArray<USceneComponent*> CannonComponents;
 
-	// Projectile class
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
-	TSubclassOf<AActor> ProjectileClass;
-
-	// Timer for sequential shots
+	/* ---- TIMERS ---- */
 	FTimerHandle FireTimerHandle;
+	FTimerHandle CooldownTimerHandle;
 
-	// Cannon shoot delay
-	UPROPERTY(EditDefaultsOnly, Category = "Cannons")
+	/* ---- VARIABLES ----*/
+	UPROPERTY(BlueprintReadWrite)
+	int32 CannonCount = 0;
+	UPROPERTY(EditAnywhere, Category="Cannons")
 	float FireDelay = 0.5f;
+	UPROPERTY(EditAnywhere, Category="Cannons")
+	float ShootCooldown = 1;
+	UPROPERTY(BlueprintReadWrite, Category = "Interaction")
+	bool bIsInteracting;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cannons")
-	int32 CannonCount = 0; // Default value
-	int32 CurrentCannonIndex = 0;
-	bool bShootLeft;
-
+	
 private:
-	float OriginalMaxWalkSpeed; // To store the original speed
-	FTimerHandle ScurryTimerHandle; // Timer handle for scurry
-
+	/* ---- FUNCTIONS ----*/
 	void ShootCannon();
+	void ResetShootCooldown();
 	void OnShootLeftStarted();
 	void OnShootLeftCompleted();
 	void OnShootRightStarted();
 	void OnShootRightCompleted();
 	void FindCannons();
+	void ResetScurrySpeed();
 
+	/* ---- VARIABLES ----*/
+	float OriginalMaxWalkSpeed; // To store the original speed
+	FTimerHandle ScurryTimerHandle; // Timer handle for scurry
+	int32 CurrentCannonIndex = 0;
+	bool bCanShoot = true;
+	bool bShootLeft;
+	bool bIsHoldingShoot = false;
+	float ShootTime;
+
+	
 public:
+	/* ---- FUNCTIONS ----*/
 	UFUNCTION(BlueprintCallable, Category = "Shooting")
 	void StopShooting();
-	
+
+	/* ---- SOUNDS & PARTICLES ----*/
 	UFUNCTION(BlueprintImplementableEvent, Category = "Scurry Effects")
 	void PlayScurryEffects();
-
 	UFUNCTION(BlueprintImplementableEvent, Category = "Scurry Effects")
 	void StopScurryEffects();
-
 	UFUNCTION(BlueprintImplementableEvent, Category = "Scurry Effects")
 	void PlayCannonEffects(USceneComponent* Cannon, UNiagaraComponent* NiagaraComponent);
-	
-	/** Returns CameraBoom subobject **/
+
+	/* ---- COMPONENTS ----*/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
-	// Scurry Amount
+	/* ---- VARIABLES ----*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float ScurryAmount;
-
 	UPROPERTY(BlueprintReadOnly, Category = "Movement")
-	bool bScurryActive = false; // Tracks whether scurry is currently active
+	bool bScurryActive = false;
 
+	/* ---- COMPONENTS ---- */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision", meta = (AllowPrivateAccess = "true"))
 	class UBoxComponent* CustomCollisionBox;
 };

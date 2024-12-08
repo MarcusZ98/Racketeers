@@ -1,8 +1,10 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "BoatCharacter.h"
+#include "BoatCharacter.h"
 #include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
+#include "NiagaraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -11,11 +13,10 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Projectile.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
-
-//DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 ABoatCharacter::ABoatCharacter()
 {
@@ -27,6 +28,7 @@ ABoatCharacter::ABoatCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
+	bIsHoldingShoot = false;
 
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
@@ -56,6 +58,12 @@ void ABoatCharacter::BeginPlay()
 	Super::BeginPlay();
 	FindCannons();
 }
+
+void ABoatCharacter::Tick(float DeltaTime)
+{
+	ShootTime += DeltaTime;
+}
+
 
 void ABoatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -154,18 +162,17 @@ void ABoatCharacter::ServerStartScurry_Implementation(bool bIsScurrying)
 
 void ABoatCharacter::ResetScurrySpeed()
 {
-	
-		// Reset the speed to the original value
-		GetCharacterMovement()->MaxWalkSpeed = OriginalMaxWalkSpeed;
+	// Reset the speed to the original value
+	GetCharacterMovement()->MaxWalkSpeed = OriginalMaxWalkSpeed;
 
-		// Clear the timer
-		GetWorldTimerManager().ClearTimer(ScurryTimerHandle);
+	// Clear the timer
+	GetWorldTimerManager().ClearTimer(ScurryTimerHandle);
 
-		// Reset the scurry state
-		bScurryActive = false;
+	// Reset the scurry state
+	bScurryActive = false;
 
-		// Stop effects in Blueprint
-		StopScurryEffects();
+	// Stop effects in Blueprint
+	StopScurryEffects();
 }
 
 
@@ -177,29 +184,36 @@ void ABoatCharacter::ResetScurrySpeed()
 
 void ABoatCharacter::OnShootLeftStarted()
 {
-	
+	ServerHoldShoot();
 }
 
 void ABoatCharacter::OnShootLeftCompleted()
 {
-	bShootLeft = true;
 	ServerStartShooting(true);
 }
 
 void ABoatCharacter::OnShootRightStarted()
 {
-	
+	ServerHoldShoot();
 }
 
 void ABoatCharacter::OnShootRightCompleted()
 {
-	bShootLeft = false;
 	ServerStartShooting(false);
+}
+
+void ABoatCharacter::ServerHoldShoot_Implementation()
+{
+	bIsHoldingShoot = true;
+	ShootTime = 1;
 }
 
 void ABoatCharacter::ServerStartShooting_Implementation(bool bLeft)
 {
+	if(!bCanShoot || bIsInteracting) return;
+	
 	bShootLeft = bLeft;
+	bIsHoldingShoot = false;
 	CurrentCannonIndex = 0;
 
 	// Fire the first cannon immediately
@@ -207,7 +221,18 @@ void ABoatCharacter::ServerStartShooting_Implementation(bool bLeft)
 
 	// Start firing with delay
 	GetWorldTimerManager().SetTimer(FireTimerHandle, this, &ABoatCharacter::ShootCannon, FireDelay, true);
+
+	// Disable further shooting and start the cooldown timer
+	bCanShoot = false;
+	GetWorld()->GetTimerManager().SetTimer(
+		CooldownTimerHandle, this, &ABoatCharacter::ResetShootCooldown, ShootCooldown, false);
 }
+
+void ABoatCharacter::ResetShootCooldown()
+{
+	bCanShoot = true;
+}
+
 
 void ABoatCharacter::StopShooting()
 {
@@ -217,52 +242,57 @@ void ABoatCharacter::StopShooting()
 
 void ABoatCharacter::ShootCannon()
 {
-	if (bShootLeft)
-	{
-		CannonComponents = CannonLeftComponents;
-	}
-	else
-	{
-		CannonComponents = CannonRightComponents;
-	}
+	CannonComponents = bShootLeft ? CannonLeftComponents : CannonRightComponents;
 
-	if (CannonComponents.IsValidIndex(CurrentCannonIndex) && ProjectileClass)
-	{
-		USceneComponent* SelectedCannon = CannonComponents[CurrentCannonIndex];
+	if (!CannonComponents.IsValidIndex(CurrentCannonIndex) || !ProjectileClass) return;
+	
+	USceneComponent* SelectedCannon = CannonComponents[CurrentCannonIndex];
+	UNiagaraComponent* SelectedParticle = nullptr;
 
-		if (SelectedCannon)
+	if (!SelectedCannon) return;
+		
+	// Initialize variables for projectile spawn location and rotation
+	FVector SpawnLocation = SelectedCannon->GetComponentLocation();
+	FRotator SpawnRotation = SelectedCannon->GetComponentRotation();
+
+	// Check child components for specific tags (e.g., "ProjectilePos" and "EffectPos")
+	for (int32 i = 0; i < SelectedCannon->GetNumChildrenComponents(); ++i)
+	{
+		USceneComponent* ChildComponent = Cast<USceneComponent>(SelectedCannon->GetChildComponent(i));
+				
+		if (ChildComponent)
 		{
-			// Initialize variables for projectile spawn location and rotation
-			FVector SpawnLocation = SelectedCannon->GetComponentLocation();
-			FRotator SpawnRotation = SelectedCannon->GetComponentRotation();
-
-			// Check child components for a specific tag (e.g., "Projectile")
-			for (int32 ChildIndex = 0; ChildIndex < SelectedCannon->GetNumChildrenComponents(); ++ChildIndex)
+			if (ChildComponent->ComponentHasTag(FName("ProjectilePos")))
 			{
-				USceneComponent* ChildComponent = Cast<USceneComponent>(SelectedCannon->GetChildComponent(ChildIndex));
-				if (ChildComponent && ChildComponent->ComponentHasTag(FName("ProjectilePos")))
-				{
-					SpawnLocation = ChildComponent->GetComponentLocation();
-					SpawnRotation = ChildComponent->GetComponentRotation();
-					break; // Found the projectile component, no need to check further
-				} 
+				// Update spawn location and rotation if "ProjectilePos" tag is found
+				SpawnLocation = ChildComponent->GetComponentLocation();
+				SpawnRotation = ChildComponent->GetComponentRotation();
 			}
-
-			// Spawn the projectile at the determined location and rotation
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.Owner = this;
-			SpawnParams.Instigator = GetInstigator();
-
-			GetWorld()->SpawnActor<AActor>(
-				ProjectileClass,
-				SpawnLocation,
-				SpawnRotation,
-				SpawnParams
-			);
-
-			//PlayCannonEffects(SelectedCannon, SelectedEffect);
+			else if (ChildComponent->ComponentHasTag(FName("ParticlePos")))
+			{
+				// Attempt to cast the child component to UNiagaraComponent
+				SelectedParticle = Cast<UNiagaraComponent>(ChildComponent);
+			}
 		}
 	}
+
+	// Spawn the projectile at the determined location and rotation
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = GetInstigator();
+
+	AProjectile* SpawnedProjectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParams);
+
+	 // Cast to your projectile class to call the function
+	 Cast<AProjectile>(SpawnedProjectile);
+	 if (SpawnedProjectile)
+	 {
+	 	// Call SetShootRange with the appropriate value
+	 	SpawnedProjectile->SetShootRange(ShootTime);
+	 }
+	
+	// Play the cannon effects using the SelectedEffect Niagara component
+	PlayCannonEffects(SelectedCannon, SelectedParticle);
 
 	// Increment cannon index for the next shot
 	CurrentCannonIndex++;
@@ -297,5 +327,6 @@ void ABoatCharacter::FindCannons()
 		}
 	}
 }
+
 
 	
