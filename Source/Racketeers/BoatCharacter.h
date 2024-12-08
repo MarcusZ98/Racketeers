@@ -75,8 +75,16 @@ protected:
 	FTimerHandle FireTimerHandle;
 	FTimerHandle CooldownTimerHandle;
 
+	/* ---- ARRAYS ----*/
+	TArray<FName> LeftCannonOrder;
+	TArray<FName> RightCannonOrder;
+	TArray<FName> CannonChildren;
+
+	FVector SpawnLocation;
+	FRotator SpawnRotation;
+
 	/* ---- VARIABLES ----*/
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 CannonCount = 0;
 	UPROPERTY(EditAnywhere, Category="Cannons")
 	float FireDelay = 0.5f;
@@ -94,7 +102,7 @@ private:
 	void OnShootLeftCompleted();
 	void OnShootRightStarted();
 	void OnShootRightCompleted();
-	void FindCannons();
+	void AddCannonsInOrder(float Count, USceneComponent* Cannon);
 	void ResetScurrySpeed();
 
 	/* ---- VARIABLES ----*/
@@ -111,6 +119,8 @@ public:
 	/* ---- FUNCTIONS ----*/
 	UFUNCTION(BlueprintCallable, Category = "Shooting")
 	void StopShooting();
+	UFUNCTION(BlueprintCallable)
+	void FindCannons();
 
 	/* ---- SOUNDS & PARTICLES ----*/
 	UFUNCTION(BlueprintImplementableEvent, Category = "Scurry Effects")

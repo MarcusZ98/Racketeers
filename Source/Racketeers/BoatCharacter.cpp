@@ -56,12 +56,15 @@ void ABoatCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
-	FindCannons();
 }
 
 void ABoatCharacter::Tick(float DeltaTime)
 {
-	ShootTime += DeltaTime;
+	// Increment ShootTime only when holding shoot
+	if (bIsHoldingShoot)
+	{
+		ShootTime += DeltaTime;
+	}
 }
 
 
@@ -207,7 +210,6 @@ void ABoatCharacter::ServerHoldShoot_Implementation()
 void ABoatCharacter::ServerStartShooting_Implementation(bool bLeft)
 {
 	if(!bCanShoot || bIsInteracting) return;
-	
 	bShootLeft = bLeft;
 	bIsHoldingShoot = false;
 	CurrentCannonIndex = 0;
@@ -220,8 +222,7 @@ void ABoatCharacter::ServerStartShooting_Implementation(bool bLeft)
 
 	// Disable further shooting and start the cooldown timer
 	bCanShoot = false;
-	GetWorld()->GetTimerManager().SetTimer(
-		CooldownTimerHandle, this, &ABoatCharacter::ResetShootCooldown, ShootCooldown, false);
+	GetWorld()->GetTimerManager().SetTimer(CooldownTimerHandle, this, &ABoatCharacter::ResetShootCooldown, ShootCooldown, false);
 }
 
 void ABoatCharacter::ResetShootCooldown()
@@ -238,59 +239,49 @@ void ABoatCharacter::StopShooting()
 
 void ABoatCharacter::ShootCannon()
 {
+	// Use pre-ordered CannonComponents
 	CannonComponents = bShootLeft ? CannonLeftComponents : CannonRightComponents;
 
 	if (!CannonComponents.IsValidIndex(CurrentCannonIndex) || !ProjectileClass) return;
-	
+
 	USceneComponent* SelectedCannon = CannonComponents[CurrentCannonIndex];
 	UNiagaraComponent* SelectedParticle = nullptr;
 
 	if (!SelectedCannon) return;
-		
-	// Initialize variables for projectile spawn location and rotation
-	FVector SpawnLocation = SelectedCannon->GetComponentLocation();
-	FRotator SpawnRotation = SelectedCannon->GetComponentRotation();
 
-	// Check child components for specific tags (e.g., "ProjectilePos" and "EffectPos")
+	// Iterate through child components to locate ProjectilePos and ParticlePos
 	for (int32 i = 0; i < SelectedCannon->GetNumChildrenComponents(); ++i)
 	{
 		USceneComponent* ChildComponent = Cast<USceneComponent>(SelectedCannon->GetChildComponent(i));
-				
 		if (ChildComponent)
 		{
 			if (ChildComponent->ComponentHasTag(FName("ProjectilePos")))
 			{
-				// Update spawn location and rotation if "ProjectilePos" tag is found
 				SpawnLocation = ChildComponent->GetComponentLocation();
 				SpawnRotation = ChildComponent->GetComponentRotation();
 			}
 			else if (ChildComponent->ComponentHasTag(FName("ParticlePos")))
 			{
-				// Attempt to cast the child component to UNiagaraComponent
 				SelectedParticle = Cast<UNiagaraComponent>(ChildComponent);
 			}
 		}
 	}
 
-	// Spawn the projectile at the determined location and rotation
+	// Spawn the projectile
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 	SpawnParams.Instigator = GetInstigator();
 
 	AProjectile* SpawnedProjectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParams);
+	if (SpawnedProjectile)
+	{
+		SpawnedProjectile->SetShootRange(ShootTime);
+	}
 
-	 // Cast to your projectile class to call the function
-	 Cast<AProjectile>(SpawnedProjectile);
-	 if (SpawnedProjectile)
-	 {
-	 	// Call SetShootRange with the appropriate value
-	 	SpawnedProjectile->SetShootRange(ShootTime);
-	 }
-	
-	// Play the cannon effects using the SelectedEffect Niagara component
+	// Play the cannon effects
 	PlayCannonEffects(SelectedCannon, SelectedParticle);
 
-	// Increment cannon index for the next shot
+	// Increment the cannon index
 	CurrentCannonIndex++;
 
 	// Stop shooting if all cannons have been fired
@@ -302,24 +293,67 @@ void ABoatCharacter::ShootCannon()
 
 void ABoatCharacter::FindCannons()
 {
-	// Clear the array to ensure no duplicates
 	CannonLeftComponents.Empty();
 	CannonRightComponents.Empty();
 
-	// Find all components with the "Cannon" tag
+	// Gather all scene components
 	TArray<USceneComponent*> FoundComponents;
 	GetComponents<USceneComponent>(FoundComponents);
 
-	for (USceneComponent* Component : FoundComponents)
+	// Add cannons in order based on predefined logic
+	for (USceneComponent* Cannon : FoundComponents)
 	{
-		if (Component->ComponentHasTag(FName("CannonLeft")) && CannonLeftComponents.Num() <= CannonCount)
+		if (Cannon)
 		{
-			CannonLeftComponents.Add(Component);
+			AddCannonsInOrder(CannonCount, Cannon);
 		}
+	}
 
-		else if(Component->ComponentHasTag(FName("CannonRight")) && CannonRightComponents.Num() <= CannonCount)
+}
+
+void ABoatCharacter::AddCannonsInOrder(float Count, USceneComponent* Cannon)
+{
+	switch (CannonCount)
+	{
+	case 1:
+		LeftCannonOrder = {FName("CannonL1")};
+		RightCannonOrder = {FName("CannonR1")};
+		break;
+		
+	case 2:
+		LeftCannonOrder = {FName("CannonL2"), FName("CannonL3")};
+		RightCannonOrder = {FName("CannonR3"), FName("CannonR2")};
+		break;
+		
+	case 3:
+		LeftCannonOrder = {FName("CannonL2"), FName("CannonL1"), FName("CannonL3")};
+		RightCannonOrder = {FName("CannonR2"), FName("CannonR1"), FName("CannonR3")};
+		break;
+
+	default:
+		break;
+		
+	}
+	
+	// Add to LeftCannonComponents if matches LeftCannonOrder
+	for (const FName& Tag : LeftCannonOrder)
+	{
+		if (Cannon->ComponentHasTag(Tag))
 		{
-			CannonRightComponents.Add(Component);
+			CannonLeftComponents.Add(Cannon);
+			Cannon->SetVisibility(true);
+			return; // Ensure each cannon is added only once
+		}
+	}
+
+	// Add to RightCannonComponents if matches RightCannonOrder
+	for (const FName& Tag : RightCannonOrder)
+	{
+		if (Cannon->ComponentHasTag(Tag))
+		{
+			CannonRightComponents.Add(Cannon);
+			Cannon->SetVisibility(true);
+			return; // Ensure each cannon is added only once
 		}
 	}
 }
