@@ -19,7 +19,6 @@ void AGM_LobbyHost::OnPostLogin(AController* NewPlayer)
 {
 	if (APC_Lobby* LobbyPC = Cast<APC_Lobby>(NewPlayer))
 	{
-		// Call the client RPC on the specific PlayerController
 		LobbyPC->Client_ShowTeamSelectionWidget();
 		
 		Players.Add(LobbyPC);
@@ -55,13 +54,12 @@ void AGM_LobbyHost::SpawnPlayer(APlayerController* PC, ETeams Team)
 			ALobbySpawnPoint* CurrentSP = Cast<ALobbySpawnPoint>(SP);
 
 			// Check if the spawn point is available and the player is on the correct team
-			if (CurrentSP->Team == Team && CurrentSP->PlayerController == nullptr)
+			if (CurrentSP->Team == Team && !CurrentSP->IsOccupied())
 			{
 				// Set the player's new info
 				APS_Lobby* PS = Cast<APS_Lobby>(PlayerController->PlayerState);
 				PS->LobbyInfo.Team = Team;
 				PS->LobbyInfo.PlayerName = PS->GetPlayerName();
-				PS->LobbyInfo.SpawnPoint = CurrentSP;
 				PS->LobbyInfo.TeamID = CurrentSP->TeamID;
 
 				PlayerController->SpawnPoint = CurrentSP;
@@ -94,9 +92,9 @@ void AGM_LobbyHost::UpdatePlayers()
 		ALobbySpawnPoint* CurrentSP = Cast<ALobbySpawnPoint>(SP);
 
 		// Update the player info for all occupied spawn points
-		if (CurrentSP && CurrentSP->PlayerController && Players.Contains(CurrentSP->PlayerController))
+		if (CurrentSP && CurrentSP->IsOccupied() && Players.Contains(CurrentSP->GetPlayerController()))
 		{
-			APS_Lobby* PS = Cast<APS_Lobby>(CurrentSP->PlayerController->PlayerState);
+			APS_Lobby* PS = Cast<APS_Lobby>(CurrentSP->GetPlayerController()->PlayerState);
 			CurrentSP->Multicast_UpdateWidgetInfo(PS->LobbyInfo, PS);
 			CurrentSP->Multicast_ToggleReady(PS->LobbyInfo.bIsReady);
 		}
@@ -115,7 +113,7 @@ void AGM_LobbyHost::UpdateIfTeamFull()
 	{
 		if (const ALobbySpawnPoint* SpawnPoint = Cast<ALobbySpawnPoint>(SP))
 		{
-			if (SpawnPoint->PlayerController)
+			if (SpawnPoint->IsOccupied())
 			{
 				if (SpawnPoint->Team == ETeams::Team_Panda)
 				{
@@ -161,13 +159,9 @@ void AGM_LobbyHost::StartTheMatch()
 {
 	ProcessServerTravel(MapName);
 
-	for(const auto player : Players)
+	for(const auto Player : Players)
 	{
-		if(APS_Lobby* PS = Cast<APS_Lobby>(player))
-		{
-			APC_Lobby* PC = Cast<APC_Lobby>(PS->GetOwner());
-			PC->Client_OnStartMatch();
-		}
+		Cast<APC_Lobby>(Player)->Client_OnStartMatch();
 	}
 }
 

@@ -8,10 +8,6 @@
 #include "PC_Lobby.h"
 #include "PS_Lobby.generated.h"
 
-/**
- * 
- */
-
 class ALobbySpawnPoint;
 
 USTRUCT(BlueprintType)
@@ -31,16 +27,12 @@ struct FLobbyInfo
 	UPROPERTY(BlueprintReadWrite, Category = "LobbyInfo")
 	bool bIsReady;
 
-	UPROPERTY(BlueprintReadWrite, Category = "LobbyInfo")
-	ALobbySpawnPoint* SpawnPoint;
-
 	FLobbyInfo()
 	{
 		PlayerName = "DEFAULT NAME";
 		Team = ETeams::NONE;
 		TeamID = -1;
 		bIsReady = false;
-		SpawnPoint = nullptr;
 	}
 };
 
@@ -55,7 +47,7 @@ public:
 
 	APS_Lobby();
 
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Lobby")
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite)
 	FLobbyInfo LobbyInfo = FLobbyInfo();
 
 	virtual void CopyProperties(APlayerState* PlayerState) override;

@@ -14,33 +14,30 @@ UCLASS()
 class RACKETEERS_API AGM_LobbyHost : public AGM_Base
 {
 	GENERATED_BODY()
-
-public:
 	
 	// ----------------- Variables -----------------
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Players")
 	TArray<AActor*> SpawnPositions;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	bool bAllowUnbalancedTeams;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
-	FString MapName = "World_P";
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
+	UPROPERTY(EditAnywhere, Category = "Players")
 	TArray<APlayerController*> Players;
 
+	UPROPERTY(EditAnywhere, Category = "Game Rules")
+	bool bAllowUnbalancedTeams;
+	
+	UPROPERTY(EditAnywhere, Category = "Game Rules")
+	FString MapName = "World_P";
+
 	// ----------------- Functions -----------------
+
+public:
 	
 	UFUNCTION()
 	virtual void BeginPlay() override;
 	
 	UFUNCTION()
 	virtual void OnPostLogin(AController* NewPlayer) override;
-	
-	UFUNCTION()
-	void SetUpSpawnPositions();
 
 	UFUNCTION()
 	void SpawnPlayer(APlayerController* PC, ETeams Team);
@@ -50,15 +47,14 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void UpdatePlayers();
-
-	UFUNCTION()
-	void UpdateIfTeamFull();
 	
-	UFUNCTION()
-	void UpdateIfEnoughPlayersToStart() const;
-
 	UFUNCTION(BlueprintCallable)
 	void StartTheMatch();
 
+private:
+
+	void SetUpSpawnPositions();
+	void UpdateIfTeamFull();
+	void UpdateIfEnoughPlayersToStart() const;
 	
 };
