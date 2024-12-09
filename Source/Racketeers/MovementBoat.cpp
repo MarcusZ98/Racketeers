@@ -67,6 +67,7 @@ void UMovementBoat::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 void UMovementBoat::Move(FVector2D Value, bool bStarted)
 {
     bShouldMove = bStarted;
+    FindCameraAndSpringArm();
 
     if (bStarted)
     {
@@ -150,15 +151,9 @@ void UMovementBoat::MoveForward(float DeltaTime, bool bScurryActive)
     if (MovementInput.IsNearlyZero())
     {
         // Reset boat location.z to make z position consistent
-        // Get the current location
         FVector CurrentLocation = GetOwner()->GetActorLocation();
-
-        // Reset only the Z component
         CurrentLocation.Z = DefaultZLocation;
-
-        // Set the new location
         GetOwner()->SetActorLocation(CurrentLocation, true);
-        
         return; // No input, do nothing
     }
 
@@ -195,7 +190,8 @@ FVector UMovementBoat::GetWorldSpaceDirection(const FVector2D& InputDirection) c
     }
 
     // Get the camera's rotation
-    FRotator CameraRotation = BoatCamera->GetComponentRotation();
+    //FRotator CameraRotation = BoatCamera->GetComponentRotation();
+    FRotator CameraRotation = SpringArm->GetComponentRotation();
     FRotator YawRotation(0.0f, CameraRotation.Yaw, 0.0f); // Ignore pitch and roll for movement
 
     // Calculate forward and right vectors based on the camera's yaw
@@ -230,7 +226,31 @@ void UMovementBoat::FindCameraAndSpringArm()
 {
     TeamCamera = nullptr;
     SpringArm = nullptr;
-    SpringArm = GetOwner()->FindComponentByClass<USpringArmComponent>();
+
+    FName CameraTag;
+    if (GetOwner()->ActorHasTag("BoatPanda"))
+    {
+        CameraTag = FName("CameraPanda");
+    }
+    else if (GetOwner()->ActorHasTag("BoatRaccoon"))
+    {
+        CameraTag = FName("CameraRaccoon");
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Boat does not have a valid team tag!"));
+        return;
+    }
+
+    for (TActorIterator<AActor> It(GetWorld()); It; ++It)
+    {
+        if (It->ActorHasTag(CameraTag))
+        {
+            TeamCamera = *It;
+            SpringArm = TeamCamera->FindComponentByClass<USpringArmComponent>();
+            return;
+        }
+    }
 }
 
 void UMovementBoat::Client_InterpolateTransform(float DeltaTime)
