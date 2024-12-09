@@ -6,6 +6,9 @@
 #include "Phase.h"
 #include "RacketeersController.h"
 #include "Engine/LevelStreamingDynamic.h"
+#include "GameFramework/GameModeBase.h"
+#include "GameFramework/GameStateBase.h"
+#include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -24,8 +27,9 @@ void ALevelLoadingManager::BeginPlay()
 {
 	Super::BeginPlay();
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "ALevelLoadingManager::BeginPlay");
-	CurrentLevelPath = "Phase1Parent";
-	CurrentSubLevelPath = "Phase1_GamePlay";
+	NextLevelPath = "Phase1Parent";
+	NextSubLevelPath = "Phase1_GamePlay";
+	
 	LoadLevel();
 
 	/*
@@ -44,20 +48,54 @@ void ALevelLoadingManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow,FString::FromInt(GetWorld()->IsStreamingLevelBeingConsidered(CurrentLoadedLevel)));
+
+
+	
+
 }
 
 
+
+//Server Calls ever Player to Load a certain level
+//
+
 void ALevelLoadingManager::MulticastLoadLevel_Implementation(const UPhase* LevelPath)
 {
+	for (APlayerState* PS : UGameplayStatics::GetGameState(GetWorld())->PlayerArray)
+	{
+		ARacketeersController* PC = Cast<ARacketeersController>(PS->GetPlayerController());
+		NextSubLevelPath = LevelPath->LevelToLoad;
+		PC->ClientUnLoadLevel(CurrentSubLevelPath);
+		
+		//PC->ClientLoadLevel();
+	}
+	
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "LEVEL LOADING MULTICAST LOADING");
 	NextLevelPath = LevelPath->MainParentLevel;
 	NextSubLevelPath = LevelPath->LevelToLoad;
 	UnloadLevel();
-	//LoadLevel(LevelPath);
+	LoadLevel();
 }
 
 void ALevelLoadingManager::LoadLevelParent()
 {
+	bLevelIsLoading = true;
+	OnLoadLevel.Broadcast();
+	CurrentLoadedLevel = ULevelStreamingDynamic::LoadLevelInstance(GetWorld(), CurrentSubLevelPath, FVector::ZeroVector,FRotator::ZeroRotator,bLevelLoadSuccessfull);
+	CurrentLoadedLevel->OnLevelLoaded.AddDynamic(this, &ALevelLoadingManager::LevelLoaded);
+	if(bLevelLoadSuccessfull)
+	{
+		//OnLoadingLevelCompleted.Broadcast();
+		bLevelLoadSuccessfull = false;
+		bLevelIsLoading = false;
+		GetWorld()->AddStreamingLevel(CurrentLoadedLevel);
+		
+		return;
+	}
+
+	//CurrentLoadedLevel->ClearLoadedLevel();
+	
+	/*
 	FLatentActionInfo LoadActionInfo;
 	
 	LoadActionInfo.Linkage = 0;
@@ -65,6 +103,7 @@ void ALevelLoadingManager::LoadLevelParent()
 	LoadActionInfo.ExecutionFunction = TEXT("LoadSubLevel");
 	LoadActionInfo.UUID = GetUniqueID();
 	UGameplayStatics::LoadStreamLevel(GetWorld(), *CurrentLevelPath, true,false, LoadActionInfo);
+	*/
 }
 void ALevelLoadingManager::LoadSubLevel()
 {
@@ -72,6 +111,7 @@ void ALevelLoadingManager::LoadSubLevel()
 	bLevelIsLoading = true;
 	OnLoadLevel.Broadcast();
 	CurrentLoadedLevel = ULevelStreamingDynamic::LoadLevelInstance(GetWorld(), CurrentSubLevelPath, FVector::ZeroVector,FRotator::ZeroRotator,bLevelLoadSuccessfull);
+
 	if(bLevelLoadSuccessfull)
 	{
 		OnLoadingLevelCompleted.Broadcast();
@@ -144,8 +184,8 @@ void ALevelLoadingManager::UnloadLevel()
 	//Phase 3
 		// Random Phase 3 Map 
 	
-	GetWorld()->RemoveStreamingLevel(CurrentLoadedLevel);
-	UGameplayStatics::UnloadStreamLevel(GetWorld(), *CurrentLevelPath, LoadActionInfo, false);
+	//GetWorld()->RemoveStreamingLevel(CurrentLoadedLevel);
+	//UGameplayStatics::UnloadStreamLevel(GetWorld(), *CurrentLevelPath, LoadActionInfo, false);
 
 }
 

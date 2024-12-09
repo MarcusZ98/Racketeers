@@ -53,7 +53,9 @@ void UWidgetSubsystem::ActivateWidget(FName Name)
 		if(GEngine){}
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Could Not Find Widget, Check Name or it dosent exist i map");
 	}
+
 	UUserWidget* TempWidget = *MapOfAllPlayerWidget.Find(Name);
+	if(TempWidget == nullptr){return;}
 	ActiveWidgetComponents.Add(Name, TempWidget);
 	TempWidget->AddToViewport();
 }
