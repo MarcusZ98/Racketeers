@@ -5,6 +5,7 @@
 #include "GM_LobbyHost.h"
 #include "PS_Lobby.h"
 #include "Blueprint/UserWidget.h"
+#include "Kismet/GameplayStatics.h"
 
 void APC_Lobby::BeginPlay()
 {
@@ -18,7 +19,6 @@ void APC_Lobby::Client_ShowTeamSelectionWidget_Implementation()
 	// Create the team selection widget
 	if (TeamSelectionWidgetClass)
 	{
-		
 		if (UUserWidget* TeamSelectionWidget = CreateWidget<UUserWidget>(this, TeamSelectionWidgetClass))
 		{
 			TeamSelectionWidget->AddToViewport();
@@ -32,7 +32,6 @@ void APC_Lobby::Client_ShowLobbyWidget_Implementation()
 {
 	if (LobbyWidgetClass)
 	{
-		
 		if (UUserWidget* LobbyWidget = CreateWidget<UUserWidget>(this, LobbyWidgetClass))
 		{
 			LobbyWidget->AddToViewport();
@@ -43,15 +42,21 @@ void APC_Lobby::Client_ShowLobbyWidget_Implementation()
 
 void APC_Lobby::Client_ShowCosmeticWidget_Implementation()
 {
-  // Create the cosmetic selection widget
+	if (CosmeticWidgetClass)
+	{
+		if (UUserWidget* CosmeticWidget = CreateWidget<UUserWidget>(this, CosmeticWidgetClass))
+		{
+			CosmeticWidget->AddToViewport();
+		}
+	}
 }
 
 void APC_Lobby::Server_SpawnPlayer_Implementation(APlayerController* PC, ETeams Team)
 {
-	
 	if (AGM_LobbyHost* GameMode = Cast<AGM_LobbyHost>(GetWorld()->GetAuthGameMode()))
 	{
 		GameMode->SpawnPlayer(PC, Team);
+		Multicast_PlaySpawnSound();
 	}
 	Cast<APC_Lobby>(PC)->Client_ShowLobbyWidget();
 }
@@ -61,14 +66,16 @@ void APC_Lobby::Server_RemovePlayer_Implementation()
 	if (AGM_LobbyHost* GameMode = Cast<AGM_LobbyHost>(GetWorld()->GetAuthGameMode()))
 	{
 		GameMode->RemovePlayer(this);
+		Multicast_PlayDespawnSound();
 	}
 }
 
-void APC_Lobby::Server_ToggleReady_Implementation()
+void APC_Lobby::Server_ToggleReady_Implementation(APlayerController* PC)
 {
 	if (APS_Lobby* PS = Cast<APS_Lobby>(PlayerState))
 	{
 		PS->LobbyInfo.bIsReady = !PS->LobbyInfo.bIsReady;
+		Cast<APC_Lobby>(PC)->Client_PlayToggleReadySound(PS->LobbyInfo.bIsReady);
 	}
 
 	if (AGM_LobbyHost* GameMode = Cast<AGM_LobbyHost>(GetWorld()->GetAuthGameMode()))
@@ -82,16 +89,36 @@ void APC_Lobby::Client_OnStartMatch_Implementation()
 	OnStartMatch();
 }
 
+void APC_Lobby::Multicast_PlaySpawnSound_Implementation()
+{
+	if (SpawnSound)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), SpawnSound);
+	}
+}
 
+void APC_Lobby::Multicast_PlayDespawnSound_Implementation()
+{
+	if (DespawnSound)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), DespawnSound);
+	}
+}
 
-
-
-
-
-
-
-
-
-
-
-
+void APC_Lobby::Client_PlayToggleReadySound_Implementation(bool bIsReady)
+{
+	if (bIsReady)
+	{
+		if (ReadySound)
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(), ReadySound);
+		}
+	}
+	else
+	{
+		if (UnreadySound)
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(), UnreadySound);
+		}
+	}
+}

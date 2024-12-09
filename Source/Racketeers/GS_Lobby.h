@@ -16,13 +16,13 @@ class RACKETEERS_API AGS_Lobby : public AGS_Base
 
 public:
 
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Lobby")
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Game")
 	bool bRaccoonFull = false;
 	
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Lobby")
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Game")
 	bool bPandaFull = false;
 
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Lobby")
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Game")
 	bool bEnoughPlayersToStart = false;
 
 

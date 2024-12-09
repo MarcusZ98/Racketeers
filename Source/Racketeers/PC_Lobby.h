@@ -16,52 +16,90 @@ class RACKETEERS_API APC_Lobby : public APlayerController
 {
 	GENERATED_BODY()
 
+	// ----------------------------Variables--------------------------------------------
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	TSubclassOf<UUserWidget> TeamSelectionWidgetClass;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	TSubclassOf<UUserWidget> LobbyWidgetClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
+	ALobbySpawnPoint* SpawnPoint;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	UUserWidget* LobbyWidgetREF;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lobby")
-	ALobbySpawnPoint* SpawnPoint;
+private:
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UUserWidget> TeamSelectionWidgetClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UUserWidget> LobbyWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UUserWidget> CosmeticWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound", meta = (AllowPrivateAccess = "true"))
+	USoundBase* SpawnSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound", meta = (AllowPrivateAccess = "true"))
+	USoundBase* DespawnSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound", meta = (AllowPrivateAccess = "true"))
+	USoundBase* ReadySound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound", meta = (AllowPrivateAccess = "true"))
+	USoundBase* UnreadySound;
+	
+	// ----------------------------Functions--------------------------------------------
+public:
+	
 	UFUNCTION()
 	virtual void BeginPlay() override;
 
-	// ----------------------------Widget Functions--------------------------------------------
-	
-	// Show the team selection widget
-	UFUNCTION(Client, Reliable, BlueprintCallable)
-	void Client_ShowTeamSelectionWidget();
+	// Pass the start match event to the blueprint
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void OnStartMatch();
 
-	UFUNCTION(Client, Reliable, BlueprintCallable)
-	void Client_ShowLobbyWidget();
-
-	// Show the cosmetic widget
-	UFUNCTION(Client, Reliable, BlueprintCallable)
-	void Client_ShowCosmeticWidget();
-
-	// --------------------------------------------------------------------------------------------
+	// ----------------------------Server Functions--------------------------------------------
 
 	// Spawn the player on server
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void Server_SpawnPlayer(APlayerController* PC, ETeams Team);
 
+	// Remove the player on the server
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void Server_RemovePlayer();
 
 	// Toggle the player's ready status
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void Server_ToggleReady();
+	void Server_ToggleReady(APlayerController* PC);
+	
 
+	// ----------------------------Client Functions--------------------------------------------
+
+	// Show the lobby widget
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void Client_ShowLobbyWidget();
+
+	// Show the team selection widget
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void Client_ShowTeamSelectionWidget();
+
+	// Show the cosmetic widget
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void Client_ShowCosmeticWidget();
+
+	// Start the match
 	UFUNCTION(Client, Reliable)
 	void Client_OnStartMatch();
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void OnStartMatch();
+	UFUNCTION(Client, Unreliable, BlueprintCallable)
+	void Client_PlayToggleReadySound(bool bIsReady);
+
+	// ----------------------------Multicast Functions--------------------------------------------
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void Multicast_PlaySpawnSound();
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void Multicast_PlayDespawnSound();
 };
+

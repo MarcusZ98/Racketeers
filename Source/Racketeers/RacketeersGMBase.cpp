@@ -4,6 +4,7 @@
 #include "RacketeersGMBase.h"
 
 #include "BaseGameInstance.h"
+#include "BoatCharacter.h"
 #include "HeadMountedDisplayTypes.h"
 #include "PS_Base.h"
 #include "RacketeersController.h"
@@ -537,4 +538,63 @@ void ARacketeersGMBase::RespawnPlayer(APlayerState* PState)
 	PS->GetPawn()->SetActorLocation(PlayerStart->GetActorLocation());
 	
 }
+
+/*void ARacketeersGMBase::InitializeBoatData()
+{
+	// Raccoon Team
+	FTeamParts RaccoonParts;
+	RaccoonParts.PlayerValues.Add(1, {90, 500, 1, RaccoonHullMaterial, RaccoonSailMaterial, BoatRaccoon,"Raccoon0"});
+	RaccoonParts.PlayerValues.Add(2, {180, 500, 2, RaccoonHullMaterial, RaccoonSailMaterial, BoatRaccoon,"Raccoon1"});
+	RaccoonParts.PlayerValues.Add(3, {360, 500, 3, RaccoonHullMaterial, RaccoonSailMaterial, BoatRaccoon,"Raccoon2"});
+
+	// Panda Team
+	FTeamParts PandaParts;
+	PandaParts.PlayerValues.Add(1, {90, 500, 1,PandaHullMaterial, PandaSailMaterial, BoatPanda,"Panda0"});
+	PandaParts.PlayerValues.Add(2, {180, 500, 2, PandaHullMaterial, PandaSailMaterial, BoatPanda,"Panda1"});
+	PandaParts.PlayerValues.Add(3, {360, 500, 3, PandaHullMaterial, PandaSailMaterial, BoatPanda,"Panda2"});
+
+	// Add to TeamData
+	TeamData.Add(ETeams::Team_Raccoon, RaccoonParts);
+	TeamData.Add(ETeams::Team_Panda, PandaParts);
+} 
+
+void ARacketeersGMBase::GetActivePlayers()
+{
+    GameState = GetWorld()->GetGameState<AGameStateBase>();
+    if (!GameState) return;
+
+    for (APlayerState* PlayerState : GameState->PlayerArray)
+    {
+        if (!PlayerState) continue;
+
+        CustomPlayerState = Cast<APS_Base>(PlayerState);
+        if (!CustomPlayerState) continue;
+
+        TeamID = CustomPlayerState->PlayerInfo.Team;
+        PlayerID = CustomPlayerState->PlayerInfo.TeamPlayerID;
+
+        SetBoatValues(TeamID, PlayerID);
+    }
+}
+
+void ARacketeersGMBase::SetBoatValues(ETeams MyTeamID, int32 MyPlayerID)
+{
+	BoatCharacter = Cast<ABoatCharacter>(UGameplayStatics::GetPlayerPawn(this, PlayerID - 1));
+	if (!BoatCharacter) return;
+
+	if (TeamData.Contains(static_cast<ETeams>(TeamID)))
+	{
+		FTeamParts& TeamParts = TeamData[static_cast<ETeams>(TeamID)];
+		if (TeamParts.PlayerValues.Contains(PlayerID))
+		{
+			const FBoatData& BoatValues = TeamParts.PlayerValues[PlayerID];
+			BoatCharacter->SetHealth(BoatValues.Health);
+			BoatCharacter->SetCannonAmount(BoatValues.CannonAmount);
+			BoatCharacter->SetHullAndSailMaterial(BoatValues.HullMaterial, BoatValues.SailMaterial);
+		}
+	}
+}
+*/
+
+
 

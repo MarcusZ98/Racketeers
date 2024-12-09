@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BoatCharacter.h"
+#include "BoatValues.h"
 #include "GM_Base.h"
 #include "LevelLoadingManager.h"
 #include "TimerInfo.h"
@@ -125,6 +127,52 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 TotalRounds;
 
+	/*UFUNCTION(BlueprintCallable)
+	void InitializeBoatData();
+	UFUNCTION(BlueprintCallable)
+	void GetActivePlayers();
+
+protected:
+	//void SpawnBoat();
+	void SetBoatValues(ETeams MyTeamID, int32 MyPlayerID);
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team Data")
+	TMap<ETeams, FTeamParts> TeamData;
+	
+	//UPROPERTY()
+	//APlayerState* PlayerState;
+	UPROPERTY()
+	APS_Base* CustomPlayerState;
+	UPROPERTY()
+	APlayerController* PlayerController;
+	UPROPERTY()
+	ABoatCharacter* BoatCharacter;
+	UPROPERTY()
+	UMaterialInterface* Material;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Boats")
+	ABoatCharacter* BoatRaccoon;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Boats")
+	ABoatCharacter* BoatPanda;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Boat Materials")
+	UMaterialInterface* RaccoonHullMaterial;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Boat Materials")
+	UMaterialInterface* RaccoonSailMaterial;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Boat Materials")
+	UMaterialInterface* PandaHullMaterial;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Boat Materials")
+	UMaterialInterface* PandaSailMaterial;
+	
+	float PlayerIndex;
+	FPlayerInfo PlayerInfo;
+	ETeams TeamID;
+	int32 PlayerID;
+	*/
+
+	
 private:
 
 
