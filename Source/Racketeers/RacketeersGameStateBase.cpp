@@ -49,7 +49,7 @@ void ARacketeersGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 void ARacketeersGameStateBase::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	AddPart(ETeams::Team_Raccoon, EPart::Cannon_0);
 	AddPart(ETeams::Team_Raccoon, EPart::Hull_0);
 	AddPart(ETeams::Team_Raccoon, EPart::Sail_0);
@@ -158,7 +158,6 @@ void ARacketeersGameStateBase::UpdateHealth()
 
 bool ARacketeersGameStateBase::CheckTeamAlive(ETeams Team)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "Alive" + FString::FromInt(GetTeamStats(Team).TeamAlive));
 	if(GetTeamStats(Team).TeamAlive <= 0)
 	{
 		return false;

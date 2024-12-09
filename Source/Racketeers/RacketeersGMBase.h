@@ -111,6 +111,8 @@ public:
 	void RoundCompletion();
 
 	UFUNCTION(BlueprintCallable)
+	void TravelToLevel();
+	UFUNCTION(BlueprintCallable)
 	void Transition();
 	
 	void BroadcastOnPlayerPressed(ETeams Team);
@@ -118,6 +120,12 @@ public:
 	int8 GetTotalRounds();
 	TEnumAsByte<EPhaseState> SwitchIncomingState();
 
+	
+
+
+	//Create one phase1 GameMode, one phase 2 GameMode and one Phase3 GameMode
+
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsGameActive;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -126,6 +134,12 @@ public:
 	TArray<UPhase*> Phases;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 TotalRounds;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category= "Phase Data")
+	FString LevelToLoad;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category= "Phase Data")
+	FString MainParentLevel;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Phase Data")
+	FString StartPhaseName;
 
 	/*UFUNCTION(BlueprintCallable)
 	void InitializeBoatData();

@@ -31,8 +31,8 @@ struct FGamePackage
 
 
 USTRUCT(BlueprintType)
-struct FGameStatsPackage
-{
+struct FGameStatsPackage{
+	
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadWrite)
@@ -55,6 +55,14 @@ struct FGameStatsPackage
 		
 };
 
+USTRUCT(BlueprintType)
+struct FGameModeData 
+{
+	GENERATED_BODY()
+	UPROPERTY(BlueprintReadWrite)
+	FString LevelToLoad = "";
+};
+
 
 
 UCLASS()
@@ -75,9 +83,23 @@ public:
 	bool CheckIfDataToTransfer();
 	
 	FGameStatsPackage GetDataTransferPackage();
+	
+	UFUNCTION(BlueprintCallable)
+	void SetGameModeData(FGameModeData Data);
+	UFUNCTION(BlueprintCallable)
+	FGameModeData GetGameModeData();
+
+	//void ClearData(FRacketeersData* Data);
+	
+
+
+public:
+	
 private:
 	UPROPERTY()
 	FGameStatsPackage TempSavedGameStatsPackage;
+	UPROPERTY()
+	FGameModeData TempGameModeData;
 	
 
 
