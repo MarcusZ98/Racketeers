@@ -4,6 +4,7 @@
 #include "RacketeersGMBase.h"
 
 #include "BaseGameInstance.h"
+#include "EngineUtils.h"
 #include "BoatCharacter.h"
 #include "HeadMountedDisplayTypes.h"
 #include "PS_Base.h"
@@ -13,6 +14,7 @@
 #include "WidgetSubsystem.h"
 #include "Engine/LevelStreamingDynamic.h"
 #include "GameFramework/GameStateBase.h"
+#include "GameFramework/PlayerStart.h"
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -66,12 +68,25 @@ void ARacketeersGMBase::InitGame(const FString& MapName, const FString& Options,
 
 void ARacketeersGMBase::BeginPlay()
 {
+
+	Super::BeginPlay();
 	//UE_LOG(LogTemp, Warning, TEXT("RacketeersGMBase::BeginPlay"));
 	
 	//Set the GameState in GameMode
 	//GameState = Cast<AGS_Base>(UGameplayStatics::GetGameState(GetWorld()));
 
 
+	/*
+	UBaseGameInstance* GI = Cast<UBaseGameInstance>(GetGameInstance());
+	if(GI)
+	{
+		FGameModeData Data = GI->GetGameModeData();
+		LevelToLoad = Data.LevelToLoad;
+		
+	}
+	*/
+	
+	bUseSeamlessTravel = true;
 	WidgetSubsystem = GetGameInstance()->GetSubsystem<UWidgetSubsystem>();
 
 	//Initilize variables
@@ -145,7 +160,7 @@ void ARacketeersGMBase::BeginPlay()
 
 	PController->OnPlayerPressedReady.AddDynamic(TransitionComponent, &UTransitionComponent::IncrementPlayerReady);
 
-	TransitionComponent->OnFinished.AddDynamic(this, &ARacketeersGMBase::AllStagesFinished);
+	TransitionComponent->OnFinished.AddDynamic(this, &ARacketeersGMBase::TravelToLevel);
 	TransitionComponent->GameState = GetGameState<ARacketeersGameStateBase>();
 	
 }
@@ -183,6 +198,8 @@ void ARacketeersGMBase::Tick(float DeltaSeconds)
 		//CurrentTime += DeltaSeconds;
 	}
 }
+
+
 void ARacketeersGMBase::RoundCompletion()
 {
 	CurrentTime = 0;
@@ -205,11 +222,19 @@ void ARacketeersGMBase::RoundCompletion()
 
 	//if(GEngine)
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Load Transition stats");
-	LoadTransitionStats();
+	//LoadTransitionStats();
 
 	//if(GEngine)
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Transition");
 	Transition();
+}
+
+void ARacketeersGMBase::TravelToLevel()
+{
+	SwitchState();
+
+	ProcessServerTravel(LevelToLoad, false);
+
 }
 
 bool ARacketeersGMBase::CheckWinnerOfRound()
@@ -246,7 +271,9 @@ void ARacketeersGMBase::SwitchState()
 	{
 		CurrentPhase = Phases[CurrentPhase->State+1];	
 	}
+
 	ARacketeersGameStateBase* GS = GetGameState<ARacketeersGameStateBase>();
+	if(GS == nullptr) {return;}
 	GS->CurrentPhase = this->CurrentPhase->State;
 	GS->OnRep_PhaseChange();
 }
@@ -254,12 +281,27 @@ void ARacketeersGMBase::SwitchState()
 
 void ARacketeersGMBase::Transition()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, LevelToLoad);
+	UBaseGameInstance* BI = Cast<UBaseGameInstance>(GetGameInstance());
+	if(BI == nullptr) return;
+	FGameModeData Data;
+	Data.LevelToLoad = LevelToLoad;
+	BI->SetGameModeData(Data);
+	ProcessServerTravel("StatsTransitionMap",true);
+	//TransitionComponent->AddWidgetsToPlayers(GetGameState<ARacketeersGameStateBase>());
+
+	
+	
+	/*
+	/*
 	if(CurrentPhase->State == EPhaseState::Phase_3)
 	{
 		return;
 	}
 
+	
 	//LoadLevel();
+
 	
 	OnUnloadingMap.Broadcast();
 	
@@ -272,7 +314,7 @@ void ARacketeersGMBase::Transition()
 	//if(GEngine)
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Unload Level");
 	UnloadLevel((TEXT("%s"), *CurrentPhase->LevelToLoad), ActionInfo);
-	
+	*/
 }
 
 void ARacketeersGMBase::BroadcastOnPlayerPressed(ETeams Team)
@@ -322,10 +364,15 @@ void ARacketeersGMBase::AllStagesFinished()
 
 	TransitionComponent->RemoveWidgetsFromPlayers();
 	TransitionComponent->CountPlayersReady = 0;
+
+	RespawnPlayers();
+	
 	if(C->HasAuthority())
 	{
 		C->ServerMultiCastActivateTimer();
 	}
+
+	
 }
 
 int ARacketeersGMBase::GetNextPhaseNumber()
@@ -472,8 +519,20 @@ void ARacketeersGMBase::LoadLevel()
 	}
 
 	bool bStreamingSucceded = false;
-	//LevelLoadingManager->MulticastLoadLevel(Phases[GetNextPhaseNumber()]);
-	//LevelLoadingManager->OnLoadingLevelCompleted.AddDynamic(this, &ARacketeersGMBase::RespawnPlayers);
+
+	/*
+	LevelLoadingManager->UnloadLevel();
+	
+	LevelLoadingManager->OnLoadingLevelCompleted.AddDynamic(this, &ARacketeersGMBase::RespawnPlayers);
+	LevelLoadingManager->NextSubLevelPath = Phases[GetNextPhaseNumber()]->LevelToLoad;
+	LevelLoadingManager->LoadLevel();
+	for (TObjectPtr<APlayerState> PlayerState : GameState->PlayerArray) 
+	{
+		ARacketeersController* PC = Cast<ARacketeersController>(PlayerState->GetPlayerController());
+		PC->ClientUnLoadLevel(CurrentPhase->LevelToLoad);
+		PC->ClientLoadLevel(LevelLoadingManager->CurrentSubLevelPath);
+	}
+	*/
 
 	
 	//ULevelStreamingDynamic::LoadLevelInstance(GetWorld(), *Phases[GetNextPhaseNumber()]->LevelToLoad, FVector::ZeroVector,FRotator::ZeroRotator,bStreamingSucceded);
@@ -483,6 +542,10 @@ void ARacketeersGMBase::LoadLevel()
 
 void ARacketeersGMBase::RespawnPlayers()
 {
+	UWorld* World = GetWorld();
+
+	// If incoming start is specified, then just use it
+	
 	
 	for (int i = 0; i < this->GetGameState<AGameState>()->PlayerArray.Num(); ++i)
 	{
@@ -510,7 +573,14 @@ void ARacketeersGMBase::RespawnPlayers()
 		PS->GetPawn()->SetActorRotation(PlayerStart->GetActorRotation());
 		
 	}
+	
 	TransitionComponent->bIsFinished = true;
+	if(TransitionComponent->bIsFinished && TransitionComponent->CountPlayersReady == GameState->PlayerArray.Num())
+	{
+		TransitionComponent->CountPlayersReady = 0;
+		TransitionComponent->OnFinished.Broadcast();
+	}
+	
 	OnloadedMap.Broadcast();
 	if(GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Respawn Players");
@@ -539,6 +609,14 @@ void ARacketeersGMBase::RespawnPlayer(APlayerState* PState)
 	
 }
 
+/*
+ * CLass Sync
+ *  Send Info about what it should run when finished
+ *  
+ *	
+ *	
+ *	
+ */
 /*void ARacketeersGMBase::InitializeBoatData()
 {
 	// Raccoon Team
@@ -595,6 +673,3 @@ void ARacketeersGMBase::SetBoatValues(ETeams MyTeamID, int32 MyPlayerID)
 	}
 }
 */
-
-
-

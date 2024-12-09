@@ -19,7 +19,7 @@ ATimerInfo::ATimerInfo()
 
 void ATimerInfo::Tick(float DeltaSeconds)
 {
-	UE_LOG(LogTemp, Warning, TEXT("TimerInfo::Tick()"));
+	//UE_LOG(LogTemp, Warning, TEXT("TimerInfo::Tick()"));
 	if(GEngine)
 	{
 		FString TeamName = "TimerInfo::Tick()";

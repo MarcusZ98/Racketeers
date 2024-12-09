@@ -38,6 +38,7 @@ public:
 	UUserWidget* WidgetToDisplay;
 	FName WidgetName;
 	bool bIsFinished;
+	UPROPERTY(BlueprintReadWrite)
 	bool bIsOn;
 	UPROPERTY()
 	ARacketeersGameStateBase* GameState;
