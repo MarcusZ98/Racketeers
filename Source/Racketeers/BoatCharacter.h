@@ -86,7 +86,7 @@ protected:
 	/* ---- VARIABLES ----*/
 	UPROPERTY(EditAnywhere, Category="Cannons")
 	float FireDelay = 0.5f;
-	UPROPERTY(EditAnywhere, Category="Cannons")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Cannons")
 	float ShootCooldown = 1;
 	UPROPERTY(BlueprintReadWrite, Category = "Interaction")
 	bool bIsInteracting;
@@ -118,7 +118,6 @@ private:
 	bool bCanShoot = true;
 	bool bShootLeft;
 	bool bIsHoldingShoot = false;
-	float ShootTime;
 
 	
 public:
@@ -127,6 +126,10 @@ public:
 	void StopShooting();
 	UFUNCTION(BlueprintCallable)
 	void FindCannons();
+	UFUNCTION(BlueprintCallable, Category = "Cooldown")
+	float GetCooldownProgress() const;
+	UFUNCTION(BlueprintCallable, Category = "Shoot")
+	float GetShootRange() const;
 
 	/* ---- SETTERS ----*/
 	/*UFUNCTION(BlueprintCallable, Category = "Boat Properties")
@@ -161,6 +164,11 @@ public:
 	float ScurryAmount;
 	UPROPERTY(BlueprintReadOnly, Category = "Movement")
 	bool bScurryActive = false;
+	// Replicated remaining cooldown time
+	UPROPERTY(Replicated)
+	float RemainingCooldownTime;
+	UPROPERTY(Replicated)
+	float ShootTime;
 
 	/* ---- COMPONENTS ---- */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision", meta = (AllowPrivateAccess = "true"))
