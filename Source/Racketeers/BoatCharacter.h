@@ -5,6 +5,7 @@
 #include "Projectile.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+//#include "UserWidget.generated.h"
 #include "BoatCharacter.generated.h"
 
 class USpringArmComponent;
@@ -71,6 +72,14 @@ protected:
 	UPROPERTY()
 	TArray<USceneComponent*> CannonComponents;
 
+	/* ---- WIDGETS ---- */
+	// Widget Blueprint class to be assigned in the editor
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget> BoatWidgetClass;
+	// Instance of the created widget
+	UPROPERTY(BlueprintReadWrite, Category = "UI")
+	UUserWidget* BoatWidgetInstance;
+	
 	/* ---- TIMERS ---- */
 	FTimerHandle FireTimerHandle;
 	FTimerHandle CooldownTimerHandle;

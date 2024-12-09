@@ -15,6 +15,7 @@
 #include "InputActionValue.h"
 #include "Projectile.h"
 #include "Components/BoxComponent.h"
+#include "Components/ProgressBar.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
@@ -64,6 +65,8 @@ void ABoatCharacter::Tick(float DeltaTime)
 	if (bIsHoldingShoot && ShootTime < 3)
 	{
 		ShootTime += DeltaTime;
+		// Ensure the widget instance exists
+		//UI_PlayShootRange();
 	}
 
 	if (HasAuthority()) // Only update on the server
