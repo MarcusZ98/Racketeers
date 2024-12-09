@@ -5,6 +5,7 @@
 #include "Projectile.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "BoatWidget.h"
 //#include "UserWidget.generated.h"
 #include "BoatCharacter.generated.h"
 
@@ -13,6 +14,7 @@ class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnShootTimeUpdated, float, CurrentShootTime);
 
 UCLASS(config=Game)
 class ABoatCharacter : public ACharacter
@@ -78,7 +80,12 @@ protected:
 	TSubclassOf<UUserWidget> BoatWidgetClass;
 	// Instance of the created widget
 	UPROPERTY(BlueprintReadWrite, Category = "UI")
-	UUserWidget* BoatWidgetInstance;
+	UBoatWidget* BoatWidgetInstance;
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnShootTimeUpdated);
+
+	UPROPERTY(BlueprintAssignable, Category = "UI")
+	FOnShootTimeUpdated OnShootTimeUpdated;
 	
 	/* ---- TIMERS ---- */
 	FTimerHandle FireTimerHandle;

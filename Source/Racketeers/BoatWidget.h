@@ -13,5 +13,13 @@ UCLASS()
 class RACKETEERS_API UBoatWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+public:
+	// Blueprint-implemented event
+	UFUNCTION(BlueprintImplementableEvent, Category = "UI")
+	void UI_PlayShootRange();
+
+	// Blueprint-implemented event
+	UFUNCTION(BlueprintImplementableEvent, Category = "UI")
+	void UI_PlayShootCooldown();
 };

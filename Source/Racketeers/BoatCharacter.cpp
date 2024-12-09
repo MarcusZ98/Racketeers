@@ -65,8 +65,16 @@ void ABoatCharacter::Tick(float DeltaTime)
 	if (bIsHoldingShoot && ShootTime < 3)
 	{
 		ShootTime += DeltaTime;
-		// Ensure the widget instance exists
-		//UI_PlayShootRange();
+		OnShootTimeUpdated.Broadcast();
+		// if (BoatWidgetInstance)
+		// {
+		// 	// Cast the widget instance to UBoatWidget
+		// 	UBoatWidget* BoatWidget = Cast<UBoatWidget>(BoatWidgetInstance);
+		// 	if (BoatWidget && IsLocallyControlled())
+		// 	{
+		// 		BoatWidget->UI_PlayShootRange(); // Call the Blueprint-implemented event
+		// 	}
+		// }
 	}
 
 	if (HasAuthority()) // Only update on the server
