@@ -49,7 +49,7 @@ void ARacketeersGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 void ARacketeersGameStateBase::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	AddPart(ETeams::Team_Raccoon, EPart::Cannon_0);
 	AddPart(ETeams::Team_Raccoon, EPart::Hull_0);
 	AddPart(ETeams::Team_Raccoon, EPart::Sail_0);

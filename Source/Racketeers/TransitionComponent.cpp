@@ -39,19 +39,17 @@ void UTransitionComponent::IncrementPlayerReady(ETeams Team)
 {
 	
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "IncrementPlayerReady" );
-	if(bIsOn)
-	{
 		CountPlayer(Team);
 		AGameStateBase* GS = UGameplayStatics::GetGameState(GetWorld());
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "NUM: " + FString::FromInt(GS->PlayerArray.Num()) + " Current Player Count: " + FString::FromInt(CountPlayersReady) );
 
 		if(GS == nullptr) return;
-		if(bIsFinished && CountPlayersReady == GS->PlayerArray.Num())
+		if(CountPlayersReady == GS->PlayerArray.Num())
 		{
 			CountPlayersReady = 0;
 			OnFinished.Broadcast();
 		}
-	}
+	
 	//ARacketeersGMBase* GM = Cast<ARacketeersGMBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	//GM->IncrementPlayerCounter();
 }
@@ -60,13 +58,20 @@ void UTransitionComponent::CountPlayer(ETeams Team)
 {
 	ARacketeersGameStateBase* GS = Cast<ARacketeersGameStateBase>(UGameplayStatics::GetGameState(GetWorld()));
 	CountPlayersReady++;
-	if(GS == nullptr) return;
-	if(Team == ETeams::Team_Raccoon)
+	if(GS == nullptr)
 	{
-		GS->RaccoonsReady++;
+
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "GameState IS NULLPTR, CountPlayer");
 		return;
 	}
 
+	if(Team == ETeams::Team_Raccoon)
+	{
+		GS->RaccoonsReady++;
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Add  to RaccoonsReady");
+		return;
+	}
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Add  to PandasReady");
 	GS->PandasReady++;
 }
 

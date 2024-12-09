@@ -249,8 +249,8 @@ bool ARacketeersController::AddToStats_Validate(int Amount, EGameStats GameStats
 
 void ARacketeersController::ClientCheckReady_Implementation(ETeams Team)
 {
-	if(bhavePressedContinue) return;
-	bhavePressedContinue = true;
+	//if(bhavePressedContinue) return;
+	//bhavePressedContinue = true;
 	ServerCheckReady(Team);
 }
 

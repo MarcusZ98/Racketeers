@@ -68,12 +68,25 @@ void ARacketeersGMBase::InitGame(const FString& MapName, const FString& Options,
 
 void ARacketeersGMBase::BeginPlay()
 {
+
+	Super::BeginPlay();
 	//UE_LOG(LogTemp, Warning, TEXT("RacketeersGMBase::BeginPlay"));
 	
 	//Set the GameState in GameMode
 	//GameState = Cast<AGS_Base>(UGameplayStatics::GetGameState(GetWorld()));
 
 
+	/*
+	UBaseGameInstance* GI = Cast<UBaseGameInstance>(GetGameInstance());
+	if(GI)
+	{
+		FGameModeData Data = GI->GetGameModeData();
+		LevelToLoad = Data.LevelToLoad;
+		
+	}
+	*/
+	
+	bUseSeamlessTravel = true;
 	WidgetSubsystem = GetGameInstance()->GetSubsystem<UWidgetSubsystem>();
 
 	//Initilize variables
@@ -147,7 +160,7 @@ void ARacketeersGMBase::BeginPlay()
 
 	PController->OnPlayerPressedReady.AddDynamic(TransitionComponent, &UTransitionComponent::IncrementPlayerReady);
 
-	TransitionComponent->OnFinished.AddDynamic(this, &ARacketeersGMBase::AllStagesFinished);
+	TransitionComponent->OnFinished.AddDynamic(this, &ARacketeersGMBase::TravelToLevel);
 	TransitionComponent->GameState = GetGameState<ARacketeersGameStateBase>();
 	
 }
@@ -185,6 +198,8 @@ void ARacketeersGMBase::Tick(float DeltaSeconds)
 		//CurrentTime += DeltaSeconds;
 	}
 }
+
+
 void ARacketeersGMBase::RoundCompletion()
 {
 	CurrentTime = 0;
@@ -207,11 +222,19 @@ void ARacketeersGMBase::RoundCompletion()
 
 	//if(GEngine)
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Load Transition stats");
-	LoadTransitionStats();
+	//LoadTransitionStats();
 
 	//if(GEngine)
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Transition");
 	Transition();
+}
+
+void ARacketeersGMBase::TravelToLevel()
+{
+	SwitchState();
+
+	ProcessServerTravel(LevelToLoad, false);
+
 }
 
 bool ARacketeersGMBase::CheckWinnerOfRound()
@@ -248,7 +271,9 @@ void ARacketeersGMBase::SwitchState()
 	{
 		CurrentPhase = Phases[CurrentPhase->State+1];	
 	}
+
 	ARacketeersGameStateBase* GS = GetGameState<ARacketeersGameStateBase>();
+	if(GS == nullptr) {return;}
 	GS->CurrentPhase = this->CurrentPhase->State;
 	GS->OnRep_PhaseChange();
 }
@@ -256,13 +281,25 @@ void ARacketeersGMBase::SwitchState()
 
 void ARacketeersGMBase::Transition()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, LevelToLoad);
+	UBaseGameInstance* BI = Cast<UBaseGameInstance>(GetGameInstance());
+	if(BI == nullptr) return;
+	FGameModeData Data;
+	Data.LevelToLoad = LevelToLoad;
+	BI->SetGameModeData(Data);
+	ProcessServerTravel("StatsTransitionMap",true);
+	//TransitionComponent->AddWidgetsToPlayers(GetGameState<ARacketeersGameStateBase>());
+
+	
+	
+	/*
 	/*
 	if(CurrentPhase->State == EPhaseState::Phase_3)
 	{
 		return;
 	}
 
-	*/ 
+	
 	//LoadLevel();
 
 	
@@ -277,6 +314,7 @@ void ARacketeersGMBase::Transition()
 	//if(GEngine)
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Unload Level");
 	UnloadLevel((TEXT("%s"), *CurrentPhase->LevelToLoad), ActionInfo);
+	*/
 }
 
 void ARacketeersGMBase::BroadcastOnPlayerPressed(ETeams Team)
