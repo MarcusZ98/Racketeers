@@ -19,60 +19,74 @@ class RACKETEERS_API ALobbySpawnPoint : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
-	// Sets default values for this actor's properties
-	ALobbySpawnPoint();
-
 	// ----------------------------Variables--------------------------------------------
+
+public:	
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UArrowComponent* PlayerSpawnPoint;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", Replicated)
 	UWidgetComponent* LobbyInfoWidget;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team")
-	APlayerController* PlayerController = nullptr;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Team")
-	TSubclassOf<AActor> PandaPlayerClass;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Team")
-	TSubclassOf<AActor> RaccoonPlayerClass;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team", Replicated)
-	AActor* Player = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
-	UNiagaraSystem* SpawnVFX;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	int TeamID = -1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	ETeams Team;
 
-	// ----------------------------Functions--------------------------------------------
+private:
 	
+	UPROPERTY(EditDefaultsOnly, Category = "Classes")
+	TSubclassOf<AActor> RaccoonPlayerClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Classes")
+	TSubclassOf<AActor> PandaPlayerClass;
+
+	UPROPERTY(EditAnywhere, Category = "VFX")
+	UNiagaraSystem* SpawnVFX;
+	
+	UPROPERTY(EditAnywhere, Category = "Player")
+	APlayerController* PlayerController = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Player", Replicated)
+	AActor* Player = nullptr;
+	
+	
+
+	// ----------------------------Functions--------------------------------------------
+
+public:
+
+	ALobbySpawnPoint();
+
+	// Spawn the player on the spawn point
 	UFUNCTION(Server, Reliable)
 	void Server_SpawnPlayer();
 
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_SpawnVFX();
-
+	//Update the widget info on all clients
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_UpdateWidgetInfo(const FLobbyInfo& NewLobbyInfo, APlayerState* PS);
-	
-	UFUNCTION(Server, Reliable)
-	void Server_RemovePlayer();
 
+	// Toggle the ready status on all clients
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_ToggleReady(bool bIsReady);
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void ToggleReadyStatus(bool bIsReady);
+	// Remove the player from the spawn point
+	UFUNCTION(Server, Reliable)
+	void Server_RemovePlayer();
 
+	// Get/Set Player Controller
 	void SetPlayerController(APlayerController* PC) { PlayerController = PC; }
+	APlayerController* GetPlayerController() const { return PlayerController; }
+
+	bool IsOccupied() const { return PlayerController != nullptr; }
+
+private:
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void Multicast_SpawnVFX();
+
 
 protected:
 

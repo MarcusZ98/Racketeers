@@ -10,4 +10,5 @@ void AGS_Lobby::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 
 	DOREPLIFETIME(AGS_Lobby, bRaccoonFull);
 	DOREPLIFETIME(AGS_Lobby, bPandaFull);
+	DOREPLIFETIME(AGS_Lobby, bEnoughPlayersToStart);
 }
