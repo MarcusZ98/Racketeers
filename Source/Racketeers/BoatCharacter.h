@@ -14,7 +14,6 @@ class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnShootTimeUpdated, float, CurrentShootTime);
 
 UCLASS(config=Game)
 class ABoatCharacter : public ACharacter
@@ -81,11 +80,8 @@ protected:
 	// Instance of the created widget
 	UPROPERTY(BlueprintReadWrite, Category = "UI")
 	UBoatWidget* BoatWidgetInstance;
-
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnShootTimeUpdated);
-
-	UPROPERTY(BlueprintAssignable, Category = "UI")
-	FOnShootTimeUpdated OnShootTimeUpdated;
+	UPROPERTY()
+	UBoatWidget* BoatWidget;
 	
 	/* ---- TIMERS ---- */
 	FTimerHandle FireTimerHandle;
@@ -131,9 +127,8 @@ private:
 	float OriginalMaxWalkSpeed; // To store the original speed
 	FTimerHandle ScurryTimerHandle; // Timer handle for scurry
 	int32 CurrentCannonIndex = 0;
-	bool bCanShoot = true;
 	bool bShootLeft;
-	bool bIsHoldingShoot = false;
+	
 
 	
 public:
@@ -185,6 +180,13 @@ public:
 	float RemainingCooldownTime;
 	UPROPERTY(Replicated)
 	float ShootTime;
+	UPROPERTY(Replicated)
+	bool bIsHoldingShoot = false;
+	UPROPERTY(Replicated)
+	bool bCanShoot = true;
+	UPROPERTY(Replicated)
+	bool bIsShooting = false;
+
 
 	/* ---- COMPONENTS ---- */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision", meta = (AllowPrivateAccess = "true"))

@@ -19,7 +19,21 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "UI")
 	void UI_PlayShootRange();
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "UI")
+	void UI_PlayAnimationShootRange();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "UI")
+	void UI_PlayAnimationError();
+
 	// Blueprint-implemented event
 	UFUNCTION(BlueprintImplementableEvent, Category = "UI")
 	void UI_PlayShootCooldown();
+
+	// Blueprint-implemented event
+	UFUNCTION(BlueprintImplementableEvent, Category = "UI")
+	void UI_PlayAnimationShootCooldown();
+
+	// Blueprint-implemented event
+	UFUNCTION(BlueprintImplementableEvent, Category = "UI")
+	void UI_PlayAnimationHealth();
 };
