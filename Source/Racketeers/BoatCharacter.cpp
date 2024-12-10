@@ -61,9 +61,22 @@ void ABoatCharacter::BeginPlay()
 void ABoatCharacter::Tick(float DeltaTime)
 {
 	// Increment ShootTime only when holding shoot
-	if (bIsHoldingShoot)
+	if (bIsHoldingShoot && ShootTime < 3)
 	{
 		ShootTime += DeltaTime;
+	}
+
+	if (HasAuthority()) // Only update on the server
+	{
+		if (GetWorld()->GetTimerManager().IsTimerActive(CooldownTimerHandle))
+		{
+			// Update remaining cooldown time for replication
+			RemainingCooldownTime = GetWorld()->GetTimerManager().GetTimerRemaining(CooldownTimerHandle);
+		}
+		else
+		{
+			RemainingCooldownTime = 0.0f; // Cooldown is complete
+		}
 	}
 }
 
@@ -356,6 +369,33 @@ void ABoatCharacter::AddCannonsInOrder(float Count, USceneComponent* Cannon)
 			return; // Ensure each cannon is added only once
 		}
 	}
+}
+
+float ABoatCharacter::GetCooldownProgress() const
+{
+	// Calculate progress based on RemainingCooldownTime
+	if (ShootCooldown > 0.0f)
+	{
+		return 1.0f - FMath::Clamp(RemainingCooldownTime / ShootCooldown, 0.0f, 1.0f);
+	}
+
+	// Default to fully charged if cooldown is invalid
+	return 1.0f;
+}
+
+float ABoatCharacter::GetShootRange() const
+{
+	return ShootTime;
+}
+
+void ABoatCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// Replicate remaining cooldown time
+	DOREPLIFETIME(ABoatCharacter, RemainingCooldownTime);
+	DOREPLIFETIME(ABoatCharacter, ShootTime);
+
 }
 
 

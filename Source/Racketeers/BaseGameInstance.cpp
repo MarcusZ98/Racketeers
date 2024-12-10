@@ -40,6 +40,19 @@ FGameStatsPackage UBaseGameInstance::GetDataTransferPackage()
 }
 
 
+void UBaseGameInstance::SetGameModeData(FGameModeData Data)
+{
+	TempGameModeData = Data;
+}
+
+FGameModeData UBaseGameInstance::GetGameModeData()
+{
+	FGameModeData Temp = TempGameModeData;
+	TempGameModeData = FGameModeData();
+	return Temp;
+}
+
+
 void UBaseGameInstance::SetGameStateData_Implementation()
 {
 	FGameStatsPackage GameStatsPackage = GetDataTransferPackage();
