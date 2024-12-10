@@ -36,7 +36,8 @@ enum EPhaseState
 {
 	Phase_1,
 	Phase_2,
-	Phase_3
+	Phase_3,
+	Phase_NONE
 };
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable, BlueprintType)
