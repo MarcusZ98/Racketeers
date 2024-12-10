@@ -46,7 +46,6 @@ bool UWidgetSubsystem::SetCanRunTick_Validate(bool b)
 }
 
 void UWidgetSubsystem::ActivateWidget(FName Name)
-
 {
 	if(!ActiveWidgetComponents.Contains(Name))
 	{

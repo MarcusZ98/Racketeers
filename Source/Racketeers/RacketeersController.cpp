@@ -58,7 +58,9 @@ void ARacketeersController::ActivateWidget_Implementation(FName Name, UUserWidge
 		    W->AddToViewport();
 			WS->ActiveWidgetComponents.Add(Name, W);
 		}
+		return;
 	}
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Could Not Activate Widget");
 	//UserWidget = Widget;
 	
 	/*
