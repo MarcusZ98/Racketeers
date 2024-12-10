@@ -5,6 +5,8 @@
 #include "Projectile.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "BoatWidget.h"
+//#include "UserWidget.generated.h"
 #include "BoatCharacter.generated.h"
 
 class USpringArmComponent;
@@ -12,6 +14,7 @@ class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnShootTimeUpdated, float, CurrentShootTime);
 
 UCLASS(config=Game)
 class ABoatCharacter : public ACharacter
@@ -71,6 +74,19 @@ protected:
 	UPROPERTY()
 	TArray<USceneComponent*> CannonComponents;
 
+	/* ---- WIDGETS ---- */
+	// Widget Blueprint class to be assigned in the editor
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget> BoatWidgetClass;
+	// Instance of the created widget
+	UPROPERTY(BlueprintReadWrite, Category = "UI")
+	UBoatWidget* BoatWidgetInstance;
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnShootTimeUpdated);
+
+	UPROPERTY(BlueprintAssignable, Category = "UI")
+	FOnShootTimeUpdated OnShootTimeUpdated;
+	
 	/* ---- TIMERS ---- */
 	FTimerHandle FireTimerHandle;
 	FTimerHandle CooldownTimerHandle;
@@ -86,7 +102,7 @@ protected:
 	/* ---- VARIABLES ----*/
 	UPROPERTY(EditAnywhere, Category="Cannons")
 	float FireDelay = 0.5f;
-	UPROPERTY(EditAnywhere, Category="Cannons")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Cannons")
 	float ShootCooldown = 1;
 	UPROPERTY(BlueprintReadWrite, Category = "Interaction")
 	bool bIsInteracting;
@@ -118,7 +134,6 @@ private:
 	bool bCanShoot = true;
 	bool bShootLeft;
 	bool bIsHoldingShoot = false;
-	float ShootTime;
 
 	
 public:
@@ -127,6 +142,10 @@ public:
 	void StopShooting();
 	UFUNCTION(BlueprintCallable)
 	void FindCannons();
+	UFUNCTION(BlueprintCallable, Category = "Cooldown")
+	float GetCooldownProgress() const;
+	UFUNCTION(BlueprintCallable, Category = "Shoot")
+	float GetShootRange() const;
 
 	/* ---- SETTERS ----*/
 	/*UFUNCTION(BlueprintCallable, Category = "Boat Properties")
@@ -161,6 +180,11 @@ public:
 	float ScurryAmount;
 	UPROPERTY(BlueprintReadOnly, Category = "Movement")
 	bool bScurryActive = false;
+	// Replicated remaining cooldown time
+	UPROPERTY(Replicated)
+	float RemainingCooldownTime;
+	UPROPERTY(Replicated)
+	float ShootTime;
 
 	/* ---- COMPONENTS ---- */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision", meta = (AllowPrivateAccess = "true"))

@@ -56,5 +56,6 @@ private:
 	void SetUpSpawnPositions();
 	void UpdateIfTeamFull();
 	void UpdateIfEnoughPlayersToStart() const;
+	void SetPlayerIDs();
 	
 };
