@@ -100,6 +100,7 @@ void ARacketeersGMBase::BeginPlay()
 	
 	//UE_LOG(LogTemp, Warning, TEXT("About To Spawn Timer Info"));
 	TimerInfo = Cast<ATimerInfo>(UGameplayStatics::GetActorOfClass(GetWorld(), ATimerInfo::StaticClass()));
+
 	
 	if(TimerInfo == nullptr)
 	{
@@ -148,7 +149,7 @@ void ARacketeersGMBase::BeginPlay()
 	{
 		//if(GEngine)
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Activate Time ");
-		ATimerInfo::SetTime(Phase_1->TimeLimit);
+		ATimerInfo::SetTime(TimeLimit);
 		TimerInfo->SetIsActive(true);
 	}
 
@@ -210,8 +211,8 @@ void ARacketeersGMBase::RoundCompletion()
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Check If Game Is Over");
 	if(CheckIfGameIsOver())
 	{
-		//if(GEngine)
-			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "End Game");
+		if(GEngine)
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "End Game");
 		EndGame();
 		return;
 	}
@@ -231,8 +232,9 @@ void ARacketeersGMBase::RoundCompletion()
 
 void ARacketeersGMBase::TravelToLevel()
 {
-	SwitchState();
-
+	//SwitchState();
+	OnloadedMap.Broadcast();
+	SetPackage();
 	ProcessServerTravel(LevelToLoad, false);
 
 }
@@ -240,7 +242,7 @@ void ARacketeersGMBase::TravelToLevel()
 bool ARacketeersGMBase::CheckWinnerOfRound()
 {
 
-	if(CurrentPhase->State == EPhaseState::Phase_3)
+	if(State == EPhaseState::Phase_3)
 	{
 		ARacketeersGameStateBase* GS = GetGameState<ARacketeersGameStateBase>();
 		if(GS == nullptr) return false;
@@ -258,7 +260,6 @@ bool ARacketeersGMBase::CheckWinnerOfRound()
 		GS->RacconsRoundsWon++;
 		GS->RedPandasRoundsWon++;
 	}
-	
 	return true;
 }
 
@@ -281,12 +282,19 @@ void ARacketeersGMBase::SwitchState()
 
 void ARacketeersGMBase::Transition()
 {
+	
+	OnloadedMap.Broadcast();
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, LevelToLoad);
-	UBaseGameInstance* BI = Cast<UBaseGameInstance>(GetGameInstance());
-	if(BI == nullptr) return;
-	FGameModeData Data;
-	Data.LevelToLoad = LevelToLoad;
-	BI->SetGameModeData(Data);
+	if(!PossibleLevelsToLoad.IsEmpty())
+	{
+		int RandomInt = FMath::RandRange(0, PossibleLevelsToLoad.Num() - 1);
+		if(PossibleLevelsToLoad.IsValidIndex(RandomInt))
+		{
+			LevelToLoad = PossibleLevelsToLoad[RandomInt];
+		}
+
+	}
+	SetPackage();
 	ProcessServerTravel("StatsTransitionMap",true);
 	//TransitionComponent->AddWidgetsToPlayers(GetGameState<ARacketeersGameStateBase>());
 
@@ -395,12 +403,14 @@ bool ARacketeersGMBase::CheckIfGameIsOver()
 
 	ARacketeersGameStateBase* GS = this->GetGameState<ARacketeersGameStateBase>();
 	
-	if(CurrentPhase->State == EPhaseState::Phase_3)
+	if(State == EPhaseState::Phase_3)
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "In Check If Game Is Over");
 		int AvailibleRounds = TotalRounds - (GS->RacconsRoundsWon + GS->RedPandasRoundsWon);
 		int8 RoundsPlayed = GS->RacconsRoundsWon + GS->RedPandasRoundsWon;
-		if(RoundsPlayed >= GetTotalRounds())
+		if(AvailibleRounds <= 0)
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Game Was Over");
 			return true; 
 		}
 	}
@@ -427,30 +437,7 @@ bool ARacketeersGMBase::LoadTransitionStats()
 bool ARacketeersGMBase::EndGame()
 {
 
-	ARacketeersGameStateBase* GS = GetGameState<ARacketeersGameStateBase>();
-	
-	FGameStatsPackage Package{
-		GS->RacconResource,
-		GS->RacconsRoundsWon,
-		GS->RaccoonsBoatHealth,
-		GS->RedPandasResource,
-		GS->RedPandasRoundsWon,
-		GS->RedPandasBoatHealth
-	};
-
-	if(Package.RacconsRoundsWon > Package.RedPandasRoundsWon)
-	{
-		Package.WonTeam = ETeams::Team_Raccoon;
-	}
-	else if (Package.RacconsRoundsWon < Package.RedPandasRoundsWon)
-	{
-		Package.WonTeam = ETeams::Team_Raccoon;
-	}
-
-	Package.WonTeam = ETeams::NONE;
-
-	UBaseGameInstance* GI = GetGameInstance<UBaseGameInstance>();
-	GI->SetDataToTransfer(Package);
+	SetPackage();
 	ProcessServerTravel("VictoryMap_GamePlay");
 
 	return true;
@@ -496,6 +483,45 @@ TEnumAsByte<EPhaseState> ARacketeersGMBase::SwitchIncomingState()
 	GS->OnRep_IncomingPhaseChange();
 
 	return NewPhase;
+}
+
+void ARacketeersGMBase::SetPackage()
+{
+	UBaseGameInstance* BI = Cast<UBaseGameInstance>(GetGameInstance());
+	ARacketeersGameStateBase* GS = GetGameState<ARacketeersGameStateBase>();
+	
+	FGameStatsPackage Package{
+		GS->RacconResource,
+		GS->RacconsRoundsWon,
+		GS->RaccoonsBoatHealth,
+		GS->RaccoonParts.Array(),
+		GS->RedPandasResource,
+		GS->RedPandasRoundsWon,
+		GS->RedPandasBoatHealth,
+		GS->PandaParts.Array(),
+		GS->PlayerArray.Num()
+	};
+
+	if(Package.RacconsRoundsWon > Package.RedPandasRoundsWon)
+	{
+		Package.WonTeam = ETeams::Team_Raccoon;
+	}
+	else if (Package.RacconsRoundsWon < Package.RedPandasRoundsWon)
+	{
+		Package.WonTeam = ETeams::Team_Raccoon;
+	}
+	else
+	{
+		Package.WonTeam = ETeams::NONE;
+	}
+
+
+	if(BI == nullptr) return;
+	FGameModeData Data;
+	Data.LevelToLoad = LevelToLoad;
+	BI->SetGameModeData(Data);
+	BI->SetDataToTransfer(Package);
+	
 }
 
 void ARacketeersGMBase::UnloadLevel(FName name, FLatentActionInfo& ActionInfo)
