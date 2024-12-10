@@ -49,6 +49,45 @@ void ARacketeersGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 void ARacketeersGameStateBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if(HasAuthority())
+	{
+		ARacketeersGMBase* GM = Cast<ARacketeersGMBase>( UGameplayStatics::GetGameMode(GetWorld()));
+		if(GM)
+		{
+			CurrentPhase = GM->State;
+		}
+		UBaseGameInstance* GI = Cast<UBaseGameInstance>(GetGameInstance());
+		if (GI->CheckIfDataToTransfer())
+		{
+			FGameStatsPackage Package = GI->GetDataTransferPackage();
+			GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Red, "Raccon Wins " + FString::FromInt(Package.RacconsRoundsWon));
+			GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Red, "Pandas Wins " + FString::FromInt(Package.RedPandasRoundsWon));
+		
+			RacconResource = Package.RaccoonResources;
+			RacconsRoundsWon = Package.RacconsRoundsWon;
+			RaccoonsBoatHealth = Package.RacconsBoatHealth;
+			for (TEnumAsByte<EPart> RaccoonPart : Package.RaccoonParts)
+			{
+				RaccoonParts.Add(RaccoonPart);
+			}
+			RedPandasResource = Package.PandaResources;
+			RedPandasRoundsWon = Package.RedPandasRoundsWon;
+			RedPandasBoatHealth = Package.RedPandasBoatHealth;
+			for (TEnumAsByte<EPart> PandaPart : Package.PandaParts)
+			{
+				PandaParts.Add(PandaPart);
+			}
+			GameWinner = Package.WonTeam;
+			GI->ClearDataStatsPackage();
+		}
+
+	}
+	
+	//UKismetSystemLibrary::K2_SetTimerDelegate()
+	
+	
+	/*
 	
 	AddPart(ETeams::Team_Raccoon, EPart::Cannon_0);
 	AddPart(ETeams::Team_Raccoon, EPart::Hull_0);
@@ -59,20 +98,6 @@ void ARacketeersGameStateBase::BeginPlay()
 
 
 	
-	UBaseGameInstance* GI = Cast<UBaseGameInstance>(GetGameInstance());
-	if (GI->CheckIfDataToTransfer())
-	{
-		FGameStatsPackage Package = GI->GetDataTransferPackage();
-
-		RacconResource = Package.RaccoonResources;
-		RacconsRoundsWon = Package.RacconsRoundsWon;
-		RaccoonsBoatHealth = Package.RacconsBoatHealth;
-		RedPandasResource = Package.PandaResources;
-		RedPandasRoundsWon = Package.RedPandasRoundsWon;
-		RedPandasBoatHealth = Package.RedPandasBoatHealth;
-		GameWinner = Package.WonTeam;
-		GI->ClearDataStatsPackage();
-	}
 
 	if (HasAuthority())
 	{
@@ -86,6 +111,7 @@ void ARacketeersGameStateBase::BeginPlay()
 	RaccoonsBoatHealth = RaccoonsMaxHealth;
 	RedPandasBoatHealth = RedPandasMaxHealth;
 
+	*/
 }
 
 void ARacketeersGameStateBase::ChangeCurrentPhase(TEnumAsByte<EPhaseState> NewPhase)

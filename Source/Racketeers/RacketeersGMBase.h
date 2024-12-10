@@ -119,13 +119,15 @@ public:
 	void IncrementPlayerCounter();
 	int8 GetTotalRounds();
 	TEnumAsByte<EPhaseState> SwitchIncomingState();
+	void SetPackage();
 
-	
 
 
 	//Create one phase1 GameMode, one phase 2 GameMode and one Phase3 GameMode
-
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Phase Data")
+	TEnumAsByte<EPhaseState> State;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Phase Data")
+	float TimeLimit;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsGameActive;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
