@@ -15,6 +15,7 @@
 #include "InputActionValue.h"
 #include "Projectile.h"
 #include "Components/BoxComponent.h"
+#include "Components/ProgressBar.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
@@ -64,6 +65,16 @@ void ABoatCharacter::Tick(float DeltaTime)
 	if (bIsHoldingShoot && ShootTime < 3)
 	{
 		ShootTime += DeltaTime;
+		OnShootTimeUpdated.Broadcast();
+		// if (BoatWidgetInstance)
+		// {
+		// 	// Cast the widget instance to UBoatWidget
+		// 	UBoatWidget* BoatWidget = Cast<UBoatWidget>(BoatWidgetInstance);
+		// 	if (BoatWidget && IsLocallyControlled())
+		// 	{
+		// 		BoatWidget->UI_PlayShootRange(); // Call the Blueprint-implemented event
+		// 	}
+		// }
 	}
 
 	if (HasAuthority()) // Only update on the server
