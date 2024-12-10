@@ -311,7 +311,7 @@ void ARacketeersGameStateBase::OnRep_PhaseChange()
 			UpdateHealth();
 			UpdateTeamAlive();
 			OnPhaseThreeActive.Broadcast();
-			WS->ActivateWidget("TeamHealth");
+			//WS->ActivateWidget("TeamHealth");
 			WS->RemoveWidget("TeamResources");
 			break;
 	}
