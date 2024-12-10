@@ -157,6 +157,7 @@ void AGM_LobbyHost::UpdateIfEnoughPlayersToStart() const
 
 void AGM_LobbyHost::StartTheMatch()
 {
+	SetPlayerIDs();
 	ProcessServerTravel(MapName);
 
 	for(const auto Player : Players)
@@ -164,5 +165,30 @@ void AGM_LobbyHost::StartTheMatch()
 		Cast<APC_Lobby>(Player)->Client_OnStartMatch();
 	}
 }
+
+void AGM_LobbyHost::SetPlayerIDs()
+{
+	int PandaID = 0;
+	int RaccoonID = 0;
+
+	for(auto Player : Players)
+	{
+		if(APS_Lobby* PS = Cast<APS_Lobby>(Player->PlayerState))
+		{
+			if(PS->LobbyInfo.Team == ETeams::Team_Panda)
+			{
+				PS->LobbyInfo.TeamID = PandaID;
+				PandaID++;
+			}
+			else if(PS->LobbyInfo.Team == ETeams::Team_Raccoon)
+			{
+				PS->LobbyInfo.TeamID = RaccoonID;
+				RaccoonID++;
+			}
+		}
+	}
+}
+
+
 
 

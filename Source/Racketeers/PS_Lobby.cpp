@@ -13,15 +13,6 @@ APS_Lobby::APS_Lobby()
 void APS_Lobby::CopyProperties(APlayerState* PlayerState)
 {
 	Super::CopyProperties(PlayerState);
-
-	if (HasAuthority())
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "Running on Server");
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Running on Client");
-	}
 	
 	if(APS_Base* PS_Base = Cast<APS_Base>(PlayerState))
 	{
