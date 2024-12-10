@@ -60,16 +60,8 @@ void ARacketeersGameStateBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-
-
-
-	
-
 	if(HasAuthority())
 	{
-		
-
-		
 		ARacketeersGMBase* GM = Cast<ARacketeersGMBase>( UGameplayStatics::GetGameMode(GetWorld()));
 		if(GM)
 		{
