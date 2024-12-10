@@ -29,6 +29,9 @@ class RACKETEERS_API AGM_LobbyHost : public AGM_Base
 	UPROPERTY(EditAnywhere, Category = "Game Rules")
 	FString MapName = "World_P";
 
+	UPROPERTY(EditAnywhere, Category = "UI")
+	float LoadingScreenTime = 4.0f;
+
 	// ----------------- Functions -----------------
 
 public:
@@ -57,5 +60,6 @@ private:
 	void UpdateIfTeamFull();
 	void UpdateIfEnoughPlayersToStart() const;
 	void SetPlayerIDs();
+	void StartMatchTravel();
 	
 };
