@@ -46,12 +46,30 @@ void ARacketeersGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 }
 
 
+ARacketeersGameStateBase::ARacketeersGameStateBase()
+{
+	AddPart(ETeams::Team_Raccoon, EPart::Cannon_0);
+	AddPart(ETeams::Team_Raccoon, EPart::Hull_0);
+	AddPart(ETeams::Team_Raccoon, EPart::Sail_0);
+	AddPart(ETeams::Team_Panda, EPart::Cannon_0);
+	AddPart(ETeams::Team_Panda, EPart::Hull_0);
+	AddPart(ETeams::Team_Panda, EPart::Sail_0);
+}
+
 void ARacketeersGameStateBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+
+
+
+	
+
 	if(HasAuthority())
 	{
+		
+
+		
 		ARacketeersGMBase* GM = Cast<ARacketeersGMBase>( UGameplayStatics::GetGameMode(GetWorld()));
 		if(GM)
 		{
@@ -61,8 +79,6 @@ void ARacketeersGameStateBase::BeginPlay()
 		if (GI->CheckIfDataToTransfer())
 		{
 			FGameStatsPackage Package = GI->GetDataTransferPackage();
-			//GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Red, " ExpectedPlayers " + FString::FromInt(Package.ExpectedPlayers));
-		
 			RacconResource = Package.RaccoonResources;
 			RacconsRoundsWon = Package.RacconsRoundsWon;
 			RaccoonsBoatHealth = Package.RacconsBoatHealth;
@@ -89,12 +105,6 @@ void ARacketeersGameStateBase::BeginPlay()
 	
 	/*
 	
-	AddPart(ETeams::Team_Raccoon, EPart::Cannon_0);
-	AddPart(ETeams::Team_Raccoon, EPart::Hull_0);
-	AddPart(ETeams::Team_Raccoon, EPart::Sail_0);
-	AddPart(ETeams::Team_Panda, EPart::Cannon_0);
-	AddPart(ETeams::Team_Panda, EPart::Hull_0);
-	AddPart(ETeams::Team_Panda, EPart::Sail_0);
 
 
 	

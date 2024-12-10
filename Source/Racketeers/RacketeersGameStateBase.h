@@ -29,6 +29,8 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 
 	public:
 
+	ARacketeersGameStateBase();
+
 	UPROPERTY(BlueprintCallable, BlueprintAssignable)
 	FOnPhaseOneActive OnPhaseOneActive;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable)
