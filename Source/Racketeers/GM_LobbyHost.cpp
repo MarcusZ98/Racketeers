@@ -158,12 +158,24 @@ void AGM_LobbyHost::UpdateIfEnoughPlayersToStart() const
 void AGM_LobbyHost::StartTheMatch()
 {
 	SetPlayerIDs();
-	ProcessServerTravel(MapName);
 
-	for(const auto Player : Players)
+	for (const auto Player : Players)
 	{
-		Cast<APC_Lobby>(Player)->Client_OnStartMatch();
+		if (APC_Lobby* LobbyPlayer = Cast<APC_Lobby>(Player))
+		{
+			LobbyPlayer->Client_OnStartMatch();
+		}
 	}
+
+	// Add a delay before starting the server travel
+	FTimerHandle StartMatchTimer;
+	GetWorld()->GetTimerManager().SetTimer(StartMatchTimer, this, &AGM_LobbyHost::StartMatchTravel, LoadingScreenTime, false);
+}
+
+// Function to handle server travel after delay
+void AGM_LobbyHost::StartMatchTravel()
+{
+	ProcessServerTravel(MapName);
 }
 
 void AGM_LobbyHost::SetPlayerIDs()
