@@ -73,9 +73,8 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 	int32 GetTeamResources(ETeams Team, EResources Resource) const;
 	UFUNCTION(BlueprintCallable)
 	FTeamGameStats GetTeamStats(ETeams Team);
-
-	UFUNCTION(Blueprintable)
-	void UpdateTeamAlive();
+	UFUNCTION(BlueprintCallable)
+	virtual void UpdateTeamAlive();
 	UFUNCTION(BlueprintCallable)
 	void UpdateHealth();
 	
@@ -103,8 +102,8 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 
 	UPROPERTY(Replicated, BlueprintReadWrite)
 	FGameStats TeamStats;
-
-	
+	UPROPERTY(BlueprintReadWrite)
+	int ExpectedPlayers;
 	UPROPERTY(BlueprintReadWrite)
 	TSet<TEnumAsByte<EPart>> RaccoonParts;
 	UPROPERTY(BlueprintReadWrite)

@@ -61,8 +61,7 @@ void ARacketeersGameStateBase::BeginPlay()
 		if (GI->CheckIfDataToTransfer())
 		{
 			FGameStatsPackage Package = GI->GetDataTransferPackage();
-			GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Red, "Raccon Wins " + FString::FromInt(Package.RacconsRoundsWon));
-			GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Red, "Pandas Wins " + FString::FromInt(Package.RedPandasRoundsWon));
+			//GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Red, " ExpectedPlayers " + FString::FromInt(Package.ExpectedPlayers));
 		
 			RacconResource = Package.RaccoonResources;
 			RacconsRoundsWon = Package.RacconsRoundsWon;
@@ -79,6 +78,7 @@ void ARacketeersGameStateBase::BeginPlay()
 				PandaParts.Add(PandaPart);
 			}
 			GameWinner = Package.WonTeam;
+			ExpectedPlayers = Package.ExpectedPlayers;
 			GI->ClearDataStatsPackage();
 		}
 

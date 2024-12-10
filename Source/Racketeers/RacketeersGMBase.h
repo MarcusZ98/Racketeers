@@ -92,6 +92,7 @@ public:
 	UPROPERTY(Editanywhere, BlueprintReadWrite, Blueprintable, Category = "Phases")
 	UPhase* Phase_3;
 
+
 	UFUNCTION(BlueprintCallable)
 	void LoadLevel();
 	UFUNCTION(BlueprintCallable)
@@ -124,6 +125,7 @@ public:
 
 
 	//Create one phase1 GameMode, one phase 2 GameMode and one Phase3 GameMode
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Phase Data")
 	TEnumAsByte<EPhaseState> State;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Phase Data")
@@ -138,10 +140,14 @@ public:
 	int32 TotalRounds;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category= "Phase Data")
 	FString LevelToLoad;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Phase Data")
+	TArray<FString> PossibleLevelsToLoad;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category= "Phase Data")
 	FString MainParentLevel;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Phase Data")
 	FString StartPhaseName;
+
+
 
 	/*UFUNCTION(BlueprintCallable)
 	void InitializeBoatData();

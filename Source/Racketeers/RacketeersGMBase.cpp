@@ -241,6 +241,7 @@ void ARacketeersGMBase::TravelToLevel()
 
 bool ARacketeersGMBase::CheckWinnerOfRound()
 {
+
 	if(State == EPhaseState::Phase_3)
 	{
 		ARacketeersGameStateBase* GS = GetGameState<ARacketeersGameStateBase>();
@@ -281,8 +282,18 @@ void ARacketeersGMBase::SwitchState()
 
 void ARacketeersGMBase::Transition()
 {
+	
 	OnloadedMap.Broadcast();
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, LevelToLoad);
+	if(!PossibleLevelsToLoad.IsEmpty())
+	{
+		int RandomInt = FMath::RandRange(0, PossibleLevelsToLoad.Num() - 1);
+		if(PossibleLevelsToLoad.IsValidIndex(RandomInt))
+		{
+			LevelToLoad = PossibleLevelsToLoad[RandomInt];
+		}
+
+	}
 	SetPackage();
 	ProcessServerTravel("StatsTransitionMap",true);
 	//TransitionComponent->AddWidgetsToPlayers(GetGameState<ARacketeersGameStateBase>());
@@ -488,6 +499,7 @@ void ARacketeersGMBase::SetPackage()
 		GS->RedPandasRoundsWon,
 		GS->RedPandasBoatHealth,
 		GS->PandaParts.Array(),
+		GS->PlayerArray.Num()
 	};
 
 	if(Package.RacconsRoundsWon > Package.RedPandasRoundsWon)
