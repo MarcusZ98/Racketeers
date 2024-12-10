@@ -51,6 +51,7 @@ ABoatCharacter::ABoatCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+
 }
 
 void ABoatCharacter::BeginPlay()
@@ -62,19 +63,47 @@ void ABoatCharacter::BeginPlay()
 void ABoatCharacter::Tick(float DeltaTime)
 {
 	// Increment ShootTime only when holding shoot
-	if (bIsHoldingShoot && ShootTime < 3)
+	if (!bIsShooting && bCanShoot && ShootTime < 3)
 	{
 		ShootTime += DeltaTime;
-		OnShootTimeUpdated.Broadcast();
-		// if (BoatWidgetInstance)
-		// {
-		// 	// Cast the widget instance to UBoatWidget
-		// 	UBoatWidget* BoatWidget = Cast<UBoatWidget>(BoatWidgetInstance);
-		// 	if (BoatWidget && IsLocallyControlled())
-		// 	{
-		// 		BoatWidget->UI_PlayShootRange(); // Call the Blueprint-implemented event
-		// 	}
-		// }
+		 if (BoatWidgetInstance && bIsHoldingShoot)
+		 {
+		 	BoatWidget = Cast<UBoatWidget>(BoatWidgetInstance);
+		 	// Cast the widget instance to UBoatWidget
+		 	if (BoatWidget && IsLocallyControlled())
+		 	{
+		 		BoatWidget->UI_PlayShootRange(); // Call the Blueprint-implemented event
+		 	}
+		 }
+	}else if(!bCanShoot && bIsShooting)
+	{
+		if (BoatWidgetInstance)
+		{
+			BoatWidget = Cast<UBoatWidget>(BoatWidgetInstance);
+			// Cast the widget instance to UBoatWidget
+			if (BoatWidget && IsLocallyControlled())
+			{
+				BoatWidget->UI_PlayAnimationError(); // Call the Blueprint-implemented event
+			}
+		}
+	}else if(BoatWidgetInstance)
+	{
+		BoatWidget = Cast<UBoatWidget>(BoatWidgetInstance);
+		// Cast the widget instance to UBoatWidget
+		if (BoatWidget && IsLocallyControlled())
+		{
+			BoatWidget->UI_PlayAnimationShootRange();
+		}
+	}
+
+	if(bIsShooting && BoatWidgetInstance)
+	{
+		BoatWidget = Cast<UBoatWidget>(BoatWidgetInstance);
+		// Cast the widget instance to UBoatWidget
+		if (BoatWidget && IsLocallyControlled())
+		{
+			BoatWidget->UI_PlayShootCooldown(); // Call the Blueprint-implemented event
+		}
 	}
 
 	if (HasAuthority()) // Only update on the server
@@ -90,6 +119,7 @@ void ABoatCharacter::Tick(float DeltaTime)
 		}
 	}
 }
+
 
 
 void ABoatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -212,6 +242,7 @@ void ABoatCharacter::OnShootLeftStarted()
 
 void ABoatCharacter::OnShootLeftCompleted()
 {
+		bIsHoldingShoot = false;
 	ServerStartShooting(true);
 }
 
@@ -222,6 +253,7 @@ void ABoatCharacter::OnShootRightStarted()
 
 void ABoatCharacter::OnShootRightCompleted()
 {
+	bIsHoldingShoot = false;
 	ServerStartShooting(false);
 }
 
@@ -257,6 +289,7 @@ void ABoatCharacter::ResetShootCooldown()
 
 void ABoatCharacter::StopShooting()
 {
+	bIsShooting = false;
 	// Clear the timer to stop firing
 	GetWorldTimerManager().ClearTimer(FireTimerHandle);
 }
@@ -307,6 +340,7 @@ void ABoatCharacter::ShootCannon()
 
 	// Increment the cannon index
 	CurrentCannonIndex++;
+	bIsShooting = true;
 
 	// Stop shooting if all cannons have been fired
 	if (CurrentCannonIndex >= CannonComponents.Num())
@@ -406,6 +440,9 @@ void ABoatCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	// Replicate remaining cooldown time
 	DOREPLIFETIME(ABoatCharacter, RemainingCooldownTime);
 	DOREPLIFETIME(ABoatCharacter, ShootTime);
+	DOREPLIFETIME(ABoatCharacter, bIsHoldingShoot);
+	DOREPLIFETIME(ABoatCharacter, bCanShoot);
+	DOREPLIFETIME(ABoatCharacter, bIsShooting);
 
 }
 
