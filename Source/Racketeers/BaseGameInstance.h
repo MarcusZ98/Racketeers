@@ -41,13 +41,19 @@ struct FGameStatsPackage{
 	int32 RacconsRoundsWon = 0;
 	UPROPERTY(BlueprintReadWrite)
 	float RacconsBoatHealth = 0; 
-
+	UPROPERTY(BlueprintReadWrite)
+	TArray<TEnumAsByte<EPart>> RaccoonParts;
+	
 	UPROPERTY(BlueprintReadWrite)
 	FResources PandaResources;
 	UPROPERTY(BlueprintReadWrite)
 	int32 RedPandasRoundsWon = 0;
 	UPROPERTY(BlueprintReadWrite)
 	float RedPandasBoatHealth = 0;
+	UPROPERTY(BlueprintReadWrite)
+	TArray<TEnumAsByte<EPart>> PandaParts;
+	UPROPERTY(BlueprintReadWrite)
+	int ExpectedPlayers;
 	UPROPERTY(BlueprintReadWrite)
 	ETeams WonTeam = ETeams::NONE;
 	
