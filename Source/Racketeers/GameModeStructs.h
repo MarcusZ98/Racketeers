@@ -43,9 +43,9 @@ struct FTeam
 UENUM(BlueprintType)
 enum class ETeams : uint8
 {
-	Team_Raccoon,
-	Team_Panda,
-	NONE,
+	Team_Raccoon = 0,
+	Team_Panda = 1,
+	NONE = 2,
 };
 
 UENUM(BlueprintType)
@@ -97,27 +97,28 @@ enum EGameStats : uint8
 };
 
 UENUM(BlueprintType)
-enum EPart
+enum class EHullPart: uint8
 {
-	Hull_0,
-	Hull_1,
-	Hull_2,
-	Cannon_0,
-	Cannon_1,
-	Cannon_2,
-	Sail_0,
-	Sail_1,
-	Sail_2,
-	NONE,
+	Hull_0 = 0,
+	Hull_1 = 1,
+	Hull_2 = 2,
+	Hull_NONE = 3,
 };
-
-USTRUCT(BlueprintType)
-struct FParts
+UENUM(BlueprintType)
+enum class ECannonPart : uint8
 {
-	GENERATED_BODY()
-	EPart Hull = Hull_0;
-	EPart Cannon = Cannon_0;
-	EPart Sail = Sail_0;
+	Cannon_0 = 0,
+	Cannon_1 = 1,
+	Cannon_2 = 2,
+	Cannon_NONE = 3,
+};
+UENUM(BlueprintType)
+enum class ESailPart: uint8
+{
+	Sail_0 = 0,
+	Sail_1 = 1,
+	Sail_2 = 2,
+	Sail_NONE = 3,
 };
 
 USTRUCT(BlueprintType)
@@ -153,14 +154,20 @@ USTRUCT(BlueprintType)
 struct FTeamShipParts
 {
 	GENERATED_BODY()
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TEnumAsByte<EPart> Hull = Hull_0;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TEnumAsByte<EPart> Cannon = Cannon_0;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TEnumAsByte<EPart> Sail = Sail_0;
-};
+	UPROPERTY(BlueprintReadWrite)
+	EHullPart Hull;
+	UPROPERTY(BlueprintReadWrite)
+	ECannonPart Cannon;
+	UPROPERTY(BlueprintReadWrite)
+	ESailPart Sail;
 
+	FTeamShipParts()
+	{
+		Hull = EHullPart::Hull_0;
+		Cannon = ECannonPart::Cannon_0;
+		Sail = ESailPart::Sail_0;
+	}
+};
 
 UENUM(BlueprintType)
 enum EPartSpacing
