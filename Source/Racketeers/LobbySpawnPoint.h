@@ -11,7 +11,6 @@
 
 
 class APS_Lobby;
-struct FLobbyInfo;
 class UNiagaraSystem;
 
 UCLASS()
@@ -37,13 +36,13 @@ public:
 
 private:
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Classes")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Classes", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AActor> RaccoonPlayerClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Classes")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Classes", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AActor> PandaPlayerClass;
 
-	UPROPERTY(EditAnywhere, Category = "VFX")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX", meta = (AllowPrivateAccess = "true"))
 	UNiagaraSystem* SpawnVFX;
 	
 	UPROPERTY(EditAnywhere, Category = "Player")
