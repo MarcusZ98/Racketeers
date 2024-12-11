@@ -2,9 +2,7 @@
 
 
 #include "RacketeersGameStateBase.h"
-
 #include <filesystem>
-
 #include "BaseGameInstance.h"
 #include "GameplayTagContainer.h"
 #include "RacketeersGMBase.h"
@@ -45,24 +43,56 @@ void ARacketeersGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 	DOREPLIFETIME(ARacketeersGameStateBase, PandasReady);
 
 	DOREPLIFETIME(ARacketeersGameStateBase, RaccoonParts);
-	DOREPLIFETIME(ARacketeersGameStateBase, RaccoonParts);
+	DOREPLIFETIME(ARacketeersGameStateBase, PandasParts);
 }
 
-
-ARacketeersGameStateBase::ARacketeersGameStateBase()
+void ARacketeersGameStateBase::CheckAllPlayersJoin()
 {
 
-	AddPart(ETeams::Team_Raccoon, EPartSpacing::HULL, EPart::Hull_0);
-	AddPart(ETeams::Team_Panda, EPartSpacing::HULL, EPart::Hull_0);
-	AddPart(ETeams::Team_Raccoon, EPartSpacing::CANNON, EPart::Cannon_0);
-	AddPart(ETeams::Team_Panda, EPartSpacing::CANNON, EPart::Cannon_0);
-	AddPart(ETeams::Team_Raccoon, EPartSpacing::SAIL, EPart::Sail_0);
-	AddPart(ETeams::Team_Panda, EPartSpacing::SAIL, EPart::Sail_0);
+	PandasParts = TempPackage.RedPandasParts;
+	RaccoonParts = TempPackage.RaccoonParts;
+	/*
+	ExpectedPlayers = TempPackage.ExpectedPlayers;
+	GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Red, "CheckAllPlayersJoin");
+	if(PlayerArray.Num() == ExpectedPlayers)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Red, "Expected Players");
+		UBaseGameInstance* GI = Cast<UBaseGameInstance>(GetGameInstance());
+		ARacketeersGMBase* GM = Cast<ARacketeersGMBase>( UGameplayStatics::GetGameMode(GetWorld()));
+		TimerCheckAllPlayersJoined.Clear();
+		if(GM)
+		{
+			CurrentPhase = GM->State;
+		}
+			RacconResource = TempPackage.RaccoonResources;
+			RacconsRoundsWon = TempPackage.RacconsRoundsWon;
+			RaccoonsBoatHealth = TempPackage.RacconsBoatHealth;
+			RaccoonParts = TempPackage.RaccoonParts;
+			RedPandasResource = TempPackage.PandaResources;
+			RedPandasRoundsWon = TempPackage.RedPandasRoundsWon;
+			RedPandasBoatHealth = TempPackage.RedPandasBoatHealth;
+			PandasParts = TempPackage.RedPandasParts;
+			GameWinner = TempPackage.WonTeam;
+			GI->ClearDataStatsPackage();
+	}
+	*/
 }
 
 void ARacketeersGameStateBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	/*
+	if(GetLocalRole() == ROLE_Authority)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Red, "BEGIN PLAY HAS LOCLA ROLE");
+		UBaseGameInstance* GI = Cast<UBaseGameInstance>(GetGameInstance());
+		TempPackage = GI->GetDataTransferPackage();
+		TimerCheckAllPlayersJoined.BindDynamic(this, &ARacketeersGameStateBase::CheckAllPlayersJoin);
+		UKismetSystemLibrary::K2_SetTimerDelegate(TimerCheckAllPlayersJoined, 1, true, true);
+		
+	}
+	*/
 
 	if(HasAuthority())
 	{
@@ -75,6 +105,7 @@ void ARacketeersGameStateBase::BeginPlay()
 		if (GI->CheckIfDataToTransfer())
 		{
 			FGameStatsPackage Package = GI->GetDataTransferPackage();
+			TempPackage = Package;
 			RacconResource = Package.RaccoonResources;
 			RacconsRoundsWon = Package.RacconsRoundsWon;
 			RaccoonsBoatHealth = Package.RacconsBoatHealth;
@@ -89,9 +120,16 @@ void ARacketeersGameStateBase::BeginPlay()
 		}
 
 	}
+
+	// Add a delay before starting the server travel
+	/*
+	FTimerHandle StartMatchTimer;
+	GetWorld()->GetTimerManager().SetTimer(StartMatchTimer, this, &ARacketeersGameStateBase::CheckAllPlayersJoin, 5, false);
+	*/
 	
+	ForceNetUpdate();  // Force replication to update
 	//UKismetSystemLibrary::K2_SetTimerDelegate()
-	
+
 	
 	/*
 	
@@ -200,21 +238,21 @@ void ARacketeersGameStateBase::CheckRoundEnd(ETeams Team)
 	}
 }
 
-void ARacketeersGameStateBase::AddPart_Implementation(ETeams Team, EPartSpacing Part, EPart NewPart)
+void ARacketeersGameStateBase::AddPart_Implementation(ETeams Team, EPartSpacing Part, int32 NewPart)
 {
 
 	if(Team == ETeams::Team_Raccoon)
 	{
 		int Space = (int)Part;
-		TEnumAsByte<EPart>* PartType = ((&RaccoonParts.Hull + Space));
+		int8* PartType = (int8*)((&RaccoonParts.Hull + Space));
 		PartType[0] = NewPart;
 	}
 	int Space = (int)Part;
-	TEnumAsByte<EPart>* PartType = ((&PandasParts.Hull + Space));
+	int8* PartType = (int8*)((&PandasParts.Hull + Space));
 	PartType[0] = NewPart;
 }
 
-void ARacketeersGameStateBase::RemovePart_Implementation(ETeams Team, EPart Part)
+void ARacketeersGameStateBase::RemovePart_Implementation()
 {
 
 }
