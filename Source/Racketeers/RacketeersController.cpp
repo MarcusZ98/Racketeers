@@ -58,7 +58,9 @@ void ARacketeersController::ActivateWidget_Implementation(FName Name, UUserWidge
 		    W->AddToViewport();
 			WS->ActiveWidgetComponents.Add(Name, W);
 		}
+		return;
 	}
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Could Not Activate Widget");
 	//UserWidget = Widget;
 	
 	/*
@@ -214,7 +216,7 @@ bool ARacketeersController::ServerRespawnPlayer_Validate(APlayerState* PSState)
 }
 
 
-void ARacketeersController::AddPart_Implementation(ETeams Team, EPart Part)
+void ARacketeersController::AddPart_Implementation(ETeams Team, EPartSpacing Part, EPart NewPart)
 {
 	ARacketeersGameStateBase* State = Cast<ARacketeersGameStateBase>(UGameplayStatics::GetGameState(GetWorld()));
 	if(State == nullptr)
@@ -222,10 +224,10 @@ void ARacketeersController::AddPart_Implementation(ETeams Team, EPart Part)
 		//UE_LOG(LogTemp, Error, TEXT("Game State is NULLPTR in AddTOStats_Implementation in RackeetersController"));
 		return;
 	}
-	State->AddPart(Team, Part);
+	State->AddPart(Team, Part, NewPart);
 }
 
-bool ARacketeersController::AddPart_Validate(ETeams Team, EPart Part)
+bool ARacketeersController::AddPart_Validate(ETeams Team, EPartSpacing Part, EPart NewPart)
 {
 	return true;
 }
