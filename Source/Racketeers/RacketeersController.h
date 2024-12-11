@@ -79,7 +79,7 @@ class RACKETEERS_API ARacketeersController : public APlayerController
 	void AddToStats(int Amount, EGameStats GameStats, ETeams Team);
 
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable)
-	void AddPart(ETeams Team, EPart Part);
+	void AddPart(ETeams Team, EPartSpacing Part, int32 NewPart);
 	
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable)
 	void AddResource(int Amount, EResources Resource, ETeams Team);

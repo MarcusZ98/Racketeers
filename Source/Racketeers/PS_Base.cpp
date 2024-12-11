@@ -32,22 +32,23 @@ void APS_Base::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetime
 
 void APS_Base::DamagePlayerBoat_Implementation(APlayerState* PS, int Amount)
 {
-	if(BoatHealth <= 0)
+	APS_Base* PSBase = Cast<APS_Base>(PS);
+	if(PSBase == nullptr) return;
+	if(PSBase->BoatHealth <= 0)
 	{
 		return;
 	}
 	//UE_LOG(LogTemp, Display, TEXT("Health: %f"), MaxBoatHealth);
-	APS_Base* PSBase = Cast<APS_Base>(PS);
 	GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Red, "Health:" + FString::FromInt(PSBase->MaxBoatHealth));
-	if(PSBase == nullptr) return;
+
 	PSBase->BoatHealth -= Amount;
-	if(BoatHealth <= 0)
+	if(PSBase->BoatHealth <= 0)
 	{
 		ARacketeersGameStateBase* GameState = Cast<ARacketeersGameStateBase>(UGameplayStatics::GetGameState(GetWorld()));
 		if(GameState)
 		{
-			GameState->AddToStats(-1, EGameStats::ALIVE, PlayerInfo.Team);
-			GameState->CheckRoundEnd(PlayerInfo.Team);
+			GameState->AddToStats(-1, EGameStats::ALIVE, PSBase->PlayerInfo.Team);
+			GameState->CheckRoundEnd(PSBase->PlayerInfo.Team);
 		}
 	}
 }
