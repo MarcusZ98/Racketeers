@@ -43,17 +43,21 @@ void ARacketeersGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 	
 	DOREPLIFETIME(ARacketeersGameStateBase, RaccoonsReady);
 	DOREPLIFETIME(ARacketeersGameStateBase, PandasReady);
+
+	DOREPLIFETIME(ARacketeersGameStateBase, RaccoonParts);
+	DOREPLIFETIME(ARacketeersGameStateBase, RaccoonParts);
 }
 
 
 ARacketeersGameStateBase::ARacketeersGameStateBase()
 {
-	AddPart(ETeams::Team_Raccoon, EPart::Cannon_0);
-	AddPart(ETeams::Team_Raccoon, EPart::Hull_0);
-	AddPart(ETeams::Team_Raccoon, EPart::Sail_0);
-	AddPart(ETeams::Team_Panda, EPart::Cannon_0);
-	AddPart(ETeams::Team_Panda, EPart::Hull_0);
-	AddPart(ETeams::Team_Panda, EPart::Sail_0);
+
+	AddPart(ETeams::Team_Raccoon, EPartSpacing::HULL, EPart::Hull_0);
+	AddPart(ETeams::Team_Panda, EPartSpacing::HULL, EPart::Hull_0);
+	AddPart(ETeams::Team_Raccoon, EPartSpacing::CANNON, EPart::Cannon_0);
+	AddPart(ETeams::Team_Panda, EPartSpacing::CANNON, EPart::Cannon_0);
+	AddPart(ETeams::Team_Raccoon, EPartSpacing::SAIL, EPart::Sail_0);
+	AddPart(ETeams::Team_Panda, EPartSpacing::SAIL, EPart::Sail_0);
 }
 
 void ARacketeersGameStateBase::BeginPlay()
@@ -74,17 +78,11 @@ void ARacketeersGameStateBase::BeginPlay()
 			RacconResource = Package.RaccoonResources;
 			RacconsRoundsWon = Package.RacconsRoundsWon;
 			RaccoonsBoatHealth = Package.RacconsBoatHealth;
-			for (TEnumAsByte<EPart> RaccoonPart : Package.RaccoonParts)
-			{
-				RaccoonParts.Add(RaccoonPart);
-			}
+			RaccoonParts = Package.RaccoonParts;
 			RedPandasResource = Package.PandaResources;
 			RedPandasRoundsWon = Package.RedPandasRoundsWon;
 			RedPandasBoatHealth = Package.RedPandasBoatHealth;
-			for (TEnumAsByte<EPart> PandaPart : Package.PandaParts)
-			{
-				PandaParts.Add(PandaPart);
-			}
+			PandasParts = Package.RedPandasParts;
 			GameWinner = Package.WonTeam;
 			ExpectedPlayers = Package.ExpectedPlayers;
 			GI->ClearDataStatsPackage();
@@ -202,23 +200,23 @@ void ARacketeersGameStateBase::CheckRoundEnd(ETeams Team)
 	}
 }
 
-void ARacketeersGameStateBase::AddPart_Implementation(ETeams Team, EPart Part)
+void ARacketeersGameStateBase::AddPart_Implementation(ETeams Team, EPartSpacing Part, EPart NewPart)
 {
+
 	if(Team == ETeams::Team_Raccoon)
 	{
-		RaccoonParts.Add(Part);
-		return;
+		int Space = (int)Part;
+		TEnumAsByte<EPart>* PartType = ((&RaccoonParts.Hull + Space));
+		PartType[0] = NewPart;
 	}
-	PandaParts.Add(Part);
+	int Space = (int)Part;
+	TEnumAsByte<EPart>* PartType = ((&PandasParts.Hull + Space));
+	PartType[0] = NewPart;
 }
 
 void ARacketeersGameStateBase::RemovePart_Implementation(ETeams Team, EPart Part)
 {
-	if(Team == ETeams::Team_Raccoon)
-	{
-		RaccoonParts.Remove(Part);
-	}
-	PandaParts.Remove(Part);
+
 }
 
 void ARacketeersGameStateBase::SetMaxHealth_Implementation(ETeams Team, int32 MaxHealth)

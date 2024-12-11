@@ -149,3 +149,23 @@ struct FGameStats
 	FTeamGameStats Pandas;
 };
 
+USTRUCT(BlueprintType)
+struct FTeamShipParts
+{
+	GENERATED_BODY()
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TEnumAsByte<EPart> Hull = Hull_0;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TEnumAsByte<EPart> Cannon = Cannon_0;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TEnumAsByte<EPart> Sail = Sail_0;
+};
+
+
+UENUM(BlueprintType)
+enum EPartSpacing
+{
+	HULL,
+	CANNON,
+	SAIL
+};

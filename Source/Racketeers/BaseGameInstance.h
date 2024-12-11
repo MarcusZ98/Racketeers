@@ -42,7 +42,7 @@ struct FGameStatsPackage{
 	UPROPERTY(BlueprintReadWrite)
 	float RacconsBoatHealth = 0; 
 	UPROPERTY(BlueprintReadWrite)
-	TArray<TEnumAsByte<EPart>> RaccoonParts;
+	FTeamShipParts RaccoonParts;
 	
 	UPROPERTY(BlueprintReadWrite)
 	FResources PandaResources;
@@ -51,7 +51,7 @@ struct FGameStatsPackage{
 	UPROPERTY(BlueprintReadWrite)
 	float RedPandasBoatHealth = 0;
 	UPROPERTY(BlueprintReadWrite)
-	TArray<TEnumAsByte<EPart>> PandaParts;
+	FTeamShipParts RedPandasParts;
 	UPROPERTY(BlueprintReadWrite)
 	int ExpectedPlayers;
 	UPROPERTY(BlueprintReadWrite)
