@@ -81,7 +81,7 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 	void UpdateHealth();
 	
 	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
-	void AddPart(ETeams Team, EPart Part);
+	void AddPart(ETeams Team, EPartSpacing Part, EPart NewPart);
 	UFUNCTION(NetMulticast, Reliable)
 	void RemovePart(ETeams Team, EPart Part);
 
@@ -106,10 +106,12 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 	FGameStats TeamStats;
 	UPROPERTY(BlueprintReadWrite)
 	int ExpectedPlayers;
-	UPROPERTY(BlueprintReadWrite)
-	TSet<TEnumAsByte<EPart>> RaccoonParts;
-	UPROPERTY(BlueprintReadWrite)
-	TSet<TEnumAsByte<EPart>> PandaParts; 
+
+
+	UPROPERTY(Replicated, BlueprintReadWrite)
+	FTeamShipParts RaccoonParts;
+	UPROPERTY(Replicated, BlueprintReadWrite)
+	FTeamShipParts PandasParts;
 
 
 	UPROPERTY(Replicated, BlueprintReadWrite)
