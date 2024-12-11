@@ -216,7 +216,7 @@ bool ARacketeersController::ServerRespawnPlayer_Validate(APlayerState* PSState)
 }
 
 
-void ARacketeersController::AddPart_Implementation(ETeams Team, EPart Part)
+void ARacketeersController::AddPart_Implementation(ETeams Team, EPartSpacing Part, EPart NewPart)
 {
 	ARacketeersGameStateBase* State = Cast<ARacketeersGameStateBase>(UGameplayStatics::GetGameState(GetWorld()));
 	if(State == nullptr)
@@ -224,10 +224,10 @@ void ARacketeersController::AddPart_Implementation(ETeams Team, EPart Part)
 		//UE_LOG(LogTemp, Error, TEXT("Game State is NULLPTR in AddTOStats_Implementation in RackeetersController"));
 		return;
 	}
-	State->AddPart(Team, Part);
+	State->AddPart(Team, Part, NewPart);
 }
 
-bool ARacketeersController::AddPart_Validate(ETeams Team, EPart Part)
+bool ARacketeersController::AddPart_Validate(ETeams Team, EPartSpacing Part, EPart NewPart)
 {
 	return true;
 }
