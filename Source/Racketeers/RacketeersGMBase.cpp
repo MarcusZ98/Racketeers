@@ -494,11 +494,11 @@ void ARacketeersGMBase::SetPackage()
 		GS->RacconResource,
 		GS->RacconsRoundsWon,
 		GS->RaccoonsBoatHealth,
-		GS->RaccoonParts.Array(),
+		GS->RaccoonParts,
 		GS->RedPandasResource,
 		GS->RedPandasRoundsWon,
 		GS->RedPandasBoatHealth,
-		GS->PandaParts.Array(),
+		GS->PandasParts,
 		GS->PlayerArray.Num()
 	};
 

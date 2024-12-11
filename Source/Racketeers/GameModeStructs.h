@@ -149,3 +149,20 @@ struct FGameStats
 	FTeamGameStats Pandas;
 };
 
+USTRUCT(BlueprintType)
+struct FTeamShipParts
+{
+	GENERATED_BODY()
+	EPart Hull = Hull_0;
+	EPart Cannon = Cannon_0;
+	EPart Sail = Sail_0;
+};
+
+
+UENUM(BlueprintType)
+enum EPartSpacing
+{
+	HULL,
+	CANNON,
+	SAIL
+};
