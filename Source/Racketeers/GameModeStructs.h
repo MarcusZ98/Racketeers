@@ -153,9 +153,12 @@ USTRUCT(BlueprintType)
 struct FTeamShipParts
 {
 	GENERATED_BODY()
-	EPart Hull = Hull_0;
-	EPart Cannon = Cannon_0;
-	EPart Sail = Sail_0;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TEnumAsByte<EPart> Hull = Hull_0;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TEnumAsByte<EPart> Cannon = Cannon_0;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TEnumAsByte<EPart> Sail = Sail_0;
 };
 
 
