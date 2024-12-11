@@ -216,7 +216,7 @@ bool ARacketeersController::ServerRespawnPlayer_Validate(APlayerState* PSState)
 }
 
 
-void ARacketeersController::AddPart_Implementation(ETeams Team, EPartSpacing Part, EPart NewPart)
+void ARacketeersController::AddPart_Implementation(ETeams Team, EPartSpacing Part, int32 NewPart)
 {
 	ARacketeersGameStateBase* State = Cast<ARacketeersGameStateBase>(UGameplayStatics::GetGameState(GetWorld()));
 	if(State == nullptr)
@@ -227,7 +227,7 @@ void ARacketeersController::AddPart_Implementation(ETeams Team, EPartSpacing Par
 	State->AddPart(Team, Part, NewPart);
 }
 
-bool ARacketeersController::AddPart_Validate(ETeams Team, EPartSpacing Part, EPart NewPart)
+bool ARacketeersController::AddPart_Validate(ETeams Team, EPartSpacing Part, int32 NewPart)
 {
 	return true;
 }
