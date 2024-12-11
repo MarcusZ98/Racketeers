@@ -99,23 +99,38 @@ enum EGameStats : uint8
 UENUM(BlueprintType)
 enum EPart
 {
+	NONE,
+};
+UENUM(BlueprintType)
+enum EHullPart
+{
 	Hull_0,
 	Hull_1,
 	Hull_2,
+	Hull_NONE,
+};
+UENUM(BlueprintType)
+enum EHCannonPart
+{
 	Cannon_0,
 	Cannon_1,
 	Cannon_2,
+	Cannon_NONE,
+};
+UENUM(BlueprintType)
+enum ESailPart
+{
 	Sail_0,
 	Sail_1,
 	Sail_2,
-	NONE,
+	Sail_NONE,
 };
 
 USTRUCT(BlueprintType)
 struct FParts
 {
 	GENERATED_BODY()
-	EPart Hull = Hull_0;
+	EHullPart Hull = Hull_0;
 	EPart Cannon = Cannon_0;
 	EPart Sail = Sail_0;
 };
