@@ -90,6 +90,9 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 	UFUNCTION(NetMulticast, Reliable)
 	void RemovePart();
 
+	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
+	void AddCraftingProgress(ETeams Team, EPartSpacing Part, const TArray<int>& NewProgress);
+
 	bool CheckTeamAlive(ETeams Team);
 	void CheckRoundEnd(ETeams Team);
 
@@ -117,6 +120,11 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 	FTeamShipParts RaccoonParts;
 	UPROPERTY(Replicated, BlueprintReadWrite)
 	FTeamShipParts PandasParts;
+
+	UPROPERTY(Replicated, BlueprintReadWrite)
+	FTeamCraftingProgress RaccoonCraftingProgress;
+	UPROPERTY(Replicated, BlueprintReadWrite)
+	FTeamCraftingProgress PandaCraftingProgress;
 
 
 	UPROPERTY(Replicated, BlueprintReadWrite)

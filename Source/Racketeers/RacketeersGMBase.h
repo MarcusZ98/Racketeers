@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "BoatCharacter.h"
-#include "BoatValues.h"
 #include "GM_Base.h"
 #include "LevelLoadingManager.h"
 #include "TimerInfo.h"
@@ -210,6 +209,7 @@ private:
 	
 	//methods for progressing trough phases
 
+	UFUNCTION(BlueprintCallable)
 	bool CheckIfGameIsOver();
 	bool LoadTransitionStats();
 	bool CheckWinnerOfRound();

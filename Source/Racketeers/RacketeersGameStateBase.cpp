@@ -2,9 +2,7 @@
 
 
 #include "RacketeersGameStateBase.h"
-#include <filesystem>
 #include "BaseGameInstance.h"
-#include "GameplayTagContainer.h"
 #include "RacketeersGMBase.h"
 #include "WidgetSubsystem.h"
 #include "Blueprint/UserWidget.h"
@@ -44,6 +42,9 @@ void ARacketeersGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 
 	DOREPLIFETIME(ARacketeersGameStateBase, RaccoonParts);
 	DOREPLIFETIME(ARacketeersGameStateBase, PandasParts);
+
+	DOREPLIFETIME(ARacketeersGameStateBase, RaccoonCraftingProgress);
+	DOREPLIFETIME(ARacketeersGameStateBase, PandaCraftingProgress);
 }
 
 void ARacketeersGameStateBase::CheckAllPlayersJoin()
@@ -110,10 +111,12 @@ void ARacketeersGameStateBase::BeginPlay()
 			RacconsRoundsWon = Package.RacconsRoundsWon;
 			RaccoonsBoatHealth = Package.RacconsBoatHealth;
 			RaccoonParts = Package.RaccoonParts;
+			RaccoonCraftingProgress = Package.RaccoonCraftingProgress;
 			RedPandasResource = Package.PandaResources;
 			RedPandasRoundsWon = Package.RedPandasRoundsWon;
 			RedPandasBoatHealth = Package.RedPandasBoatHealth;
 			PandasParts = Package.RedPandasParts;
+			PandaCraftingProgress = Package.RedPandasCraftingProgress;
 			GameWinner = Package.WonTeam;
 			ExpectedPlayers = Package.ExpectedPlayers;
 			GI->ClearDataStatsPackage();
@@ -256,6 +259,40 @@ void ARacketeersGameStateBase::RemovePart_Implementation()
 {
 
 }
+
+void ARacketeersGameStateBase::AddCraftingProgress_Implementation(ETeams Team, EPartSpacing Part, const TArray<int>& NewProgress)
+{
+	if (Team == ETeams::TeamRaccoon)
+	{
+		switch (Part)
+		{
+		case HULL:
+			RaccoonCraftingProgress.HullProgress = NewProgress;
+			break;
+		case CANNON:
+			RaccoonCraftingProgress.CannonProgress = NewProgress;
+			break;
+		case SAIL:
+			RaccoonCraftingProgress.SailProgress = NewProgress;
+			break;
+		}
+		return;
+	}
+
+	switch (Part)
+	{
+	case HULL:
+		PandaCraftingProgress.HullProgress = NewProgress;
+		break;
+	case CANNON:
+		PandaCraftingProgress.CannonProgress = NewProgress;
+		break;
+	case SAIL:
+		PandaCraftingProgress.SailProgress = NewProgress;
+		break;
+	}
+}
+
 
 void ARacketeersGameStateBase::SetMaxHealth_Implementation(ETeams Team, int32 MaxHealth)
 {
