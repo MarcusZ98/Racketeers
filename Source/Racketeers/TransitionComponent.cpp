@@ -65,7 +65,7 @@ void UTransitionComponent::CountPlayer(ETeams Team)
 		return;
 	}
 
-	if(Team == ETeams::Team_Raccoon)
+	if(Team == ETeams::TeamRaccoon)
 	{
 		GS->RaccoonsReady++;
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Add  to RaccoonsReady");
