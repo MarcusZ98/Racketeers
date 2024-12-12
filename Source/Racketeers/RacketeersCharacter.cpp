@@ -55,9 +55,9 @@ ARacketeersCharacter::ARacketeersCharacter()
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 
-	CosmeticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CosmeticMesh"));
-	CosmeticMesh->SetupAttachment(RootComponent);
-	CosmeticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	 CosmeticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CosmeticMesh"));
+	 CosmeticMesh->SetupAttachment(RootComponent);
+	 CosmeticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
 	
 }
@@ -156,5 +156,7 @@ void ARacketeersCharacter::Look(const FInputActionValue& Value)
 
 void ARacketeersCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
 	DOREPLIFETIME(ARacketeersCharacter, Cosmetic);
 }
