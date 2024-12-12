@@ -34,6 +34,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	ETeams Team;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", Replicated)
+	AActor* Player = nullptr;
+
 private:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Classes", meta = (AllowPrivateAccess = "true"))
@@ -47,9 +50,6 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category = "Player")
 	APlayerController* PlayerController = nullptr;
-
-	UPROPERTY(EditAnywhere, Category = "Player", Replicated)
-	AActor* Player = nullptr;
 	
 	
 
