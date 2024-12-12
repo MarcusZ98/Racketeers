@@ -88,14 +88,11 @@ void APC_Lobby::Server_ToggleReady_Implementation(APlayerController* PC)
 
 void APC_Lobby::Server_SetCosmetic_Implementation(APlayerController* PC, FCosmeticOption Cosmetic)
 {
-	if (APS_Lobby* PS = Cast<APS_Lobby>(PlayerState))
+	if (Cast<APS_Lobby>(PlayerState) && Cast<ARacketeersCharacter>(SpawnPoint->Player))
 	{
-		PS->LobbyInfo.Cosmetic = Cosmetic;
-	}
-
-	if(Cast<ARacketeersCharacter>(SpawnPoint->Player))
-	{
+		Cast<APS_Lobby>(PlayerState)->LobbyInfo.Cosmetic = Cosmetic;
 		Cast<ARacketeersCharacter>(Cast<APC_Lobby>(PC)->SpawnPoint->Player)->Cosmetic = Cosmetic;
+		Cast<ARacketeersCharacter>(Cast<APC_Lobby>(PC)->SpawnPoint->Player)->OnRep_Cosmetic();
 	}
 }
 
