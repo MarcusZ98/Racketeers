@@ -4,6 +4,7 @@
 #include "PC_Lobby.h"
 #include "GM_LobbyHost.h"
 #include "PS_Lobby.h"
+#include "RacketeersCharacter.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -81,6 +82,19 @@ void APC_Lobby::Server_ToggleReady_Implementation(APlayerController* PC)
 	if (AGM_LobbyHost* GameMode = Cast<AGM_LobbyHost>(GetWorld()->GetAuthGameMode()))
 	{
 		GameMode->UpdatePlayers();
+	}
+}
+
+void APC_Lobby::Server_SetCosmetic_Implementation(APlayerController* PC, FCosmeticOption Cosmetic)
+{
+	if (APS_Lobby* PS = Cast<APS_Lobby>(PlayerState))
+	{
+		PS->LobbyInfo.Cosmetic = Cosmetic;
+	}
+
+	if(Cast<ARacketeersCharacter>(SpawnPoint->Player))
+	{
+		Cast<ARacketeersCharacter>(Cast<APC_Lobby>(PC)->SpawnPoint->Player)->Cosmetic = Cosmetic;
 	}
 }
 
