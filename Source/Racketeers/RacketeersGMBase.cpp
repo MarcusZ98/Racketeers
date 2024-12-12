@@ -630,7 +630,7 @@ void ARacketeersGMBase::RespawnPlayers()
 	{
 		APS_Base* PS = Cast<APS_Base>(this->GetGameState<AGameState>()->PlayerArray[i]);
 		FString TeamName;
-		TeamName = UEnum::GetValueAsString(PS->PlayerInfo.Team);
+		TeamName.AppendInt((int32)PS->PlayerInfo.Team);
 		TeamName.AppendInt(PS->PlayerInfo.TeamPlayerID);
 		if(GEngine)
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, *TeamName);
@@ -665,14 +665,7 @@ void ARacketeersGMBase::RespawnPlayer(APlayerState* PState)
 	APS_Base* PS = Cast<APS_Base>(PState);
 	FString TeamName;
 
-	if(PS->PlayerInfo.Team == ETeams::TeamRaccoon)
-	{
-		TeamName ="TeamRaccoon";
-	}
-	else if(PS->PlayerInfo.Team == ETeams::TeamPanda)
-	{
-		TeamName ="TeamPanda";
-	}
+	TeamName.AppendInt((int32)PS->PlayerInfo.Team);
 	TeamName.AppendInt(PS->PlayerInfo.TeamPlayerID);
 	
 	AActor* PlayerStart = FindPlayerStart(PS->GetPlayerController(),TeamName);
