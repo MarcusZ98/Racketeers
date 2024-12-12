@@ -27,10 +27,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_Cosmetic, Category = "Cosmetic")
 	FCosmeticOption Cosmetic;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cosmetic")
-	UStaticMeshComponent* CosmeticMesh = nullptr;
-
-
 private:
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -59,8 +55,9 @@ private:
 public:
 	ARacketeersCharacter();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Cosmetic")
 	void OnRep_Cosmetic();
+
 
 protected:
 
