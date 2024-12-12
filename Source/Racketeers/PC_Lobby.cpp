@@ -4,6 +4,7 @@
 #include "PC_Lobby.h"
 #include "GM_LobbyHost.h"
 #include "PS_Lobby.h"
+#include "RacketeersCharacter.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -53,6 +54,7 @@ void APC_Lobby::Client_ShowCosmeticWidget_Implementation()
 
 void APC_Lobby::Server_SpawnPlayer_Implementation(APlayerController* PC, ETeams Team)
 {
+	
 	if (AGM_LobbyHost* GameMode = Cast<AGM_LobbyHost>(GetWorld()->GetAuthGameMode()))
 	{
 		GameMode->SpawnPlayer(PC, Team);
@@ -81,6 +83,16 @@ void APC_Lobby::Server_ToggleReady_Implementation(APlayerController* PC)
 	if (AGM_LobbyHost* GameMode = Cast<AGM_LobbyHost>(GetWorld()->GetAuthGameMode()))
 	{
 		GameMode->UpdatePlayers();
+	}
+}
+
+void APC_Lobby::Server_SetCosmetic_Implementation(APlayerController* PC, FCosmeticOption Cosmetic)
+{
+	if (Cast<APS_Lobby>(PlayerState) && Cast<ARacketeersCharacter>(SpawnPoint->Player))
+	{
+		Cast<APS_Lobby>(PlayerState)->LobbyInfo.Cosmetic = Cosmetic;
+		Cast<ARacketeersCharacter>(Cast<APC_Lobby>(PC)->SpawnPoint->Player)->Cosmetic = Cosmetic;
+		Cast<ARacketeersCharacter>(Cast<APC_Lobby>(PC)->SpawnPoint->Player)->OnRep_Cosmetic();
 	}
 }
 

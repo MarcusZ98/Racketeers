@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "PC_Lobby.generated.h"
 
+struct FCosmeticOption;
 class ALobbySpawnPoint;
 /**
  * 
@@ -71,6 +72,9 @@ public:
 	// Toggle the player's ready status
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void Server_ToggleReady(APlayerController* PC);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void Server_SetCosmetic(APlayerController* PC, FCosmeticOption Cosmetic);
 	
 
 	// ----------------------------Client Functions--------------------------------------------

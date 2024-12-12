@@ -48,6 +48,59 @@ ARacketeersGMBase::ARacketeersGMBase()
 	UE_LOG(LogTemp, Warning, TEXT("AGM_Base::AGM_Base"));
 }
 
+AActor* ARacketeersGMBase::ChoosePlayerStart_Implementation(AController* Player)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "ARacketeersGMBase::ChoosePlayerStart_Implementation");
+	return Super::ChoosePlayerStart_Implementation(Player);
+}
+
+AActor* ARacketeersGMBase::FindPlayerStart_Implementation(AController* Player, const FString& IncomingName)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "ARacketeersGMBase::FindPlayerStart_Implementation");
+	UWorld* World = GetWorld();
+	// If incoming start is specified, then just use it
+	if (!IncomingName.IsEmpty())
+	{
+		const FName IncomingPlayerStartTag = FName(*IncomingName);
+		for (TActorIterator<APlayerStart> It(World); It; ++It)
+		{
+			APlayerStart* Start = *It;
+			if (Start && Start->PlayerStartTag == IncomingPlayerStartTag)
+			{
+				return Start;
+			}
+		}
+	}
+
+	// Always pick StartSpot at start of match
+	if (ShouldSpawnAtStartSpot(Player))
+	{
+		if (AActor* PlayerStartSpot = Player->StartSpot.Get())
+		{
+			return PlayerStartSpot;
+		}
+		else
+		{
+			UE_LOG(LogGameMode, Error, TEXT("FindPlayerStart: ShouldSpawnAtStartSpot returned true but the Player StartSpot was null."));
+		}
+	}
+
+
+	AActor* BestStart = ChoosePlayerStart(Player);
+	if (BestStart == nullptr)
+	{
+		// No player start found
+		UE_LOG(LogGameMode, Log, TEXT("FindPlayerStart: PATHS NOT DEFINED or NO PLAYERSTART with positive rating"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "FindPlayerStart: PATHS NOT DEFINED or NO PLAYERSTART with positive rating");
+		// This is a bit odd, but there was a complex chunk of code that in the end always resulted in this, so we may as well just 
+		// short cut it down to this.  Basically we are saying spawn at 0,0,0 if we didn't find a proper player start
+		BestStart = World->GetWorldSettings();
+	}
+
+	return BestStart;
+	
+}
+
 void ARacketeersGMBase::UnloadWidget()
 {
 	UnloadWidgetCount++;
@@ -246,12 +299,12 @@ bool ARacketeersGMBase::CheckWinnerOfRound()
 	{
 		ARacketeersGameStateBase* GS = GetGameState<ARacketeersGameStateBase>();
 		if(GS == nullptr) return false;
-		if(GS->GetTeamStats(ETeams::Team_Raccoon).TeamAlive > GS->GetTeamStats(ETeams::Team_Panda).TeamAlive)
+		if(GS->GetTeamStats(ETeams::TeamRaccoon).TeamAlive > GS->GetTeamStats(ETeams::TeamPanda).TeamAlive)
 		{
 			GS->RacconsRoundsWon++;
 			return true;
 		}
-		if(GS->GetTeamStats(ETeams::Team_Panda).TeamAlive > GS->GetTeamStats(ETeams::Team_Raccoon).TeamAlive)
+		if(GS->GetTeamStats(ETeams::TeamPanda).TeamAlive > GS->GetTeamStats(ETeams::TeamRaccoon).TeamAlive)
 		{
 			GS->RedPandasRoundsWon++;
 			return true;
@@ -506,11 +559,11 @@ void ARacketeersGMBase::SetPackage()
 
 	if(Package.RacconsRoundsWon > Package.RedPandasRoundsWon)
 	{
-		Package.WonTeam = ETeams::Team_Raccoon;
+		Package.WonTeam = ETeams::TeamRaccoon;
 	}
 	else if (Package.RacconsRoundsWon < Package.RedPandasRoundsWon)
 	{
-		Package.WonTeam = ETeams::Team_Raccoon;
+		Package.WonTeam = ETeams::TeamRaccoon;
 	}
 	else
 	{
@@ -579,14 +632,7 @@ void ARacketeersGMBase::RespawnPlayers()
 	{
 		APS_Base* PS = Cast<APS_Base>(this->GetGameState<AGameState>()->PlayerArray[i]);
 		FString TeamName;
-		if(PS->PlayerInfo.Team == ETeams::Team_Raccoon)
-		{
-			TeamName ="Team Raccoon";
-		}
-		else if(PS->PlayerInfo.Team == ETeams::Team_Panda)
-		{
-			TeamName ="Team Panda";
-		}
+		TeamName.AppendInt((int32)PS->PlayerInfo.Team);
 		TeamName.AppendInt(PS->PlayerInfo.TeamPlayerID);
 		if(GEngine)
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, *TeamName);
@@ -621,14 +667,7 @@ void ARacketeersGMBase::RespawnPlayer(APlayerState* PState)
 	APS_Base* PS = Cast<APS_Base>(PState);
 	FString TeamName;
 
-	if(PS->PlayerInfo.Team == ETeams::Team_Raccoon)
-	{
-		TeamName ="Team Raccoon";
-	}
-	else if(PS->PlayerInfo.Team == ETeams::Team_Panda)
-	{
-		TeamName ="Team Panda";
-	}
+	TeamName.AppendInt((int32)PS->PlayerInfo.Team);
 	TeamName.AppendInt(PS->PlayerInfo.TeamPlayerID);
 	
 	AActor* PlayerStart = FindPlayerStart(PS->GetPlayerController(),TeamName);

@@ -173,7 +173,7 @@ void ARacketeersGameStateBase::ChangeCurrentPhase(TEnumAsByte<EPhaseState> NewPh
 
 int32 ARacketeersGameStateBase::GetTeamResources(ETeams Team, EResources Resource) const
 {
-	if(Team == ETeams::Team_Raccoon)
+	if(Team == ETeams::TeamRaccoon)
 	{
 		int Space = (int)Resource;
 		int32* material = (int32*)((&RacconResource.Wood + Space));
@@ -206,14 +206,14 @@ void ARacketeersGameStateBase::UpdateTeamAlive()
 			APS_Base* PSBase = Cast<APS_Base>(PS);
 			if (PSBase == nullptr) return;
 
-			if(PSBase->PlayerInfo.Team == ETeams::Team_Raccoon)
+			if(PSBase->PlayerInfo.Team == ETeams::TeamRaccoon)
 			{
-				AddToStats(1, EGameStats::ALIVE, ETeams::Team_Raccoon);
+				AddToStats(1, EGameStats::ALIVE, ETeams::TeamRaccoon);
 				continue;
 			}
-			if(PSBase->PlayerInfo.Team == ETeams::Team_Panda)
+			if(PSBase->PlayerInfo.Team == ETeams::TeamPanda)
 			{
-				AddToStats(1, EGameStats::ALIVE, ETeams::Team_Panda);
+				AddToStats(1, EGameStats::ALIVE, ETeams::TeamPanda);
 				continue;
 			}
 		}
@@ -248,7 +248,7 @@ void ARacketeersGameStateBase::CheckRoundEnd(ETeams Team)
 void ARacketeersGameStateBase::AddPart_Implementation(ETeams Team, EPartSpacing Part, int32 NewPart)
 {
 
-	if(Team == ETeams::Team_Raccoon)
+	if(Team == ETeams::TeamRaccoon)
 	{
 		int Space = (int)Part;
 		int8* PartType = (int8*)((&RaccoonParts.Hull + Space));
@@ -300,7 +300,7 @@ void ARacketeersGameStateBase::AddCraftingProgress_Implementation(ETeams Team, E
 
 void ARacketeersGameStateBase::SetMaxHealth_Implementation(ETeams Team, int32 MaxHealth)
 {
-	if(Team == ETeams::Team_Raccoon)
+	if(Team == ETeams::TeamRaccoon)
 	{
 		RaccoonsMaxHealth = MaxHealth;
 		return;
@@ -322,7 +322,7 @@ void ARacketeersGameStateBase::DamageBoat(int Amount, ETeams Team)
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "IN STATE DAMAGE BOAT");
 	}
 
-	if (Team == ETeams::Team_Raccoon)
+	if (Team == ETeams::TeamRaccoon)
 	{
 		RaccoonsBoatHealth -= Amount;
 		CheckOnRepHealthChanged();
@@ -430,7 +430,7 @@ void ARacketeersGameStateBase::SetRandomNumber(int Number)
 
 void ARacketeersGameStateBase::AddResource_Implementation(int Amount, EResources Resource, ETeams Team)
 {
-	if (Team == ETeams::Team_Raccoon)
+	if (Team == ETeams::TeamRaccoon)
 	{
 		int Space = (int)Resource;
 		int32* material = (int32*)((&RacconResource.Wood + Space));
@@ -478,7 +478,7 @@ void ARacketeersGameStateBase::AddToStats_Implementation(int Amount, EGameStats 
 //Callas på clienten sen på servern
 void ARacketeersGameStateBase::RemoveResource_Implementation(int Amount, EResources Resource, ETeams Team)
 {
-	if (Team == ETeams::Team_Raccoon)
+	if (Team == ETeams::TeamRaccoon)
 	{
 		int Space = (int)Resource;
 		int32* material = (int32*)((&RacconResource.Wood + Space));

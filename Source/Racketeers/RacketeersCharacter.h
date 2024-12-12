@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CosmeticOption.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "RacketeersCharacter.generated.h"
@@ -20,6 +21,13 @@ class ARacketeersCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_Cosmetic, Category = "Cosmetic")
+	FCosmeticOption Cosmetic;
+
+private:
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
@@ -46,7 +54,10 @@ class ARacketeersCharacter : public ACharacter
 
 public:
 	ARacketeersCharacter();
-	
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Cosmetic")
+	void OnRep_Cosmetic();
+
 
 protected:
 
@@ -63,6 +74,8 @@ protected:
 	
 	// To add mapping context
 	virtual void BeginPlay();
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
 	/** Returns CameraBoom subobject **/
