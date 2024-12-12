@@ -12,6 +12,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ARacketeersCharacter
@@ -53,6 +54,11 @@ ARacketeersCharacter::ARacketeersCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
+	 CosmeticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CosmeticMesh"));
+	 CosmeticMesh->SetupAttachment(RootComponent);
+	 CosmeticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
 	
 }
 
@@ -60,6 +66,12 @@ void ARacketeersCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+}
+
+void ARacketeersCharacter::OnRep_Cosmetic()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("OnRep_Cosmetic"));
+	CosmeticMesh->SetStaticMesh(Cosmetic.Mesh);
 }
 
 
@@ -140,4 +152,11 @@ void ARacketeersCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void ARacketeersCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ARacketeersCharacter, Cosmetic);
 }
