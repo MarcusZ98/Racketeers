@@ -54,6 +54,7 @@ void APC_Lobby::Client_ShowCosmeticWidget_Implementation()
 
 void APC_Lobby::Server_SpawnPlayer_Implementation(APlayerController* PC, ETeams Team)
 {
+	
 	if (AGM_LobbyHost* GameMode = Cast<AGM_LobbyHost>(GetWorld()->GetAuthGameMode()))
 	{
 		GameMode->SpawnPlayer(PC, Team);
