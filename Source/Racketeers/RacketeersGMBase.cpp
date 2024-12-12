@@ -561,7 +561,7 @@ void ARacketeersGMBase::SetPackage()
 	}
 	else if (Package.RacconsRoundsWon < Package.RedPandasRoundsWon)
 	{
-		Package.WonTeam = ETeams::TeamRaccoon;
+		Package.WonTeam = ETeams::TeamPanda;
 	}
 	else
 	{
