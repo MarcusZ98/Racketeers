@@ -667,11 +667,11 @@ void ARacketeersGMBase::RespawnPlayer(APlayerState* PState)
 
 	if(PS->PlayerInfo.Team == ETeams::TeamRaccoon)
 	{
-		TeamName ="Team Raccoon";
+		TeamName ="TeamRaccoon";
 	}
 	else if(PS->PlayerInfo.Team == ETeams::TeamPanda)
 	{
-		TeamName ="Team Panda";
+		TeamName ="TeamPanda";
 	}
 	TeamName.AppendInt(PS->PlayerInfo.TeamPlayerID);
 	
