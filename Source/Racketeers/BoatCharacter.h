@@ -45,12 +45,11 @@ class ABoatCharacter : public ACharacter
 
 public:
 	ABoatCharacter();
-	
+	virtual void BeginPlay();
+	virtual void Tick(float DeltaTime) override;
 
 protected:
 	/* ---- FUNCTIONS ---- */
-	virtual void BeginPlay();
-	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	void Move(const FInputActionValue& Value);
 	void Scurry(const FInputActionValue& Value);

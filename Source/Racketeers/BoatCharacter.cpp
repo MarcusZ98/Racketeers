@@ -62,6 +62,7 @@ void ABoatCharacter::BeginPlay()
 
 void ABoatCharacter::Tick(float DeltaTime)
 {
+	Super::Tick(DeltaTime);
 	// Increment ShootTime only when holding shoot
 	if (!bIsShooting && bCanShoot && ShootTime < 3)
 	{
