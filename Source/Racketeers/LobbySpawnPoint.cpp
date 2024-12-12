@@ -5,6 +5,7 @@
 #include "WidgetLobbyInfo.h"
 #include "NiagaraFunctionLibrary.h"
 #include "PS_Lobby.h"
+#include "RacketeersCharacter.h"
 #include "Net/UnrealNetwork.h"
 
 // Sets default values
@@ -42,7 +43,7 @@ void ALobbySpawnPoint::Server_SpawnPlayer_Implementation()
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 		// Spawn the player based on the team
-		const TSubclassOf<AActor> PlayerClass = (Team == ETeams::Team_Panda) ? PandaPlayerClass : RaccoonPlayerClass;
+		const TSubclassOf<AActor> PlayerClass = (Team == ETeams::TeamPanda) ? PandaPlayerClass : RaccoonPlayerClass;
 
 		Player = GetWorld()->SpawnActor<AActor>(PlayerClass, PlayerSpawnPoint->GetComponentLocation(),PlayerSpawnPoint->GetComponentRotation(), SpawnParams);
 		Player->SetActorEnableCollision(false);
