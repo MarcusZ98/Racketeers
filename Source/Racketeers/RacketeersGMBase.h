@@ -41,6 +41,11 @@ public:
 	ARacketeersGMBase();
 	
 	//Events / Delegates
+
+	UFUNCTION(BlueprintCallable)
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player);
+	UFUNCTION(BlueprintCallable)
+	virtual AActor* FindPlayerStart_Implementation(AController* Player, const FString& IncomingName) override;
 	
 	UPROPERTY(EditAnywhere, Blueprintable, BlueprintReadWrite)
 	ATimerInfo* TimerInfo = nullptr;

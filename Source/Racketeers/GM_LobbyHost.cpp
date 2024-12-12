@@ -115,11 +115,11 @@ void AGM_LobbyHost::UpdateIfTeamFull()
 		{
 			if (SpawnPoint->IsOccupied())
 			{
-				if (SpawnPoint->Team == ETeams::Team_Panda)
+				if (SpawnPoint->Team == ETeams::TeamPanda)
 				{
 					NumPandaPlayers++;
 				}
-				else if (SpawnPoint->Team == ETeams::Team_Raccoon)
+				else if (SpawnPoint->Team == ETeams::TeamRaccoon)
 				{
 					NumRaccoonPlayers++;
 				}
@@ -187,12 +187,12 @@ void AGM_LobbyHost::SetPlayerIDs()
 	{
 		if(APS_Lobby* PS = Cast<APS_Lobby>(Player->PlayerState))
 		{
-			if(PS->LobbyInfo.Team == ETeams::Team_Panda)
+			if(PS->LobbyInfo.Team == ETeams::TeamPanda)
 			{
 				PS->LobbyInfo.TeamID = PandaID;
 				PandaID++;
 			}
-			else if(PS->LobbyInfo.Team == ETeams::Team_Raccoon)
+			else if(PS->LobbyInfo.Team == ETeams::TeamRaccoon)
 			{
 				PS->LobbyInfo.TeamID = RaccoonID;
 				RaccoonID++;
