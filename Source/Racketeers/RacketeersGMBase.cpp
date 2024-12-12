@@ -50,13 +50,13 @@ ARacketeersGMBase::ARacketeersGMBase()
 
 AActor* ARacketeersGMBase::ChoosePlayerStart_Implementation(AController* Player)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "ARacketeersGMBase::ChoosePlayerStart_Implementation");
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "ARacketeersGMBase::ChoosePlayerStart_Implementation");
 	return Super::ChoosePlayerStart_Implementation(Player);
 }
 
 AActor* ARacketeersGMBase::FindPlayerStart_Implementation(AController* Player, const FString& IncomingName)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "ARacketeersGMBase::FindPlayerStart_Implementation");
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "ARacketeersGMBase::FindPlayerStart_Implementation");
 	UWorld* World = GetWorld();
 	// If incoming start is specified, then just use it
 	if (!IncomingName.IsEmpty())
@@ -91,7 +91,7 @@ AActor* ARacketeersGMBase::FindPlayerStart_Implementation(AController* Player, c
 	{
 		// No player start found
 		UE_LOG(LogGameMode, Log, TEXT("FindPlayerStart: PATHS NOT DEFINED or NO PLAYERSTART with positive rating"));
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "FindPlayerStart: PATHS NOT DEFINED or NO PLAYERSTART with positive rating");
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "FindPlayerStart: PATHS NOT DEFINED or NO PLAYERSTART with positive rating");
 		// This is a bit odd, but there was a complex chunk of code that in the end always resulted in this, so we may as well just 
 		// short cut it down to this.  Basically we are saying spawn at 0,0,0 if we didn't find a proper player start
 		BestStart = World->GetWorldSettings();
@@ -262,17 +262,17 @@ void ARacketeersGMBase::RoundCompletion()
 
 	//if(GEngine)
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Check If Game Is Over");
+	CheckWinnerOfRound();
 	if(CheckIfGameIsOver())
 	{
-		if(GEngine)
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "End Game");
+		//if(GEngine)
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "End Game");
 		EndGame();
 		return;
 	}
 	//if(GEngine)
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Check Winner of Round");
 	SwitchIncomingState();
-	CheckWinnerOfRound();
 
 	//if(GEngine)
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Load Transition stats");
@@ -337,7 +337,7 @@ void ARacketeersGMBase::Transition()
 {
 	
 	OnloadedMap.Broadcast();
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, LevelToLoad);
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, LevelToLoad);
 	if(!PossibleLevelsToLoad.IsEmpty())
 	{
 		int RandomInt = FMath::RandRange(0, PossibleLevelsToLoad.Num() - 1);
@@ -449,6 +449,11 @@ int ARacketeersGMBase::GetNextPhaseNumber()
 	
 }
 
+struct FTeamMatch
+{
+	ETeams Team = ETeams::NONE;
+	int32 RoundsWon = 0;
+};
 
 
 bool ARacketeersGMBase::CheckIfGameIsOver()
@@ -456,15 +461,21 @@ bool ARacketeersGMBase::CheckIfGameIsOver()
 
 	ARacketeersGameStateBase* GS = this->GetGameState<ARacketeersGameStateBase>();
 	
+	FTeamMatch Raccoons(ETeams::TeamRaccoon, GS->RacconsRoundsWon);
+	FTeamMatch Pandas(ETeams::TeamPanda, GS->RedPandasRoundsWon);
+
+	FTeamMatch Leader = Raccoons.RoundsWon > Pandas.RoundsWon ? Leader = Raccoons : Leader = Pandas;
+	
 	if(State == EPhaseState::Phase_3)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "In Check If Game Is Over");
-		int AvailibleRounds = TotalRounds - (GS->RacconsRoundsWon + GS->RedPandasRoundsWon);
+		
+		int32 AvailibleRounds = TotalRounds - (GS->RacconsRoundsWon + GS->RedPandasRoundsWon);
 		int8 RoundsPlayed = GS->RacconsRoundsWon + GS->RedPandasRoundsWon;
-		if(AvailibleRounds <= 0)
+
+		if(Leader.RoundsWon > AvailibleRounds)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Game Was Over");
-			return true; 
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "LEADER WINS");
+			return true;
 		}
 	}
 	return false;
@@ -654,8 +665,8 @@ void ARacketeersGMBase::RespawnPlayers()
 	}
 	
 	OnloadedMap.Broadcast();
-	if(GEngine)
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Respawn Players");
+	//if(GEngine)
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Respawn Players");
 	
 }
 
