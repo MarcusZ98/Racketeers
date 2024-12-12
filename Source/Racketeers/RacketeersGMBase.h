@@ -210,6 +210,7 @@ private:
 	
 	//methods for progressing trough phases
 
+	UFUNCTION(BlueprintCallable)
 	bool CheckIfGameIsOver();
 	bool LoadTransitionStats();
 	bool CheckWinnerOfRound();
