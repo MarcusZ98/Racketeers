@@ -43,6 +43,8 @@ struct FGameStatsPackage{
 	float RacconsBoatHealth = 0; 
 	UPROPERTY(BlueprintReadWrite)
 	FTeamShipParts RaccoonParts;
+	UPROPERTY(BlueprintReadWrite)
+	FTeamCraftingProgress RaccoonCraftingProgress;
 	
 	UPROPERTY(BlueprintReadWrite)
 	FResources PandaResources;
@@ -52,6 +54,8 @@ struct FGameStatsPackage{
 	float RedPandasBoatHealth = 0;
 	UPROPERTY(BlueprintReadWrite)
 	FTeamShipParts RedPandasParts;
+	UPROPERTY(BlueprintReadWrite)
+	FTeamCraftingProgress RedPandasCraftingProgress;
 	UPROPERTY(BlueprintReadWrite)
 	int ExpectedPlayers;
 	UPROPERTY(BlueprintReadWrite)

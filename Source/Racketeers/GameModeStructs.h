@@ -176,3 +176,15 @@ enum EPartSpacing
 	CANNON,
 	SAIL
 };
+
+USTRUCT(BlueprintType)
+struct FTeamCraftingProgress
+{
+	GENERATED_BODY()
+	UPROPERTY(BlueprintReadWrite)
+	TArray<int> HullProgress = {0, 0, 0};
+	UPROPERTY(BlueprintReadWrite)
+	TArray<int> CannonProgress = {0, 0, 0};
+	UPROPERTY(BlueprintReadWrite)
+	TArray<int> SailProgress = {0, 0, 0};
+};
