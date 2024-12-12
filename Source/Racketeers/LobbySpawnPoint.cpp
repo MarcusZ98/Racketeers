@@ -5,6 +5,7 @@
 #include "WidgetLobbyInfo.h"
 #include "NiagaraFunctionLibrary.h"
 #include "PS_Lobby.h"
+#include "RacketeersCharacter.h"
 #include "Net/UnrealNetwork.h"
 
 // Sets default values
