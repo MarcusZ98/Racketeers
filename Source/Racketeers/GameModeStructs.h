@@ -182,11 +182,11 @@ struct FCraftingProgress
 {
 	GENERATED_BODY()
 	UPROPERTY(BlueprintReadWrite)
-	int WoodAmount;
+	int WoodAmount = 0;
 	UPROPERTY(BlueprintReadWrite)
-	int FiberAmount;
+	int FiberAmount = 0;
 	UPROPERTY(BlueprintReadWrite)
-	int MetalAmount;
+	int MetalAmount = 0;
 };
 
 USTRUCT(BlueprintType)
