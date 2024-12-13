@@ -113,7 +113,12 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 	UPROPERTY(Replicated, BlueprintReadWrite)
 	FGameStats TeamStats;
 	UPROPERTY(BlueprintReadWrite)
-	int ExpectedPlayers;
+	int32 ExpectedPlayers;
+	UPROPERTY(Replicated, BlueprintReadWrite)
+	int32 PlayersJoined;
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void IncrementPlayerJoined();
 
 
 	UPROPERTY(Replicated, BlueprintReadWrite)
