@@ -45,6 +45,8 @@ void ARacketeersGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 
 	DOREPLIFETIME(ARacketeersGameStateBase, RaccoonCraftingProgress);
 	DOREPLIFETIME(ARacketeersGameStateBase, PandaCraftingProgress);
+
+	DOREPLIFETIME(ARacketeersGameStateBase, PlayersJoined);
 }
 
 void ARacketeersGameStateBase::CheckAllPlayersJoin()
@@ -239,6 +241,12 @@ void ARacketeersGameStateBase::CheckRoundEnd(ETeams Team)
 		ARacketeersGMBase* GM = Cast<ARacketeersGMBase>(UGameplayStatics::GetGameMode(GetWorld()));
 		GM->RoundCompletion();
 	}
+}
+
+void ARacketeersGameStateBase::IncrementPlayerJoined_Implementation()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Player Joined");
+	PlayersJoined++;
 }
 
 void ARacketeersGameStateBase::AddPart_Implementation(ETeams Team, EPartSpacing Part, int32 NewPart)
