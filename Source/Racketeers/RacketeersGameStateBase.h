@@ -91,7 +91,7 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 	void RemovePart();
 
 	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
-	void AddCraftingProgress(ETeams Team, EPartSpacing Part, const TArray<int32>& NewProgress);
+	void AddCraftingProgress(ETeams Team, EPartSpacing Part, FCraftingProgress CraftingProgress);
 
 	bool CheckTeamAlive(ETeams Team);
 	void CheckRoundEnd(ETeams Team);
