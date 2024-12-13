@@ -32,7 +32,7 @@ struct FCosmeticOption : public FTableRowBase
 	UTexture2D* Icon;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cosmetics")
-	TSubclassOf<AActor> Actor;
+	UStaticMesh* Mesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cosmetics")
 	UMaterialInterface* Material;
@@ -43,7 +43,7 @@ struct FCosmeticOption : public FTableRowBase
 	FCosmeticOption()
 		: Name(TEXT("Default"))
 		, Icon(nullptr)
-		, Actor(nullptr)
+		, Mesh(nullptr)
 		, Material(nullptr)
 		, Type(ECosmeticType::DEFAULT)
 	{}
