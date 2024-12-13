@@ -260,20 +260,20 @@ void ARacketeersGameStateBase::RemovePart_Implementation()
 
 }
 
-void ARacketeersGameStateBase::AddCraftingProgress_Implementation(ETeams Team, EPartSpacing Part, const TArray<int>& NewProgress)
+void ARacketeersGameStateBase::AddCraftingProgress_Implementation(ETeams Team, EPartSpacing Part, FCraftingProgress CraftingProgress)
 {
 	if (Team == ETeams::TeamRaccoon)
 	{
 		switch (Part)
 		{
 		case HULL:
-			RaccoonCraftingProgress.HullProgress = NewProgress;
+			RaccoonCraftingProgress.HullProgress = CraftingProgress;
 			break;
 		case CANNON:
-			RaccoonCraftingProgress.CannonProgress = NewProgress;
+			RaccoonCraftingProgress.CannonProgress = CraftingProgress;
 			break;
 		case SAIL:
-			RaccoonCraftingProgress.SailProgress = NewProgress;
+			RaccoonCraftingProgress.SailProgress = CraftingProgress;
 			break;
 		}
 		return;
@@ -282,13 +282,13 @@ void ARacketeersGameStateBase::AddCraftingProgress_Implementation(ETeams Team, E
 	switch (Part)
 	{
 	case HULL:
-		PandaCraftingProgress.HullProgress = NewProgress;
+		PandaCraftingProgress.HullProgress = CraftingProgress;
 		break;
 	case CANNON:
-		PandaCraftingProgress.CannonProgress = NewProgress;
+		PandaCraftingProgress.CannonProgress = CraftingProgress;
 		break;
 	case SAIL:
-		PandaCraftingProgress.SailProgress = NewProgress;
+		PandaCraftingProgress.SailProgress = CraftingProgress;
 		break;
 	}
 }
