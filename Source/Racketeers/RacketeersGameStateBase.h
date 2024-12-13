@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BaseGameInstance.h"
 #include "GameModeStructs.h"
 #include "GS_Base.h"
 #include "Phase.h"
@@ -28,9 +29,6 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 	GENERATED_BODY()
 
 	public:
-
-	ARacketeersGameStateBase();
-
 	UPROPERTY(BlueprintCallable, BlueprintAssignable)
 	FOnPhaseOneActive OnPhaseOneActive;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable)
@@ -45,7 +43,14 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 	UPROPERTY(BlueprintCallable, BlueprintAssignable)
 	FOnIncomingPhaseThreeActive OnIncomingPhaseThreeActive;
 
+	FTimerDynamicDelegate TimerCheckAllPlayersJoined;
+
+	UFUNCTION()
+	void CheckAllPlayersJoin();
+	
 	void BeginPlay() override;
+
+	FGameStatsPackage TempPackage;
 	
 	UFUNCTION(BlueprintCallable)
 	void ChangeCurrentPhase(TEnumAsByte<EPhaseState> NewPhase);
@@ -81,9 +86,12 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 	void UpdateHealth();
 	
 	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
-	void AddPart(ETeams Team, EPartSpacing Part, EPart NewPart);
+	void AddPart(ETeams Team, EPartSpacing Part, int32 NewPart);
 	UFUNCTION(NetMulticast, Reliable)
-	void RemovePart(ETeams Team, EPart Part);
+	void RemovePart();
+
+	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
+	void AddCraftingProgress(ETeams Team, EPartSpacing Part, const TArray<int>& NewProgress);
 
 	bool CheckTeamAlive(ETeams Team);
 	void CheckRoundEnd(ETeams Team);
@@ -112,6 +120,11 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 	FTeamShipParts RaccoonParts;
 	UPROPERTY(Replicated, BlueprintReadWrite)
 	FTeamShipParts PandasParts;
+
+	UPROPERTY(Replicated, BlueprintReadWrite)
+	FTeamCraftingProgress RaccoonCraftingProgress;
+	UPROPERTY(Replicated, BlueprintReadWrite)
+	FTeamCraftingProgress PandaCraftingProgress;
 
 
 	UPROPERTY(Replicated, BlueprintReadWrite)

@@ -12,6 +12,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
+
 
 //////////////////////////////////////////////////////////////////////////
 // ARacketeersCharacter
@@ -61,9 +63,6 @@ void ARacketeersCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 }
-
-
-
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -140,4 +139,11 @@ void ARacketeersCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void ARacketeersCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ARacketeersCharacter, Cosmetic);
 }

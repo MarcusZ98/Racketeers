@@ -38,10 +38,10 @@ void UTransitionComponent::BeginPlay()
 void UTransitionComponent::IncrementPlayerReady(ETeams Team)
 {
 	
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "IncrementPlayerReady" );
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "IncrementPlayerReady" );
 		CountPlayer(Team);
 		AGameStateBase* GS = UGameplayStatics::GetGameState(GetWorld());
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "NUM: " + FString::FromInt(GS->PlayerArray.Num()) + " Current Player Count: " + FString::FromInt(CountPlayersReady) );
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "NUM: " + FString::FromInt(GS->PlayerArray.Num()) + " Current Player Count: " + FString::FromInt(CountPlayersReady) );
 
 		if(GS == nullptr) return;
 		if(CountPlayersReady == GS->PlayerArray.Num())
@@ -65,7 +65,7 @@ void UTransitionComponent::CountPlayer(ETeams Team)
 		return;
 	}
 
-	if(Team == ETeams::Team_Raccoon)
+	if(Team == ETeams::TeamRaccoon)
 	{
 		GS->RaccoonsReady++;
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Add  to RaccoonsReady");
@@ -130,8 +130,8 @@ void UTransitionComponent::AddWidgetsToPlayers(AGameStateBase* GS)
 void UTransitionComponent::RemoveWidgetsFromPlayers()
 {
 	for (APlayerState*  PlayerState : UGameplayStatics::GetGameState(GetWorld())->PlayerArray)
-	{
-		ARacketeersController* PC = Cast<ARacketeersController>(PlayerState->GetPlayerController());
+		{
+			ARacketeersController* PC = Cast<ARacketeersController>(PlayerState->GetPlayerController());
 		if (PC == nullptr) continue;
 		PC->RemoveWidget(WidgetName);
 	}

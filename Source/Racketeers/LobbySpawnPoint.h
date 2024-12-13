@@ -11,7 +11,6 @@
 
 
 class APS_Lobby;
-struct FLobbyInfo;
 class UNiagaraSystem;
 
 UCLASS()
@@ -35,22 +34,22 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	ETeams Team;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", Replicated)
+	AActor* Player = nullptr;
+
 private:
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Classes")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Classes", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AActor> RaccoonPlayerClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Classes")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Classes", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AActor> PandaPlayerClass;
 
-	UPROPERTY(EditAnywhere, Category = "VFX")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX", meta = (AllowPrivateAccess = "true"))
 	UNiagaraSystem* SpawnVFX;
 	
 	UPROPERTY(EditAnywhere, Category = "Player")
 	APlayerController* PlayerController = nullptr;
-
-	UPROPERTY(EditAnywhere, Category = "Player", Replicated)
-	AActor* Player = nullptr;
 	
 	
 

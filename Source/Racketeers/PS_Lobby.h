@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CosmeticOption.h"
 #include "PS_Base.h"
 #include "GameModeStructs.h"
-#include "PC_Lobby.h"
 #include "PS_Lobby.generated.h"
 
 class ALobbySpawnPoint;
@@ -27,12 +27,16 @@ struct FLobbyInfo
 	UPROPERTY(BlueprintReadWrite, Category = "LobbyInfo")
 	bool bIsReady;
 
+	UPROPERTY(BlueprintReadWrite, Category = "LobbyInfo")
+	FCosmeticOption Cosmetic;
+
 	FLobbyInfo()
 	{
 		PlayerName = "DEFAULT NAME";
 		Team = ETeams::NONE;
 		TeamID = -1;
 		bIsReady = false;
+		Cosmetic = FCosmeticOption();
 	}
 };
 
