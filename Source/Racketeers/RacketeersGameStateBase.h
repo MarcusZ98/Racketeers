@@ -91,7 +91,7 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 	void RemovePart();
 
 	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
-	void AddCraftingProgress(ETeams Team, EPartSpacing Part, const TArray<int>& NewProgress);
+	void AddCraftingProgress(ETeams Team, EPartSpacing Part, FCraftingProgress CraftingProgress);
 
 	bool CheckTeamAlive(ETeams Team);
 	void CheckRoundEnd(ETeams Team);
@@ -113,7 +113,12 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 	UPROPERTY(Replicated, BlueprintReadWrite)
 	FGameStats TeamStats;
 	UPROPERTY(BlueprintReadWrite)
-	int ExpectedPlayers;
+	int32 ExpectedPlayers;
+	UPROPERTY(Replicated, BlueprintReadWrite)
+	int32 PlayersJoined;
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void IncrementPlayerJoined();
 
 
 	UPROPERTY(Replicated, BlueprintReadWrite)
