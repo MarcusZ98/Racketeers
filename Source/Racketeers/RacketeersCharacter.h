@@ -55,7 +55,7 @@ private:
 public:
 	ARacketeersCharacter();
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Cosmetic")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Cosmetic")
 	void OnRep_Cosmetic();
 
 
