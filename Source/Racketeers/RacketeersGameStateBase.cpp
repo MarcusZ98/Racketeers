@@ -260,7 +260,7 @@ void ARacketeersGameStateBase::RemovePart_Implementation()
 
 }
 
-void ARacketeersGameStateBase::AddCraftingProgress_Implementation(ETeams Team, EPartSpacing Part, const TArray<int>& NewProgress)
+void ARacketeersGameStateBase::AddCraftingProgress_Implementation(ETeams Team, EPartSpacing Part, const TArray<int32>& NewProgress)
 {
 	if (Team == ETeams::TeamRaccoon)
 	{
