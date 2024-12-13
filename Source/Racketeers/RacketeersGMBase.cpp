@@ -6,6 +6,7 @@
 #include "BaseGameInstance.h"
 #include "EngineUtils.h"
 #include "BoatCharacter.h"
+#include "FrameTypes.h"
 #include "HeadMountedDisplayTypes.h"
 #include "PS_Base.h"
 #include "RacketeersController.h"
@@ -684,6 +685,8 @@ void ARacketeersGMBase::RespawnPlayer(APlayerState* PState)
 	AActor* PlayerStart = FindPlayerStart(PS->GetPlayerController(),TeamName);
 	if(PlayerStart == nullptr || PS == nullptr || PS->GetPawn() == nullptr) return;
 	PS->GetPawn()->SetActorLocation(PlayerStart->GetActorLocation());
+	PS->GetPawn()->SetActorLocation(FVector(PS->GetPawn()->GetActorLocation().X, PS->GetPawn()->GetActorLocation().Y, 0.0f), true);
+
 	
 }
 

@@ -64,6 +64,11 @@ void ARacketeersCharacter::BeginPlay()
 	Super::BeginPlay();
 }
 
+void ARacketeersCharacter::OnRep_Cosmetic_Implementation()
+{
+	// Set the cosmetic mesh and material
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 // Input
