@@ -104,6 +104,8 @@ public:
 
 
 public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool bIsLAN = false;
 	
 private:
 	UPROPERTY()
