@@ -52,10 +52,18 @@ ABoatCharacter::ABoatCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	// Initialize replication
+	bReplicates = true;
+	//bReplicateMovement = true;
+	GetCharacterMovement()->SetIsReplicated(true);
+	NetUpdateFrequency = 120.0f;
+	MinNetUpdateFrequency = 60.0f;
+
 }
 
 void ABoatCharacter::BeginPlay()
 {
+	SetReplicateMovement(true);
 	// Call the base class  
 	Super::BeginPlay();
 }
