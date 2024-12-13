@@ -383,8 +383,7 @@ void ARacketeersGMBase::BroadcastOnPlayerPressed(ETeams Team)
 {
 	if(HasAuthority())
 	{
-		ARacketeersController* PController = Cast<ARacketeersController>(	UGameplayStatics::GetPlayerController(GetWorld(), 0));
-		PController->OnPlayerPressedReady.Broadcast(Team);
+		TransitionComponent->IncrementPlayerReady(Team);
 	}
 }
 
@@ -409,8 +408,8 @@ void ARacketeersGMBase::IncrementPlayerCounter()
 void ARacketeersGMBase::AllStagesFinished()
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, "ALL STAGES FINISHED" );
-	SwitchState(); 
-	ATimerInfo::SetTime(CurrentPhase->TimeLimit);
+	//SwitchState(); 
+	ATimerInfo::SetTime(TimeLimit);
 	ATimerInfo::SetIsActive(true);
 	ARacketeersGameStateBase* GS = GetGameState<ARacketeersGameStateBase>();
 	if(GS)
@@ -418,23 +417,18 @@ void ARacketeersGMBase::AllStagesFinished()
 		GS->PandasReady = 0;
 		GS->RaccoonsReady = 0;
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, "ALL STAGES FINISHED GAME STATE" );
-		GS->ChangeCurrentPhase(CurrentPhase->State);
+		//GS->ChangeCurrentPhase(CurrentPhase->State);
 	}
-
-	
 	ARacketeersController* C = Cast<ARacketeersController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 
-	TransitionComponent->RemoveWidgetsFromPlayers();
-	TransitionComponent->CountPlayersReady = 0;
+	//TransitionComponent->RemoveWidgetsFromPlayers();
+	//TransitionComponent->CountPlayersReady = 0;
 
-	RespawnPlayers();
-	
+	//RespawnPlayers();
 	if(C->HasAuthority())
 	{
 		C->ServerMultiCastActivateTimer();
 	}
-
-	
 }
 
 int ARacketeersGMBase::GetNextPhaseNumber()
@@ -659,15 +653,6 @@ void ARacketeersGMBase::RespawnPlayers()
 		PS->GetPawn()->SetActorRotation(PlayerStart->GetActorRotation());
 		
 	}
-	
-	TransitionComponent->bIsFinished = true;
-	if(TransitionComponent->bIsFinished && TransitionComponent->CountPlayersReady == GameState->PlayerArray.Num())
-	{
-		TransitionComponent->CountPlayersReady = 0;
-		TransitionComponent->OnFinished.Broadcast();
-	}
-	
-	OnloadedMap.Broadcast();
 	//if(GEngine)
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Respawn Players");
 	

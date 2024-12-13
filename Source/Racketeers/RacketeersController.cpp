@@ -266,6 +266,7 @@ void ARacketeersController::ServerCheckReady_Implementation(ETeams Team)
 	if(!HasAuthority()) return;
 	ARacketeersGMBase* GM = Cast<ARacketeersGMBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "SERVER CHECK READY");
+
 	
 	GM->BroadcastOnPlayerPressed(Team);
  }
