@@ -7,6 +7,7 @@
 #include "RacketeersCharacter.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 
 void APC_Lobby::BeginPlay()
 {
@@ -133,4 +134,11 @@ void APC_Lobby::Client_PlayToggleReadySound_Implementation(bool bIsReady)
 			UGameplayStatics::PlaySound2D(GetWorld(), UnreadySound);
 		}
 	}
+}
+
+void APC_Lobby::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(APC_Lobby, SpawnPoint);
 }
