@@ -58,10 +58,12 @@ void APC_Lobby::Server_SpawnPlayer_Implementation(APlayerController* PC, ETeams 
 	
 	if (AGM_LobbyHost* GameMode = Cast<AGM_LobbyHost>(GetWorld()->GetAuthGameMode()))
 	{
-		GameMode->SpawnPlayer(PC, Team);
-		Multicast_PlaySpawnSound();
+		if(GameMode->SpawnPlayer(PC, Team))
+		{
+			Multicast_PlaySpawnSound();
+			Cast<APC_Lobby>(PC)->Client_ShowLobbyWidget();
+		}
 	}
-	Cast<APC_Lobby>(PC)->Client_ShowLobbyWidget();
 }
 
 void APC_Lobby::Server_RemovePlayer_Implementation()
