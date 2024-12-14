@@ -3,6 +3,8 @@
 
 #include "RacketeersGMBase.h"
 
+#include <steam/steamclientpublic.h>
+
 #include "BaseGameInstance.h"
 #include "EngineUtils.h"
 #include "BoatCharacter.h"
@@ -47,6 +49,71 @@ class APS_Base;
 ARacketeersGMBase::ARacketeersGMBase()
 {
 	UE_LOG(LogTemp, Warning, TEXT("AGM_Base::AGM_Base"));
+}
+
+void ARacketeersGMBase::OnPostLogin(AController* NewPlayer)
+{
+	if(GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1,15,FColor::Yellow, "OnPostLogin");
+	}
+	const APlayerState* NewPlayerState = NewPlayer->PlayerState;
+	if(NewPlayerState == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1,15,FColor::Yellow, "PLayer State NULLPTR");
+		return;
+	}
+	for (const APlayerState* PlayerState : JoiningPlayers)
+	{
+		GEngine->AddOnScreenDebugMessage(-1,15,FColor::Yellow, "Inactiveplayer: " + PlayerState->SavedNetworkAddress + " NewPlayer: " + NewPlayerState->SavedNetworkAddress);
+		if(PlayerState->SavedNetworkAddress == NewPlayerState->SavedNetworkAddress)
+		{
+			if(GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(-1,15,FColor::Yellow, "ALLOWED TO REJOIN");
+			}
+			APlayerController* PC = NewPlayerState->GetPlayerController();
+			if(PC->GetPawn())
+			{
+				GEngine->AddOnScreenDebugMessage(-1,15,FColor::Yellow, PC->GetPawn()->GetName());
+			}else
+			{
+				GEngine->AddOnScreenDebugMessage(-1,15,FColor::Red, "NO PAWN FOUND");
+			}
+			
+			Super::OnPostLogin(NewPlayer);
+			return;
+		}
+	}
+	GEngine->AddOnScreenDebugMessage(-1,15,FColor::Yellow, "Destroy PLayer COntroller");
+	NewPlayer->Destroy();
+
+}
+
+void ARacketeersGMBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId,
+	FString& ErrorMessage)
+{
+	for (APlayerState* PlayerState : InactivePlayerArray)
+	{
+		if(PlayerState->SavedNetworkAddress == Address)
+		{
+			if(GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(-1,15,FColor::Blue, Address);
+			}
+			JoiningPlayers.Add(PlayerState);
+		}
+	}
+	Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
+}
+
+void ARacketeersGMBase::Logout(AController* Exiting)
+{
+	if(Exiting)
+	{
+		InactivePlayerArray.Add(Exiting->PlayerState);
+	}
+	Super::Logout(Exiting);
 }
 
 AActor* ARacketeersGMBase::ChoosePlayerStart_Implementation(AController* Player)

@@ -40,6 +40,12 @@ public:
 	ARacketeersGMBase();
 	
 	//Events / Delegates
+	virtual void OnPostLogin(AController* NewPlayer) override;
+	void PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage) override;
+	virtual void Logout(AController* Exiting) override;
+
+	UPROPERTY()
+	TArray<APlayerState*> JoiningPlayers;
 
 	UFUNCTION(BlueprintCallable)
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player);
@@ -105,6 +111,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RespawnPlayers();
 
+
+	
 
 	UFUNCTION(BlueprintCallable)
 	void RespawnPlayer(APlayerState* PState);
