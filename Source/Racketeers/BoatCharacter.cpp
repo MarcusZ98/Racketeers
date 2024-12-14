@@ -63,9 +63,15 @@ ABoatCharacter::ABoatCharacter()
 
 void ABoatCharacter::BeginPlay()
 {
-	SetReplicateMovement(true);
-	// Call the base class  
 	Super::BeginPlay();
+	SetReplicateMovement(true);
+	// Call the base class
+	// Automatically initialize the boat
+
+	/* if (HasAuthority()) // Ensure only the server initializes the boat
+	{
+		InitializeBoat();
+	}*/
 }
 
 void ABoatCharacter::Tick(float DeltaTime)
@@ -160,6 +166,26 @@ void ABoatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	}
 }
 
+
+///// BOAT INIT /////
+void ABoatCharacter::InitializeBoat()
+{
+	FBoatSettings Settings;
+	Health = Settings.Health;
+	CannonCount = Settings.CannonAmount;
+	GetCharacterMovement()->MaxWalkSpeed = Settings.MovementSpeed;
+	GetCharacterMovement()->RotationRate.Yaw = Settings.RotationSpeed.Yaw;
+	//HullMesh = Settings.HullMesh;
+	HullMaterial = Settings.HullMaterial;
+	SailMaterial = Settings.SailMaterial;
+
+	// Apply SailMaterial to the sail mesh
+	if (HullMesh && HullMaterial &&SailMaterial)
+	{
+		HullMesh->SetMaterial(0, HullMaterial);
+		HullMesh->SetMaterial(1, SailMaterial);
+	}
+}
 
 
 

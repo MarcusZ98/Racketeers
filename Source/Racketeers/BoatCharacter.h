@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BoatSettings.h"
 #include "NiagaraComponentPool.h"
 #include "Projectile.h"
 #include "GameFramework/Character.h"
@@ -53,6 +54,7 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	void Move(const FInputActionValue& Value);
 	void Scurry(const FInputActionValue& Value);
+	void InitializeBoat();
 
 	/* ---- RPCs ---- */
 	UFUNCTION(Server, Reliable)
@@ -108,6 +110,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boat Properties")
 	float Health;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boat Properties")
+	UStaticMesh* HullMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boat Properties")
+	UMaterialInterface* HullMaterial;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boat Properties")
 	UMaterialInterface* SailMaterial;
 
 	
@@ -140,23 +146,7 @@ public:
 	float GetCooldownProgress() const;
 	UFUNCTION(BlueprintCallable, Category = "Shoot")
 	float GetShootRange() const;
-
-	/* ---- SETTERS ----*/
-	/*UFUNCTION(BlueprintCallable, Category = "Boat Properties")
-	void SetHealth(float NewHealth);
-
-	UFUNCTION(BlueprintCallable, Category = "Boat Properties")
-	void SetCannonAmount(float NewCannonAmount);
-
-	UFUNCTION(BlueprintCallable, Category = "Boat Properties")
-	void SetMovementSpeed(float NewMovementSpeed);
-
-	UFUNCTION(BlueprintCallable, Category = "Boat Properties")
-	void SetRotationSpeed(float NewRotationSpeed);
-
-	UFUNCTION(BlueprintCallable, Category = "Boat Properties")
-	void SetHullAndSailMaterial(UMaterialInterface* NewHullMaterial, UMaterialInterface* NewSailMaterial);
-*/
+	
 	/* ---- SOUNDS & PARTICLES ----*/
 	UFUNCTION(BlueprintImplementableEvent, Category = "Scurry Effects")
 	void PlayScurryEffects();

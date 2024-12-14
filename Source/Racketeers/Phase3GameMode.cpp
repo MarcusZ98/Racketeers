@@ -2,19 +2,15 @@
 
 
 #include "Phase3GameMode.h"
+#include "EngineUtils.h"
 
+#include "AsyncTreeDifferences.h"
 #include "Kismet/GameplayStatics.h"
 
-void APhase3GameMode::BeginPlay()
-{
-    Super::BeginPlay();
-
-    GetActivePlayers();
-    //SetBoatValues(team)
-}
 
 
-void APhase3GameMode::GetActivePlayers()
+
+/* void APhase3GameMode::GetActivePlayers()
 {
     GameState = GetWorld()->GetGameState<AGameStateBase>();
     if (!GameState) return;
@@ -30,6 +26,8 @@ void APhase3GameMode::GetActivePlayers()
         PlayerID = CustomPlayerState->PlayerInfo.TeamPlayerID;
 
         SetBoatValues(TeamID, PlayerID);
+        ProcessPlayerID(PlayerID, TeamID);
+        SpawnBoat();
     }
 }
 
@@ -43,81 +41,179 @@ void APhase3GameMode::SetBoatValues(ETeams MyTeamID, int32 MyPlayerID)
     switch (MyTeamID)
     {
     case ETeams::TeamPanda:
-        ProcessTeamParts(GameStateBase->PandasParts, MyPlayerID, "Panda");
+        // Set hull material
+        ProcessPart(GameStateBase->PandasParts, MyPlayerID);
         break;
 
     case ETeams::TeamRaccoon:
-        ProcessTeamParts(GameStateBase->RaccoonParts, MyPlayerID, "Raccoon");
+        // Set hull material
+        ProcessPart(GameStateBase->RaccoonParts, MyPlayerID);
         break;
 
     default:
         UE_LOG(LogTemp, Warning, TEXT("Invalid TeamID."));
         break;
+        
     }
 }
 
-void APhase3GameMode::ProcessTeamParts(const FTeamShipParts& TeamParts, int32 MyPlayerID, const FString& TeamName)
+void APhase3GameMode::ProcessPlayerID(int32 MyPlayerID, ETeams Team)
 {
-    // Handle PlayerID logic
-    ProcessPlayerID(MyPlayerID, TeamName);
-
-    // Handle individual parts
-    switch (TeamParts)
+    switch (Team)
     {
-    case CANNON:
-        ProcessPart(1, TEXT("Cannon"));
-        break;
-    case HULL:
-        ProcessPart(2 , TEXT("Hull"));
-        break;
-    case SAIL:
-        ProcessPart(3 , TEXT("Sail"));
+    case ETeams::TeamPanda:
+        
+        switch (MyPlayerID)
+        {
+        case 0:
+            SpawnTag = "Panda0";
+            break;
+        case 1:
+            SpawnTag = "Panda1";
+            break;
+        case 2:
+            SpawnTag = "Panda2";
+            break;
+        default:
+            break;
+        }
+        
+    case ETeams::TeamRaccoon:
+        switch (MyPlayerID)
+        {
+        case 0:
+            SpawnTag = "Raccoon0";
+            break;
+        case 1:
+            SpawnTag = "Raccoon1";
+            break;
+        case 2:
+            SpawnTag = "Raccoon2";
+            break;
+        default:
+            break;
+        }
+
+    case ETeams::NONE:
         break;
     }
+
 }
 
-void APhase3GameMode::ProcessPlayerID(int32 MyPlayerID, const FString& TeamName)
+void APhase3GameMode::ProcessPart(const FTeamShipParts& TeamParts,  int32 MyPlayerID)
 {
-    switch (MyPlayerID)
+    FBoatSettings BoatSettings;
+    // Search through Cannnon Parts
+    switch (static_cast<ECannonPart>(TeamParts.Cannon))
     {
-    case 0:
-        UE_LOG(LogTemp, Log, TEXT("%s Player 0 logic."), *TeamName);
-        // Player 0-specific logic
+    case ECannonPart::Cannon_0:
+        BoatSettings.CannonAmount = (TeamID == ETeams::TeamPanda) ? 1 : 1;
         break;
-    case 1:
-        UE_LOG(LogTemp, Log, TEXT("%s Player 1 logic."), *TeamName);
-        // Player 1-specific logic
+    case ECannonPart::Cannon_1:
+        BoatSettings.CannonAmount = (TeamID == ETeams::TeamPanda) ? 2 : 2;
         break;
-    case 2:
-        UE_LOG(LogTemp, Log, TEXT("%s Player 2 logic."), *TeamName);
-        // Player 2-specific logic
+    case ECannonPart::Cannon_2:
+        BoatSettings.CannonAmount = (TeamID == ETeams::TeamPanda) ? 3 : 3;
         break;
     default:
-        UE_LOG(LogTemp, Warning, TEXT("Invalid PlayerID for %s team."), *TeamName);
         break;
     }
-}
 
-void APhase3GameMode::ProcessPart(int32 PartValue, const FString& PartName)
-{
-    // Handle part based on its integer value
-    switch (PartValue)
+    // Search through Hull Parts
+    switch (static_cast<EHullPart>(TeamParts.Hull))
     {
-    case 0:
-        UE_LOG(LogTemp, Log, TEXT("%s value is 0. Applying logic."), *PartName);
-        // Logic for value 0
+    case EHullPart::Hull_0:
+        BoatSettings.Health = (TeamID == ETeams::TeamPanda) ? 90 : 90;
+        BoatSettings.HullMaterial = (TeamID == ETeams::TeamPanda) ? PandaHullMaterial : RaccoonHullMaterial;
+        SpawnActor = (TeamID == ETeams::TeamPanda) ? BoatSmall : BoatSmall;
         break;
-    case 1:
-        UE_LOG(LogTemp, Log, TEXT("%s value is 1. Applying logic."), *PartName);
-        // Logic for value 1
+    case EHullPart::Hull_1:
+        BoatSettings.Health = (TeamID == ETeams::TeamPanda) ? 180 : 180;
+        BoatSettings.HullMaterial = (TeamID == ETeams::TeamPanda) ? PandaHullMaterial : RaccoonHullMaterial;
+        SpawnActor = (TeamID == ETeams::TeamPanda) ? BoatMedium : BoatMedium;
         break;
-    case 2:
-        UE_LOG(LogTemp, Log, TEXT("%s value is 2. Applying logic."), *PartName);
-        // Logic for value 2
+    case EHullPart::Hull_2:
+        BoatSettings.Health = (TeamID == ETeams::TeamPanda) ? 360 : 360;
+        BoatSettings.HullMaterial = (TeamID == ETeams::TeamPanda) ? PandaHullMaterial : RaccoonHullMaterial;
+        SpawnActor = (TeamID == ETeams::TeamPanda) ? BoatBig : BoatBig;
         break;
     default:
-        UE_LOG(LogTemp, Warning, TEXT("Invalid value for %s: %d."), *PartName, PartValue);
+        break;
+    }
+
+    // Search through Sail Parts
+    switch (static_cast<ESailPart>(TeamParts.Sail))
+    {
+    case ESailPart::Sail_0:
+        BoatSettings.MovementSpeed = (TeamID == ETeams::TeamPanda) ? 1150 : 1150;
+        BoatSettings.RotationSpeed.Yaw = (TeamID == ETeams::TeamPanda) ? 500 : 500;
+        BoatSettings.SailMaterial = (TeamID == ETeams::TeamPanda) ? PandaSailMaterial1 : RaccoonSailMaterial1;
+        break;
+    case ESailPart::Sail_1:
+        BoatSettings.MovementSpeed = (TeamID == ETeams::TeamPanda) ? 1400 : 1400;
+        BoatSettings.RotationSpeed.Yaw = (TeamID == ETeams::TeamPanda) ? 600 : 600;
+
+        BoatSettings.SailMaterial = (TeamID == ETeams::TeamPanda) ? PandaSailMaterial2 : RaccoonSailMaterial2;
+        break;
+    case ESailPart::Sail_2:
+        BoatSettings.MovementSpeed = (TeamID == ETeams::TeamPanda) ? 1750 : 1750;
+        BoatSettings.RotationSpeed.Yaw = (TeamID == ETeams::TeamPanda) ? 700 : 700;
+        BoatSettings.SailMaterial = (TeamID == ETeams::TeamPanda) ? PandaSailMaterial3 : RaccoonSailMaterial3;
+        break;
+    default:
         break;
     }
 }
 
+void APhase3GameMode::SpawnBoat()
+{
+    if (!SpawnActor)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("SpawnActor is not valid for SpawnTag: %s"), *SpawnTag.ToString());
+        return;
+    }
+
+    // Find the actor with the specified SpawnTag
+    AActor* SpawnPoint = nullptr;
+    for (TActorIterator<AActor> It(GetWorld()); It; ++It)
+    {
+        if (It->ActorHasTag(SpawnTag))
+        {
+            SpawnPoint = *It;
+            break;
+        }
+    }
+
+    if (!SpawnPoint)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("No BoatSpawnStart actor found with SpawnTag: %s"), *SpawnTag.ToString());
+        return;
+    }
+
+    // Get spawn location and rotation
+    FVector SpawnLocation = SpawnPoint->GetActorLocation();
+    FRotator SpawnRotation = SpawnPoint->GetActorRotation();
+
+    // Pass the struct as spawn parameters
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.Owner = this;
+    SpawnParams.Instigator = GetInstigator();
+
+    // Set custom initialization parameters via tags or directly in BoatSettings
+    ABoatCharacter* SpawnedBoat = GetWorld()->SpawnActor<ABoatCharacter>(
+        SpawnActor,
+        SpawnLocation,
+        SpawnRotation,
+        SpawnParams
+        );
+    
+    if (!SpawnedBoat)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Failed to spawn boat for SpawnTag: %s"), *SpawnTag.ToString());
+        return;
+    }
+
+    // Debug log
+    UE_LOG(LogTemp, Log, TEXT("Boat successfully spawned at location: %s with tag: %s"), *SpawnLocation.ToString(), *SpawnTag.ToString());
+}
+*/
