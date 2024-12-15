@@ -83,7 +83,7 @@ void ABoatCharacter::Tick(float DeltaTime)
 				BoatWidget->UI_PlayShootRange(); // Play charge animation while holding
 			}
 
-			if (!bIsHoldingShoot)
+			if (!bCanShoot)
 			{
 				// Play the shoot range animation once the button is released
 				BoatWidget->UI_PlayAnimationShootRange();
@@ -222,6 +222,7 @@ void ABoatCharacter::ResetScurrySpeed()
 
 void ABoatCharacter::OnShootLeftStarted()
 {
+	bIsHoldingShoot = true;
 	ServerHoldShoot();
 }
 
@@ -233,6 +234,7 @@ void ABoatCharacter::OnShootLeftCompleted()
 
 void ABoatCharacter::OnShootRightStarted()
 {
+	bIsHoldingShoot = true;
 	ServerHoldShoot();
 }
 

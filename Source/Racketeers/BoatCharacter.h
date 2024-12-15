@@ -142,22 +142,8 @@ public:
 	float GetShootRange() const;
 
 	/* ---- SETTERS ----*/
-	/*UFUNCTION(BlueprintCallable, Category = "Boat Properties")
-	void SetHealth(float NewHealth);
-
-	UFUNCTION(BlueprintCallable, Category = "Boat Properties")
-	void SetCannonAmount(float NewCannonAmount);
-
-	UFUNCTION(BlueprintCallable, Category = "Boat Properties")
-	void SetMovementSpeed(float NewMovementSpeed);
-
-	UFUNCTION(BlueprintCallable, Category = "Boat Properties")
-	void SetRotationSpeed(float NewRotationSpeed);
-
-	UFUNCTION(BlueprintCallable, Category = "Boat Properties")
-	void SetHullAndSailMaterial(UMaterialInterface* NewHullMaterial, UMaterialInterface* NewSailMaterial);
-*/
-	/* ---- SOUNDS & PARTICLES ----*/
+	
+    /* ---- SOUNDS & PARTICLES ----*/
 	UFUNCTION(BlueprintImplementableEvent, Category = "Scurry Effects")
 	void PlayScurryEffects();
 	UFUNCTION(BlueprintImplementableEvent, Category = "Scurry Effects")
