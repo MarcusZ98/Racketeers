@@ -360,3 +360,24 @@ void ARacketeersController::SetServerTimeSeconds_Implementation(ARacketeersContr
 	Controller->SetTimeSeconds(ATimerInfo::GetTime(), ATimerInfo::GetIsActive());
 	
 }
+
+void ARacketeersController::Client_TogglePauseGame_Implementation()
+{
+	if(PauseWidget == nullptr)
+	{
+		return;
+	}
+	
+	if(PauseWidget->IsInViewport())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "REMOVE FROM PARENT");
+		PauseWidget->RemoveFromParent();
+		SetInputMode(FInputModeGameOnly());
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "ADD TO VIEWPORT");
+		PauseWidget->AddToViewport();
+		SetInputMode(FInputModeUIOnly());
+	}
+}
