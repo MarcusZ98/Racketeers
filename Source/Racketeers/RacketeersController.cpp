@@ -151,7 +151,9 @@ void ARacketeersController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "ARacketeersController::BeginPlay");
+	FInputModeGameOnly InputMode;
+	SetInputMode(InputMode);
 	OnBeginPlayerEvent.Broadcast();
 }
 

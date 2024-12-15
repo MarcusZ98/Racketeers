@@ -42,6 +42,15 @@ struct FPlayerInfo
 	}
 	
 };
+USTRUCT(BlueprintType)
+struct FPlayerNetworkData
+{
+	GENERATED_BODY()
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsReconnecting = false;
+	UPROPERTY(BlueprintReadWrite)
+	FVector LastPosition = FVector();
+};
 
 
 UCLASS()
@@ -51,6 +60,9 @@ class RACKETEERS_API APS_Base : public APlayerState
 
 public:
 
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsReconnecting;
+
 
 	APS_Base();
 
@@ -58,7 +70,9 @@ public:
 
 	UPROPERTY(Replicated, BlueprintReadWrite, Category = "PlayerInfo")
 	FPlayerInfo PlayerInfo;
-
+	UPROPERTY(Replicated, BlueprintReadWrite, Category = "PlayerInfo")
+	FPlayerNetworkData PlayerNetworkData;
+	
 	UFUNCTION(Server, Reliable, WithValidation,BlueprintCallable )
 	void DamagePlayerBoat(APlayerState* PS,int Amount);
 

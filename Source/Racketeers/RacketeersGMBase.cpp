@@ -51,6 +51,10 @@ ARacketeersGMBase::ARacketeersGMBase()
 	UE_LOG(LogTemp, Warning, TEXT("AGM_Base::AGM_Base"));
 }
 
+void ARacketeersGMBase::PlayerControllerConstructed()
+{
+}
+
 void ARacketeersGMBase::OnPostLogin(AController* NewPlayer)
 {
 	if(GEngine)
@@ -63,25 +67,20 @@ void ARacketeersGMBase::OnPostLogin(AController* NewPlayer)
 		GEngine->AddOnScreenDebugMessage(-1,15,FColor::Yellow, "PLayer State NULLPTR");
 		return;
 	}
-	for (const APlayerState* PlayerState : JoiningPlayers)
+	for (APlayerState* JoiningState : JoiningPlayerStates)
 	{
-		GEngine->AddOnScreenDebugMessage(-1,15,FColor::Yellow, "Inactiveplayer: " + PlayerState->SavedNetworkAddress + " NewPlayer: " + NewPlayerState->SavedNetworkAddress);
-		if(PlayerState->SavedNetworkAddress == NewPlayerState->SavedNetworkAddress)
+		GEngine->AddOnScreenDebugMessage(-1,15,FColor::Yellow, "Inactiveplayer: " + JoiningState->SavedNetworkAddress + " NewPlayer: " + NewPlayerState->SavedNetworkAddress);
+		if(JoiningState->SavedNetworkAddress == NewPlayerState->SavedNetworkAddress)
 		{
+		
 			if(GEngine)
 			{
 				GEngine->AddOnScreenDebugMessage(-1,15,FColor::Yellow, "ALLOWED TO REJOIN");
 			}
-			APlayerController* PC = NewPlayerState->GetPlayerController();
-			if(PC->GetPawn())
-			{
-				GEngine->AddOnScreenDebugMessage(-1,15,FColor::Yellow, PC->GetPawn()->GetName());
-			}else
-			{
-				GEngine->AddOnScreenDebugMessage(-1,15,FColor::Red, "NO PAWN FOUND");
-			}
-			
 			Super::OnPostLogin(NewPlayer);
+			APlayerController* PC = NewPlayerState->GetPlayerController();
+			JoiningPlayersControllers.Add(PC);
+			JoiningPlayerStates.Remove(JoiningState);
 			return;
 		}
 	}
@@ -90,8 +89,18 @@ void ARacketeersGMBase::OnPostLogin(AController* NewPlayer)
 
 }
 
+void ARacketeersGMBase::PostLogin(APlayerController* NewPlayer)
+{
+	Super::PostLogin(NewPlayer);
+	if (NewPlayer->GetStateName() == TEXT("Spectating"))
+	{
+		NewPlayer->UnPossess();
+		NewPlayer->ChangeState(TEXT("Spectating"));
+	}
+}
+
 void ARacketeersGMBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId,
-	FString& ErrorMessage)
+                                 FString& ErrorMessage)
 {
 	for (APlayerState* PlayerState : InactivePlayerArray)
 	{
@@ -101,10 +110,16 @@ void ARacketeersGMBase::PreLogin(const FString& Options, const FString& Address,
 			{
 				GEngine->AddOnScreenDebugMessage(-1,15,FColor::Blue, Address);
 			}
-			JoiningPlayers.Add(PlayerState);
+			JoiningPlayerStates.Add(PlayerState);
 		}
 	}
 	Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
+}
+
+APlayerController* ARacketeersGMBase::Login(UPlayer* NewPlayer, ENetRole InRemoteRole, const FString& Portal,
+	const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
+{
+	return Super::Login(NewPlayer, InRemoteRole, Portal, Options, UniqueId, ErrorMessage);
 }
 
 void ARacketeersGMBase::Logout(AController* Exiting)
@@ -114,6 +129,17 @@ void ARacketeersGMBase::Logout(AController* Exiting)
 		InactivePlayerArray.Add(Exiting->PlayerState);
 	}
 	Super::Logout(Exiting);
+}
+
+void ARacketeersGMBase::AddInactivePlayer(APlayerState* PlayerState, APlayerController* PC)
+{
+	APS_Base* PS = Cast<APS_Base>(PlayerState);
+	if(PS)
+	{
+		PS->PlayerNetworkData.bIsReconnecting = true;
+	}
+	
+	Super::AddInactivePlayer(PlayerState, PC);
 }
 
 AActor* ARacketeersGMBase::ChoosePlayerStart_Implementation(AController* Player)
