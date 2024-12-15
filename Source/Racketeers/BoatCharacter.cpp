@@ -71,47 +71,23 @@ void ABoatCharacter::BeginPlay()
 void ABoatCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	// Increment ShootTime only when holding shoot
-	if (!bIsShooting && bCanShoot && ShootTime < 3)
+	
+	if (BoatWidgetInstance)
 	{
-		ShootTime += DeltaTime;
-		 if (BoatWidgetInstance && bIsHoldingShoot)
-		 {
-		 	BoatWidget = Cast<UBoatWidget>(BoatWidgetInstance);
-		 	// Cast the widget instance to UBoatWidget
-		 	if (BoatWidget && IsLocallyControlled())
-		 	{
-		 		BoatWidget->UI_PlayShootRange(); // Call the Blueprint-implemented event
-		 	}
-		 }
-	}else if(!bCanShoot && bIsShooting)
-	{
-		if (BoatWidgetInstance)
+		BoatWidget = Cast<UBoatWidget>(BoatWidgetInstance);
+		if (BoatWidget && IsLocallyControlled())
 		{
-			BoatWidget = Cast<UBoatWidget>(BoatWidgetInstance);
-			// Cast the widget instance to UBoatWidget
-			if (BoatWidget && IsLocallyControlled())
+			if (bIsHoldingShoot && !bIsShooting && bCanShoot && ShootTime < 3)
 			{
-				BoatWidget->UI_PlayAnimationError(); // Call the Blueprint-implemented event
+				ShootTime += DeltaTime;
+				BoatWidget->UI_PlayShootRange(); // Play charge animation while holding
 			}
-		}
-	}else if(BoatWidgetInstance)
-	{
-		BoatWidget = Cast<UBoatWidget>(BoatWidgetInstance);
-		// Cast the widget instance to UBoatWidget
-		if (BoatWidget && IsLocallyControlled())
-		{
-			BoatWidget->UI_PlayAnimationShootRange();
-		}
-	}
 
-	if(bIsShooting && BoatWidgetInstance)
-	{
-		BoatWidget = Cast<UBoatWidget>(BoatWidgetInstance);
-		// Cast the widget instance to UBoatWidget
-		if (BoatWidget && IsLocallyControlled())
-		{
-			BoatWidget->UI_PlayShootCooldown(); // Call the Blueprint-implemented event
+			if (!bIsHoldingShoot)
+			{
+				// Play the shoot range animation once the button is released
+				BoatWidget->UI_PlayAnimationShootRange();
+			}
 		}
 	}
 
@@ -251,7 +227,7 @@ void ABoatCharacter::OnShootLeftStarted()
 
 void ABoatCharacter::OnShootLeftCompleted()
 {
-		bIsHoldingShoot = false;
+	bIsHoldingShoot = false;
 	ServerStartShooting(true);
 }
 
