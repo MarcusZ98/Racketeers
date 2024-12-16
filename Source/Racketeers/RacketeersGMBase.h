@@ -38,9 +38,25 @@ class RACKETEERS_API ARacketeersGMBase : public AGM_Base
 public:
 
 	ARacketeersGMBase();
+	FTimerDynamicDelegate OnPlayerControllerConstructed;
+
+	UFUNCTION()
+	void PlayerControllerConstructed();
 	
 	//Events / Delegates
+	virtual void OnPostLogin(AController* NewPlayer) override;
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+	void PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage) override;
+	virtual APlayerController* Login(UPlayer* NewPlayer, ENetRole InRemoteRole, const FString& Portal, const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage) override;
+	virtual void Logout(AController* Exiting) override;
 
+	virtual void AddInactivePlayer(APlayerState* PlayerState, APlayerController* PC) override;
+
+	UPROPERTY()
+	TArray<APlayerController*> JoiningPlayersControllers;
+	UPROPERTY()
+	TArray<APlayerState*> JoiningPlayerStates;
+	
 	UFUNCTION(BlueprintCallable)
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player);
 	UFUNCTION(BlueprintCallable)
@@ -106,6 +122,8 @@ public:
 	void RespawnPlayers();
 
 
+	
+
 	UFUNCTION(BlueprintCallable)
 	void RespawnPlayer(APlayerState* PState);
 	UFUNCTION(BlueprintCallable)
@@ -125,8 +143,10 @@ public:
 	int8 GetTotalRounds();
 	TEnumAsByte<EPhaseState> SwitchIncomingState();
 	void SetPackage();
-
-
+	UFUNCTION(BlueprintCallable)
+	void MakeControllerSpectator(APlayerController* PC);
+	
+	
 
 	//Create one phase1 GameMode, one phase 2 GameMode and one Phase3 GameMode
 
