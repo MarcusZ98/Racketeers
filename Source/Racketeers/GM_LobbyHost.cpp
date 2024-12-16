@@ -44,8 +44,10 @@ void AGM_LobbyHost::SetUpSpawnPositions()
 }
 
 // Spawn the player at the first available spawn point and set spawn point in player controller
-void AGM_LobbyHost::SpawnPlayer(APlayerController* PC, ETeams Team)
+bool AGM_LobbyHost::SpawnPlayer(APlayerController* PC, ETeams Team)
 {
+	bool bSuccess = false;
+	
 	if (APC_Lobby* PlayerController = Cast<APC_Lobby>(PC))
 	{
 		// Find the first available spawn point for the team
@@ -65,11 +67,14 @@ void AGM_LobbyHost::SpawnPlayer(APlayerController* PC, ETeams Team)
 				PlayerController->SpawnPoint = CurrentSP;
 				CurrentSP->SetPlayerController(PlayerController);
 				CurrentSP->Server_SpawnPlayer();
+				bSuccess = true;
 				break;
 			}
 		}
 		UpdatePlayers();
 	}
+	return bSuccess;
+
 }
 
 void AGM_LobbyHost::RemovePlayer(APlayerController* PC)

@@ -52,10 +52,18 @@ ABoatCharacter::ABoatCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	// Initialize replication
+	bReplicates = true;
+	//bReplicateMovement = true;
+	GetCharacterMovement()->SetIsReplicated(true);
+	NetUpdateFrequency = 120.0f;
+	MinNetUpdateFrequency = 60.0f;
+
 }
 
 void ABoatCharacter::BeginPlay()
 {
+	SetReplicateMovement(true);
 	// Call the base class  
 	Super::BeginPlay();
 }
@@ -63,47 +71,24 @@ void ABoatCharacter::BeginPlay()
 void ABoatCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	// Increment ShootTime only when holding shoot
+
 	if (!bIsShooting && bCanShoot && ShootTime < 3)
 	{
 		ShootTime += DeltaTime;
-		 if (BoatWidgetInstance && bIsHoldingShoot)
-		 {
-		 	BoatWidget = Cast<UBoatWidget>(BoatWidgetInstance);
-		 	// Cast the widget instance to UBoatWidget
-		 	if (BoatWidget && IsLocallyControlled())
-		 	{
-		 		BoatWidget->UI_PlayShootRange(); // Call the Blueprint-implemented event
-		 	}
-		 }
-	}else if(!bCanShoot && bIsShooting)
-	{
-		if (BoatWidgetInstance)
+		if (BoatWidgetInstance && bIsHoldingShoot)
 		{
 			BoatWidget = Cast<UBoatWidget>(BoatWidgetInstance);
 			// Cast the widget instance to UBoatWidget
 			if (BoatWidget && IsLocallyControlled())
 			{
-				BoatWidget->UI_PlayAnimationError(); // Call the Blueprint-implemented event
+				BoatWidget->UI_PlayShootRange(); // Call the Blueprint-implemented event
 			}
-		}
-	}else if(BoatWidgetInstance)
-	{
-		BoatWidget = Cast<UBoatWidget>(BoatWidgetInstance);
-		// Cast the widget instance to UBoatWidget
-		if (BoatWidget && IsLocallyControlled())
-		{
-			BoatWidget->UI_PlayAnimationShootRange();
-		}
-	}
-
-	if(bIsShooting && BoatWidgetInstance)
-	{
-		BoatWidget = Cast<UBoatWidget>(BoatWidgetInstance);
-		// Cast the widget instance to UBoatWidget
-		if (BoatWidget && IsLocallyControlled())
-		{
-			BoatWidget->UI_PlayShootCooldown(); // Call the Blueprint-implemented event
+			
+			if (!bCanShoot)
+			{
+				// Play the shoot range animation once the button is released
+				BoatWidget->UI_PlayAnimationShootRange();
+			}
 		}
 	}
 
@@ -238,17 +223,19 @@ void ABoatCharacter::ResetScurrySpeed()
 
 void ABoatCharacter::OnShootLeftStarted()
 {
+	bIsHoldingShoot = true;
 	ServerHoldShoot();
 }
 
 void ABoatCharacter::OnShootLeftCompleted()
 {
-		bIsHoldingShoot = false;
+	bIsHoldingShoot = false;
 	ServerStartShooting(true);
 }
 
 void ABoatCharacter::OnShootRightStarted()
 {
+	bIsHoldingShoot = true;
 	ServerHoldShoot();
 }
 

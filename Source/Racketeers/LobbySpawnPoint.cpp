@@ -107,6 +107,8 @@ void ALobbySpawnPoint::Multicast_ToggleReady_Implementation(bool bReady)
 
 void ALobbySpawnPoint::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
 	DOREPLIFETIME(ALobbySpawnPoint, Player);
 	DOREPLIFETIME(ALobbySpawnPoint, LobbyInfoWidget);
 }

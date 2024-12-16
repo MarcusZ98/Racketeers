@@ -3,9 +3,12 @@
 
 #include "RacketeersGMBase.h"
 
+#include <steam/steamclientpublic.h>
+
 #include "BaseGameInstance.h"
 #include "EngineUtils.h"
 #include "BoatCharacter.h"
+#include "FrameTypes.h"
 #include "HeadMountedDisplayTypes.h"
 #include "PS_Base.h"
 #include "RacketeersController.h"
@@ -46,6 +49,97 @@ class APS_Base;
 ARacketeersGMBase::ARacketeersGMBase()
 {
 	UE_LOG(LogTemp, Warning, TEXT("AGM_Base::AGM_Base"));
+}
+
+void ARacketeersGMBase::PlayerControllerConstructed()
+{
+}
+
+void ARacketeersGMBase::OnPostLogin(AController* NewPlayer)
+{
+	if(GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1,15,FColor::Yellow, "OnPostLogin");
+	}
+	const APlayerState* NewPlayerState = NewPlayer->PlayerState;
+	if(NewPlayerState == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1,15,FColor::Yellow, "PLayer State NULLPTR");
+		return;
+	}
+	for (APlayerState* JoiningState : JoiningPlayerStates)
+	{
+		GEngine->AddOnScreenDebugMessage(-1,15,FColor::Yellow, "Inactiveplayer: " + JoiningState->SavedNetworkAddress + " NewPlayer: " + NewPlayerState->SavedNetworkAddress);
+		if(JoiningState->SavedNetworkAddress == NewPlayerState->SavedNetworkAddress)
+		{
+		
+			if(GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(-1,15,FColor::Yellow, "ALLOWED TO REJOIN");
+			}
+			Super::OnPostLogin(NewPlayer);
+			APlayerController* PC = NewPlayerState->GetPlayerController();
+			JoiningPlayersControllers.Add(PC);
+			JoiningPlayerStates.Remove(JoiningState);
+
+			if(PC && NewPlayerState->IsSpectator()) 
+			{
+				Cast<ARacketeersController>(PC)->SetPlayerSpectator();
+			}
+			return;
+		}
+	}
+	GEngine->AddOnScreenDebugMessage(-1,15,FColor::Yellow, "Destroy PLayer COntroller");
+	NewPlayer->Destroy();
+
+}
+
+void ARacketeersGMBase::PostLogin(APlayerController* NewPlayer)
+{
+	Super::PostLogin(NewPlayer);
+}
+
+void ARacketeersGMBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId,
+                                 FString& ErrorMessage)
+{
+	for (APlayerState* PlayerState : InactivePlayerArray)
+	{
+		if(PlayerState->SavedNetworkAddress == Address)
+		{
+			if(GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(-1,15,FColor::Blue, Address);
+			}
+			JoiningPlayerStates.Add(PlayerState);
+		}
+	}
+	Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
+}
+
+APlayerController* ARacketeersGMBase::Login(UPlayer* NewPlayer, ENetRole InRemoteRole, const FString& Portal,
+	const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
+{
+	return Super::Login(NewPlayer, InRemoteRole, Portal, Options, UniqueId, ErrorMessage);
+}
+
+void ARacketeersGMBase::Logout(AController* Exiting)
+{
+	if(Exiting)
+	{
+		InactivePlayerArray.Add(Exiting->PlayerState);
+	}
+	Super::Logout(Exiting);
+}
+
+void ARacketeersGMBase::AddInactivePlayer(APlayerState* PlayerState, APlayerController* PC)
+{
+	APS_Base* PS = Cast<APS_Base>(PlayerState);
+	if(PS)
+	{
+		PS->PlayerNetworkData.bIsReconnecting = true;
+	}
+	
+	Super::AddInactivePlayer(PlayerState, PC);
 }
 
 AActor* ARacketeersGMBase::ChoosePlayerStart_Implementation(AController* Player)
@@ -382,8 +476,7 @@ void ARacketeersGMBase::BroadcastOnPlayerPressed(ETeams Team)
 {
 	if(HasAuthority())
 	{
-		ARacketeersController* PController = Cast<ARacketeersController>(	UGameplayStatics::GetPlayerController(GetWorld(), 0));
-		PController->OnPlayerPressedReady.Broadcast(Team);
+		TransitionComponent->IncrementPlayerReady(Team);
 	}
 }
 
@@ -408,8 +501,8 @@ void ARacketeersGMBase::IncrementPlayerCounter()
 void ARacketeersGMBase::AllStagesFinished()
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, "ALL STAGES FINISHED" );
-	SwitchState(); 
-	ATimerInfo::SetTime(CurrentPhase->TimeLimit);
+	//SwitchState(); 
+	ATimerInfo::SetTime(TimeLimit);
 	ATimerInfo::SetIsActive(true);
 	ARacketeersGameStateBase* GS = GetGameState<ARacketeersGameStateBase>();
 	if(GS)
@@ -417,23 +510,18 @@ void ARacketeersGMBase::AllStagesFinished()
 		GS->PandasReady = 0;
 		GS->RaccoonsReady = 0;
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, "ALL STAGES FINISHED GAME STATE" );
-		GS->ChangeCurrentPhase(CurrentPhase->State);
+		//GS->ChangeCurrentPhase(CurrentPhase->State);
 	}
-
-	
 	ARacketeersController* C = Cast<ARacketeersController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 
-	TransitionComponent->RemoveWidgetsFromPlayers();
-	TransitionComponent->CountPlayersReady = 0;
+	//TransitionComponent->RemoveWidgetsFromPlayers();
+	//TransitionComponent->CountPlayersReady = 0;
 
-	RespawnPlayers();
-	
+	//RespawnPlayers();
 	if(C->HasAuthority())
 	{
 		C->ServerMultiCastActivateTimer();
 	}
-
-	
 }
 
 int ARacketeersGMBase::GetNextPhaseNumber()
@@ -590,6 +678,15 @@ void ARacketeersGMBase::SetPackage()
 	
 }
 
+void ARacketeersGMBase::MakeControllerSpectator(APlayerController* PC)
+{
+	if(PC)
+	{
+		PC->ChangeState(NAME_Spectating);
+		PC->ClientGotoState(NAME_Spectating);
+	}
+}
+
 void ARacketeersGMBase::UnloadLevel(FName name, FLatentActionInfo& ActionInfo)
 {
 	UGameplayStatics::UnloadStreamLevel(GetWorld(), name, ActionInfo, false);
@@ -658,15 +755,6 @@ void ARacketeersGMBase::RespawnPlayers()
 		PS->GetPawn()->SetActorRotation(PlayerStart->GetActorRotation());
 		
 	}
-	
-	TransitionComponent->bIsFinished = true;
-	if(TransitionComponent->bIsFinished && TransitionComponent->CountPlayersReady == GameState->PlayerArray.Num())
-	{
-		TransitionComponent->CountPlayersReady = 0;
-		TransitionComponent->OnFinished.Broadcast();
-	}
-	
-	OnloadedMap.Broadcast();
 	//if(GEngine)
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Respawn Players");
 	
@@ -684,6 +772,8 @@ void ARacketeersGMBase::RespawnPlayer(APlayerState* PState)
 	AActor* PlayerStart = FindPlayerStart(PS->GetPlayerController(),TeamName);
 	if(PlayerStart == nullptr || PS == nullptr || PS->GetPawn() == nullptr) return;
 	PS->GetPawn()->SetActorLocation(PlayerStart->GetActorLocation());
+	PS->GetPawn()->SetActorLocation(FVector(PS->GetPawn()->GetActorLocation().X, PS->GetPawn()->GetActorLocation().Y, 0.0f), true);
+
 	
 }
 

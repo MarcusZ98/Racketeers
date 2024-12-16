@@ -43,7 +43,7 @@ public:
 	virtual void OnPostLogin(AController* NewPlayer) override;
 
 	UFUNCTION()
-	void SpawnPlayer(APlayerController* PC, ETeams Team);
+	bool SpawnPlayer(APlayerController* PC, ETeams Team);
 
 	UFUNCTION(BlueprintCallable)
 	void RemovePlayer(APlayerController* PC);
