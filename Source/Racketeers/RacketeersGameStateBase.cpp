@@ -184,6 +184,22 @@ int32 ARacketeersGameStateBase::GetTeamResources(ETeams Team, EResources Resourc
 	return MaterialAmount;
 }
 
+FTeamShipParts ARacketeersGameStateBase::GetTeamShipParts(ETeams Teams) const
+{
+	if(Teams == ETeams::TeamRaccoon)
+	{
+		return RaccoonParts;
+	}
+	return PandasParts;
+}
+
+int32 ARacketeersGameStateBase::GetPartLevel(FTeamShipParts TeamShipParts , EPartSpacing Part) const
+{
+	int Space = (int)Part;
+	int32* ShipType = (int32*)((&TeamShipParts.Cannon) + Space);
+	return *ShipType;
+}
+
 FTeamGameStats ARacketeersGameStateBase::GetTeamStats(ETeams Team)
 {
 	int TeamSpace = (int)Team;
