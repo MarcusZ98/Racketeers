@@ -49,7 +49,7 @@ struct FPlayerNetworkData
 	UPROPERTY(BlueprintReadWrite)
 	bool bIsReconnecting = false;
 	UPROPERTY(BlueprintReadWrite)
-	FVector LastPosition = FVector();
+	FVector LastPosition = FVector::ZeroVector;
 };
 
 
