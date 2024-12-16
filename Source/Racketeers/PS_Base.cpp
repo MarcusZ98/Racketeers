@@ -2,7 +2,10 @@
 
 
 #include "PS_Base.h"
+
+#include "RacketeersController.h"
 #include "RacketeersGameStateBase.h"
+#include "RacketeersGMBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
@@ -18,6 +21,11 @@ void APS_Base::BeginPlay()
 {
 	Super::BeginPlay();
 	BoatHealth = MaxBoatHealth;
+}
+
+void APS_Base::OverrideWith(APlayerState* PlayerState)
+{
+	Super::OverrideWith(PlayerState);
 }
 
 void APS_Base::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -45,10 +53,18 @@ void APS_Base::DamagePlayerBoat_Implementation(APlayerState* PS, int Amount)
 	if(PSBase->BoatHealth <= 0)
 	{
 		ARacketeersGameStateBase* GameState = Cast<ARacketeersGameStateBase>(UGameplayStatics::GetGameState(GetWorld()));
+		ARacketeersGMBase* GmBase = Cast<ARacketeersGMBase>(UGameplayStatics::GetGameMode(GetWorld()));
 		if(GameState)
 		{
+			ARacketeersController* PlayerC = Cast<ARacketeersController>(PS->GetPlayerController());
+			
 			GameState->AddToStats(-1, EGameStats::ALIVE, PSBase->PlayerInfo.Team);
 			GameState->CheckRoundEnd(PSBase->PlayerInfo.Team);
+			if(PlayerC)
+			{
+				PlayerC->SetPlayerSpectator();
+			}
+		
 		}
 	}
 }
