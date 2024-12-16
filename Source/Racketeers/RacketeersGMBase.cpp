@@ -678,6 +678,15 @@ void ARacketeersGMBase::SetPackage()
 	
 }
 
+void ARacketeersGMBase::MakeControllerSpectator(APlayerController* PC)
+{
+	if(PC)
+	{
+		PC->ChangeState(NAME_Spectating);
+		PC->ClientGotoState(NAME_Spectating);
+	}
+}
+
 void ARacketeersGMBase::UnloadLevel(FName name, FLatentActionInfo& ActionInfo)
 {
 	UGameplayStatics::UnloadStreamLevel(GetWorld(), name, ActionInfo, false);

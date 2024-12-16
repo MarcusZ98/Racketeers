@@ -143,8 +143,10 @@ public:
 	int8 GetTotalRounds();
 	TEnumAsByte<EPhaseState> SwitchIncomingState();
 	void SetPackage();
-
-
+	UFUNCTION(BlueprintCallable)
+	void MakeControllerSpectator(APlayerController* PC);
+	
+	
 
 	//Create one phase1 GameMode, one phase 2 GameMode and one Phase3 GameMode
 

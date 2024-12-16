@@ -167,6 +167,30 @@ void ARacketeersController::GetLifetimeReplicatedProps(TArray<class FLifetimePro
 	
 }
 
+void ARacketeersController::SetPlayerSpectator()
+{
+	if(!HasAuthority())
+	{
+		return;
+	}
+	PlayerState->SetIsSpectator(true);
+	ChangeState(NAME_Spectating);
+	bPlayerIsWaiting = true;
+	ClientGotoState(NAME_Spectating);
+}
+
+void ARacketeersController::SetPlayerPlay()
+{
+	if(!HasAuthority())
+	{
+		return;
+	}
+	PlayerState->SetIsSpectator(false);
+	ChangeState(NAME_Playing);
+	bPlayerIsWaiting = false;
+	ClientGotoState(NAME_Playing);
+}
+
 void ARacketeersController::ClientUnLoadLevel_Implementation(const FString& LevelPath)
 {
 	for (ULevelStreaming* StreamingLevel : GetWorld()->GetStreamingLevels())

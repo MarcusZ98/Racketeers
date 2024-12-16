@@ -107,8 +107,11 @@ class RACKETEERS_API ARacketeersController : public APlayerController
 	void ClientLoadLevel(const FString& LevelPath);
 	UFUNCTION(Client, Reliable, WithValidation, BlueprintCallable)
 	void ClientUnLoadLevel(const FString& LevelPath);
-	
-	
+
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void SetPlayerSpectator();
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void SetPlayerPlay();
 };
 
 
