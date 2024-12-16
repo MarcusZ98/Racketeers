@@ -7,6 +7,7 @@
 #include "RacketeersCharacter.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 
 void APC_Lobby::BeginPlay()
 {
@@ -57,10 +58,12 @@ void APC_Lobby::Server_SpawnPlayer_Implementation(APlayerController* PC, ETeams 
 	
 	if (AGM_LobbyHost* GameMode = Cast<AGM_LobbyHost>(GetWorld()->GetAuthGameMode()))
 	{
-		GameMode->SpawnPlayer(PC, Team);
-		Multicast_PlaySpawnSound();
+		if(GameMode->SpawnPlayer(PC, Team))
+		{
+			Multicast_PlaySpawnSound();
+			Cast<APC_Lobby>(PC)->Client_ShowLobbyWidget();
+		}
 	}
-	Cast<APC_Lobby>(PC)->Client_ShowLobbyWidget();
 }
 
 void APC_Lobby::Server_RemovePlayer_Implementation()
@@ -133,4 +136,11 @@ void APC_Lobby::Client_PlayToggleReadySound_Implementation(bool bIsReady)
 			UGameplayStatics::PlaySound2D(GetWorld(), UnreadySound);
 		}
 	}
+}
+
+void APC_Lobby::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(APC_Lobby, SpawnPoint);
 }
