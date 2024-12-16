@@ -278,6 +278,7 @@ void ARacketeersGameStateBase::AddPart_Implementation(ETeams Team, EPartSpacing 
 		int Space = (int)Part;
 		int8* PartType = (int8*)((&RaccoonParts.Hull + Space));
 		PartType[0] = NewPart;
+		return;
 	}
 	int Space = (int)Part;
 	int8* PartType = (int8*)((&PandasParts.Hull + Space));
