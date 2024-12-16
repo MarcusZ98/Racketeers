@@ -26,9 +26,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Deposit")
 	void Deposit(AActor* Instigator);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Deposit")
-	void Withdraw(AActor* Instigartor);
+	void Withdraw(AActor* Instigator);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Deposit")
-	void ShowDepositOutline();
+	void ShowDepositOutline(AActor* Instigator);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Deposit")
-	void HideDepositOutline();
+	void HideDepositOutline(AActor* Instigator);
 };
