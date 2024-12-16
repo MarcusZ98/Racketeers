@@ -20,7 +20,7 @@ class RACKETEERS_API APC_Lobby : public APlayerController
 	// ----------------------------Variables--------------------------------------------
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
+	UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = "Game")
 	ALobbySpawnPoint* SpawnPoint;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
@@ -105,5 +105,7 @@ public:
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void Multicast_PlayDespawnSound();
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };
 
