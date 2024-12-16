@@ -151,7 +151,9 @@ void ARacketeersController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "ARacketeersController::BeginPlay");
+	FInputModeGameOnly InputMode;
+	SetInputMode(InputMode);
 	OnBeginPlayerEvent.Broadcast();
 }
 
@@ -163,6 +165,31 @@ void ARacketeersController::GetLifetimeReplicatedProps(TArray<class FLifetimePro
 	
 	//DOREPLIFETIME(ARacketeersController, bhavePressedContinue);
 	
+}
+
+void ARacketeersController::SetPlayerSpectator()
+{
+	if(!HasAuthority())
+	{
+		return;
+	}
+	GetPawn()->Destroy();
+	PlayerState->SetIsSpectator(true);
+	ChangeState(NAME_Spectating);
+	bPlayerIsWaiting = true;
+	ClientGotoState(NAME_Spectating);
+}
+
+void ARacketeersController::SetPlayerPlay()
+{
+	if(!HasAuthority())
+	{
+		return;
+	}
+	PlayerState->SetIsSpectator(false);
+	ChangeState(NAME_Playing);
+	bPlayerIsWaiting = false;
+	ClientGotoState(NAME_Playing);
 }
 
 void ARacketeersController::ClientUnLoadLevel_Implementation(const FString& LevelPath)
@@ -266,6 +293,7 @@ void ARacketeersController::ServerCheckReady_Implementation(ETeams Team)
 	if(!HasAuthority()) return;
 	ARacketeersGMBase* GM = Cast<ARacketeersGMBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "SERVER CHECK READY");
+
 	
 	GM->BroadcastOnPlayerPressed(Team);
  }
@@ -360,3 +388,24 @@ void ARacketeersController::SetServerTimeSeconds_Implementation(ARacketeersContr
 	Controller->SetTimeSeconds(ATimerInfo::GetTime(), ATimerInfo::GetIsActive());
 	
 }
+
+/*void ARacketeersController::Client_TogglePauseGame_Implementation()
+{
+	if(PauseWidget == nullptr)
+	{
+		return;
+	}
+	
+	if(PauseWidget->IsInViewport())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "REMOVE FROM PARENT");
+		PauseWidget->RemoveFromParent();
+		SetInputMode(FInputModeGameOnly());
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "ADD TO VIEWPORT");
+		PauseWidget->AddToViewport();
+		SetInputMode(FInputModeUIOnly());
+	}
+}*/
