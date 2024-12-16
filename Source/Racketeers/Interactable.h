@@ -31,5 +31,10 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
 	void StopInteract(AActor* Instigator);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Interaction")
+	void ShowOutline();
 	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
+	void HideOutline();
 };

@@ -102,6 +102,9 @@ class RACKETEERS_API ARacketeersController : public APlayerController
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable)
 	void ServerRespawnPlayer(APlayerState* PSState);
 
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable)
+	void ServerPlayerLeave(APlayerController* PC);
+
 
 	UFUNCTION(Client, Reliable, WithValidation, BlueprintCallable)
 	void ClientLoadLevel(const FString& LevelPath);
