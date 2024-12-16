@@ -60,6 +60,7 @@ void APS_Base::DamagePlayerBoat_Implementation(APlayerState* PS, int Amount)
 			
 			GameState->AddToStats(-1, EGameStats::ALIVE, PSBase->PlayerInfo.Team);
 			GameState->CheckRoundEnd(PSBase->PlayerInfo.Team);
+			GameState->RemovePlayerAlive(PSBase);
 			if(PlayerC)
 			{
 				PlayerC->SetPlayerSpectator();

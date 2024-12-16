@@ -195,6 +195,9 @@ void ARacketeersGameStateBase::UpdateTeamAlive()
 {
 	TeamStats.Pandas.TeamAlive = 0;
 	TeamStats.Raccoons.TeamAlive = 0;
+
+	RaccoonsAlive.Empty();
+	PandasAlive.Empty();
 	
 	if(GetLocalRole() == ROLE_Authority)
 	{
@@ -207,11 +210,13 @@ void ARacketeersGameStateBase::UpdateTeamAlive()
 			if(PSBase->PlayerInfo.Team == ETeams::TeamRaccoon)
 			{
 				AddToStats(1, EGameStats::ALIVE, ETeams::TeamRaccoon);
+				RaccoonsAlive.Add(PS);
 				continue;
 			}
 			if(PSBase->PlayerInfo.Team == ETeams::TeamPanda)
 			{
 				AddToStats(1, EGameStats::ALIVE, ETeams::TeamPanda);
+				PandasAlive.Add(PS);
 				continue;
 			}
 		}
@@ -527,6 +532,17 @@ void ARacketeersGameStateBase::OnRep_HealthChanged()
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "HEALTH CHANGED");
 	}
 	GetGameInstance()->GetSubsystem<UWidgetSubsystem>()->OnDamaged.Broadcast();
+}
+
+void ARacketeersGameStateBase::RemovePlayerAlive(APlayerState* PS)
+{
+	APS_Base* PSBase = Cast<APS_Base>(PS);
+	if(PSBase == nullptr) return;
+	if(PSBase->PlayerInfo.Team == ETeams::TeamRaccoon)
+	{
+		RaccoonsAlive.Remove(PSBase);
+	}
+	PandasAlive.Remove(PSBase);
 }
 
 inline void ARacketeersGameStateBase::CheckOnRepHealthChanged()
