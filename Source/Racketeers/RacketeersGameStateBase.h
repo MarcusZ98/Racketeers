@@ -153,9 +153,16 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 	ETeams GameWinner = ETeams::NONE;
 	
 	UPROPERTY(Replicated, BlueprintReadWrite)
-	float Phase2RandomNumber; 
+	float Phase2RandomNumber;
 
 
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void RemovePlayerAlive(APlayerState* PS);
+	
+	UPROPERTY(BlueprintReadWrite)
+	TArray<APlayerState*> RaccoonsAlive;
+	UPROPERTY(BlueprintReadWrite)
+	TArray<APlayerState*> PandasAlive;
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite)
 	int32 PandasReady;
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite)
