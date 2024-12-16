@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameModeStructs.h"
 #include "UObject/Interface.h"
 #include "Deposit.generated.h"
 
@@ -23,9 +24,9 @@ class RACKETEERS_API IDeposit
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Deposit")
-	void Deposit();
+	void Deposit(AActor* Instigator);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Deposit")
-	void Withdraw();
+	void Withdraw(AActor* Instigartor);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Deposit")
 	void ShowDepositOutline();
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Deposit")
