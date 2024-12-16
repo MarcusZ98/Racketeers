@@ -46,39 +46,10 @@ void ARacketeersGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 	DOREPLIFETIME(ARacketeersGameStateBase, RaccoonCraftingProgress);
 	DOREPLIFETIME(ARacketeersGameStateBase, PandaCraftingProgress);
 
+	DOREPLIFETIME(ARacketeersGameStateBase, ExpectedPandas);
+	DOREPLIFETIME(ARacketeersGameStateBase, ExpectedRaccoons);
+
 	DOREPLIFETIME(ARacketeersGameStateBase, PlayersJoined);
-}
-
-void ARacketeersGameStateBase::CheckAllPlayersJoin()
-{
-
-	PandasParts = TempPackage.RedPandasParts;
-	RaccoonParts = TempPackage.RaccoonParts;
-	/*
-	ExpectedPlayers = TempPackage.ExpectedPlayers;
-	GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Red, "CheckAllPlayersJoin");
-	if(PlayerArray.Num() == ExpectedPlayers)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Red, "Expected Players");
-		UBaseGameInstance* GI = Cast<UBaseGameInstance>(GetGameInstance());
-		ARacketeersGMBase* GM = Cast<ARacketeersGMBase>( UGameplayStatics::GetGameMode(GetWorld()));
-		TimerCheckAllPlayersJoined.Clear();
-		if(GM)
-		{
-			CurrentPhase = GM->State;
-		}
-			RacconResource = TempPackage.RaccoonResources;
-			RacconsRoundsWon = TempPackage.RacconsRoundsWon;
-			RaccoonsBoatHealth = TempPackage.RacconsBoatHealth;
-			RaccoonParts = TempPackage.RaccoonParts;
-			RedPandasResource = TempPackage.PandaResources;
-			RedPandasRoundsWon = TempPackage.RedPandasRoundsWon;
-			RedPandasBoatHealth = TempPackage.RedPandasBoatHealth;
-			PandasParts = TempPackage.RedPandasParts;
-			GameWinner = TempPackage.WonTeam;
-			GI->ClearDataStatsPackage();
-	}
-	*/
 }
 
 void ARacketeersGameStateBase::BeginPlay()
@@ -120,7 +91,8 @@ void ARacketeersGameStateBase::BeginPlay()
 			PandasParts = Package.RedPandasParts;
 			PandaCraftingProgress = Package.RedPandasCraftingProgress;
 			GameWinner = Package.WonTeam;
-			ExpectedPlayers = Package.ExpectedPlayers;
+			ExpectedRaccoons = Package.ExpectedRaccoons;
+			ExpectedPandas = Package.ExpectedPandas;
 			GI->ClearDataStatsPackage();
 		}
 

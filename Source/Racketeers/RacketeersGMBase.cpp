@@ -673,6 +673,22 @@ void ARacketeersGMBase::SetPackage()
 {
 	UBaseGameInstance* BI = Cast<UBaseGameInstance>(GetGameInstance());
 	ARacketeersGameStateBase* GS = GetGameState<ARacketeersGameStateBase>();
+
+	int32 ExpectedRaccoons = 0;
+	int32 ExpecedPandas = 0;
+	for (APlayerState* PlayerState : GetGameState<AGameState>()->PlayerArray)
+	{
+		APS_Base* APS = Cast<APS_Base>(PlayerState);
+		if(APS)
+		{
+			if(APS->PlayerInfo.Team == ETeams::TeamRaccoon)
+			{
+				ExpectedRaccoons++;
+				continue;
+			}
+			ExpecedPandas++;
+		}
+	}
 	
 	FGameStatsPackage Package{
 		GS->RacconResource,
@@ -685,7 +701,8 @@ void ARacketeersGMBase::SetPackage()
 		GS->RedPandasBoatHealth,
 		GS->PandasParts,
 		GS->PandaCraftingProgress,
-		GS->PlayerArray.Num()
+		GS->ExpectedRaccoons,
+		GS->ExpectedPandas
 	};
 
 	if(Package.RacconsRoundsWon > Package.RedPandasRoundsWon)

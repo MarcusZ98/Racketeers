@@ -170,64 +170,15 @@ public:
 	FString MainParentLevel;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Phase Data")
 	FString StartPhaseName;
-
-
-
-	/*UFUNCTION(BlueprintCallable)
-	void InitializeBoatData();
-	UFUNCTION(BlueprintCallable)
-	void GetActivePlayers();
-
-protected:
-	//void SpawnBoat();
-	void SetBoatValues(ETeams MyTeamID, int32 MyPlayerID);
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team Data")
-	TMap<ETeams, FTeamParts> TeamData;
-	
-	//UPROPERTY()
-	//APlayerState* PlayerState;
-	UPROPERTY()
-	APS_Base* CustomPlayerState;
-	UPROPERTY()
-	APlayerController* PlayerController;
-	UPROPERTY()
-	ABoatCharacter* BoatCharacter;
-	UPROPERTY()
-	UMaterialInterface* Material;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Boats")
-	ABoatCharacter* BoatRaccoon;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Boats")
-	ABoatCharacter* BoatPanda;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Boat Materials")
-	UMaterialInterface* RaccoonHullMaterial;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Boat Materials")
-	UMaterialInterface* RaccoonSailMaterial;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Boat Materials")
-	UMaterialInterface* PandaHullMaterial;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Boat Materials")
-	UMaterialInterface* PandaSailMaterial;
-	
-	float PlayerIndex;
-	FPlayerInfo PlayerInfo;
-	ETeams TeamID;
-	int32 PlayerID;
-	*/
-
-	
 private:
-
-
+	
 	UPROPERTY()
 	float CurrentTime;
 
 	int GetNextPhaseNumber();
-	
-	//methods for progressing trough phases
 
 	UFUNCTION(BlueprintCallable)
 	bool CheckIfGameIsOver();
@@ -236,8 +187,6 @@ private:
 	bool EndGame();
 	void SwitchState();
 	
-
-
 	UFUNCTION(BlueprintCallable)
 	void AllStagesFinished();
 	

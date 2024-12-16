@@ -57,7 +57,9 @@ struct FGameStatsPackage{
 	UPROPERTY(BlueprintReadWrite)
 	FTeamCraftingProgress RedPandasCraftingProgress;
 	UPROPERTY(BlueprintReadWrite)
-	int ExpectedPlayers = 0;
+	int32 ExpectedRaccoons = 0;
+	UPROPERTY(BlueprintReadWrite)
+	int32 ExpectedPandas = 0;
 	UPROPERTY(BlueprintReadWrite)
 	ETeams WonTeam = ETeams::NONE;
 	

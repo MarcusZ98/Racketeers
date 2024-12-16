@@ -44,9 +44,6 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 	FOnIncomingPhaseThreeActive OnIncomingPhaseThreeActive;
 
 	FTimerDynamicDelegate TimerCheckAllPlayersJoined;
-
-	UFUNCTION()
-	void CheckAllPlayersJoin();
 	
 	void BeginPlay() override;
 
@@ -119,6 +116,10 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 	FGameStats TeamStats;
 	UPROPERTY(BlueprintReadWrite)
 	int32 ExpectedPlayers;
+	UPROPERTY(Replicated, BlueprintReadWrite)
+	int32 ExpectedRaccoons;
+	UPROPERTY(Replicated, BlueprintReadWrite)
+	int32 ExpectedPandas;
 	UPROPERTY(Replicated, BlueprintReadWrite)
 	int32 PlayersJoined;
 
