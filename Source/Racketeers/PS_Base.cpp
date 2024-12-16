@@ -23,6 +23,11 @@ void APS_Base::BeginPlay()
 	BoatHealth = MaxBoatHealth;
 }
 
+void APS_Base::OverrideWith(APlayerState* PlayerState)
+{
+	Super::OverrideWith(PlayerState);
+}
+
 void APS_Base::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

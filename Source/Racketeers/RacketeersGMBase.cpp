@@ -81,6 +81,11 @@ void ARacketeersGMBase::OnPostLogin(AController* NewPlayer)
 			APlayerController* PC = NewPlayerState->GetPlayerController();
 			JoiningPlayersControllers.Add(PC);
 			JoiningPlayerStates.Remove(JoiningState);
+
+			if(PC && NewPlayerState->IsSpectator()) 
+			{
+				Cast<ARacketeersController>(PC)->SetPlayerSpectator();
+			}
 			return;
 		}
 	}
@@ -92,11 +97,6 @@ void ARacketeersGMBase::OnPostLogin(AController* NewPlayer)
 void ARacketeersGMBase::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
-	if (NewPlayer->GetStateName() == TEXT("Spectating"))
-	{
-		NewPlayer->UnPossess();
-		NewPlayer->ChangeState(TEXT("Spectating"));
-	}
 }
 
 void ARacketeersGMBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId,

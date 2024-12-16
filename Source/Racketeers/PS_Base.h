@@ -76,6 +76,8 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation,BlueprintCallable )
 	void DamagePlayerBoat(APlayerState* PS,int Amount);
 
+	virtual void OverrideWith(APlayerState* PlayerState) override;
+
 	UPROPERTY(Replicated, BlueprintReadWrite, Category = "PlayerInfo", EditAnywhere)
 	float BoatHealth;
 	UPROPERTY(Replicated, BlueprintReadWrite, Category = "PlayerInfo", EditAnywhere)
