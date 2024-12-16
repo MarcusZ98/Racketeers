@@ -77,9 +77,9 @@ void ABoatCharacter::Tick(float DeltaTime)
 		BoatWidget = Cast<UBoatWidget>(BoatWidgetInstance);
 		if (BoatWidget && IsLocallyControlled())
 		{
+			ShootTime += DeltaTime;
 			if (bIsHoldingShoot && !bIsShooting && bCanShoot && ShootTime < 3)
 			{
-				ShootTime += DeltaTime;
 				BoatWidget->UI_PlayShootRange(); // Play charge animation while holding
 			}
 
