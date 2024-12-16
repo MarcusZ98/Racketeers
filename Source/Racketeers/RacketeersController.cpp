@@ -389,7 +389,7 @@ void ARacketeersController::SetServerTimeSeconds_Implementation(ARacketeersContr
 	
 }
 
-void ARacketeersController::Client_TogglePauseGame_Implementation()
+/*void ARacketeersController::Client_TogglePauseGame_Implementation()
 {
 	if(PauseWidget == nullptr)
 	{
@@ -408,4 +408,4 @@ void ARacketeersController::Client_TogglePauseGame_Implementation()
 		PauseWidget->AddToViewport();
 		SetInputMode(FInputModeUIOnly());
 	}
-}
+}*/
