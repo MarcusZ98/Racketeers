@@ -9,6 +9,7 @@
 #include "RacketeersGameStateBase.h"
 #include "RacketeersGMBase.h"
 #include "WidgetSubsystem.h"
+#include "GameFramework/GameSession.h"
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -165,6 +166,19 @@ void ARacketeersController::GetLifetimeReplicatedProps(TArray<class FLifetimePro
 	
 	//DOREPLIFETIME(ARacketeersController, bhavePressedContinue);
 	
+}
+
+void ARacketeersController::ServerPlayerLeave_Implementation(APlayerController* PC)
+{
+	if(PC)
+	{
+		UGameplayStatics::GetGameMode(GetWorld())->GameSession->KickPlayer(PC, FText::GetEmpty());
+	}
+}
+
+bool ARacketeersController::ServerPlayerLeave_Validate(APlayerController* PC)
+{
+	return true;
 }
 
 void ARacketeersController::SetPlayerSpectator()
