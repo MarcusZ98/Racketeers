@@ -43,8 +43,6 @@ class RACKETEERS_API ARacketeersController : public APlayerController
 	FOnPlayerPressedReady OnPlayerPressedReady;
 	UPROPERTY(EditAnywhere ,BlueprintReadWrite)
 	UUserWidget* UserWidget;
-	UPROPERTY(EditAnywhere ,BlueprintReadWrite, Category = "UI")
-	UUserWidget* PauseWidget;
 
 	
 	virtual void BeginPlay() override;
@@ -110,10 +108,10 @@ class RACKETEERS_API ARacketeersController : public APlayerController
 	UFUNCTION(Client, Reliable, WithValidation, BlueprintCallable)
 	void ClientUnLoadLevel(const FString& LevelPath);
 
-	UFUNCTION(Client, Reliable, bLueprintCallable)
-	void Client_TogglePauseGame();
-	
-	
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void SetPlayerSpectator();
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void SetPlayerPlay();
 };
 
 
