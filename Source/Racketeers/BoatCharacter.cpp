@@ -71,18 +71,19 @@ void ABoatCharacter::BeginPlay()
 void ABoatCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
-	if (BoatWidgetInstance)
-	{
-		BoatWidget = Cast<UBoatWidget>(BoatWidgetInstance);
-		if (BoatWidget && IsLocallyControlled())
-		{
-			ShootTime += DeltaTime;
-			if (bIsHoldingShoot && !bIsShooting && bCanShoot && ShootTime < 3)
-			{
-				BoatWidget->UI_PlayShootRange(); // Play charge animation while holding
-			}
 
+	if (!bIsShooting && bCanShoot && ShootTime < 3)
+	{
+		ShootTime += DeltaTime;
+		if (BoatWidgetInstance && bIsHoldingShoot)
+		{
+			BoatWidget = Cast<UBoatWidget>(BoatWidgetInstance);
+			// Cast the widget instance to UBoatWidget
+			if (BoatWidget && IsLocallyControlled())
+			{
+				BoatWidget->UI_PlayShootRange(); // Call the Blueprint-implemented event
+			}
+			
 			if (!bCanShoot)
 			{
 				// Play the shoot range animation once the button is released
