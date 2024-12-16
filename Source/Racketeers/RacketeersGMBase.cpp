@@ -393,6 +393,38 @@ bool ARacketeersGMBase::CheckWinnerOfRound()
 	{
 		ARacketeersGameStateBase* GS = GetGameState<ARacketeersGameStateBase>();
 		if(GS == nullptr) return false;
+
+
+		if(GS->GetTeamStats(ETeams::TeamRaccoon).TeamAlive  == GS->GetTeamStats(ETeams::TeamPanda).TeamAlive )
+		{
+
+			float RaccoonTotalTeamHealth = 0;
+			float PandasTotalTeamHealth = 0;
+			for (APlayerState* RaccoonsAlive : GS->RaccoonsAlive)
+			{
+				APS_Base* PSBase = Cast<APS_Base>(RaccoonsAlive);
+				if(PSBase)
+				{
+					RaccoonTotalTeamHealth += PSBase->BoatHealth;
+				}
+			}
+			for (APlayerState* PandaAlive : GS->PandasAlive)
+			{
+				APS_Base* PSBase = Cast<APS_Base>(PandaAlive);
+				if(PSBase)
+				{
+					PandasTotalTeamHealth += PSBase->BoatHealth;
+				}
+			}
+			if(RaccoonTotalTeamHealth > PandasTotalTeamHealth)
+			{
+				GS->RacconsRoundsWon++;
+				return true;
+			}
+			GS->RedPandasRoundsWon++;
+			return true;
+		}
+		
 		if(GS->GetTeamStats(ETeams::TeamRaccoon).TeamAlive > GS->GetTeamStats(ETeams::TeamPanda).TeamAlive)
 		{
 			GS->RacconsRoundsWon++;
