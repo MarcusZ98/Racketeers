@@ -70,7 +70,7 @@ public:
 
 	UPROPERTY(Replicated, BlueprintReadWrite, Category = "PlayerInfo")
 	FPlayerInfo PlayerInfo;
-	UPROPERTY(Replicated, BlueprintReadWrite, Category = "PlayerInfo")
+	UPROPERTY(BlueprintReadWrite, Category = "PlayerInfo")
 	FPlayerNetworkData PlayerNetworkData;
 	
 	UFUNCTION(Server, Reliable, WithValidation,BlueprintCallable )
