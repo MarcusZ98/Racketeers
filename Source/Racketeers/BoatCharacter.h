@@ -165,8 +165,10 @@ public:
 	float RemainingCooldownTime;
 	UPROPERTY(Replicated)
 	float ShootTime;
-	UPROPERTY(Replicated)
+	UPROPERTY(BlueprintReadOnly, Replicated)
 	bool bIsHoldingShoot = false;
+	UPROPERTY(BlueprintReadOnly, Replicated)
+	bool bIsShootingLeft = false;
 	UPROPERTY(Replicated)
 	bool bCanShoot = true;
 	UPROPERTY(Replicated)
