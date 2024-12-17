@@ -35,6 +35,11 @@ class RACKETEERS_API ARacketeersController : public APlayerController
 
 	
 	public:
+	//WPB GameMenu//
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
+	TSubclassOf<UUserWidget> PauseWidgetClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
+	UUserWidget* PauseMenuWidget;
 	UPROPERTY(EditAnywhere ,BlueprintReadWrite)
 	bool bhavePressedContinue = false;
 	UPROPERTY(EditAnywhere ,BlueprintReadWrite, BlueprintCallable, BlueprintAssignable)
@@ -46,6 +51,7 @@ class RACKETEERS_API ARacketeersController : public APlayerController
 
 	
 	virtual void BeginPlay() override;
+	virtual void SetupInputComponent() override;
 	
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -115,6 +121,8 @@ class RACKETEERS_API ARacketeersController : public APlayerController
 	void SetPlayerSpectator();
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void SetPlayerPlay();
+
+	void TogglePauseMenu();
 };
 
 
