@@ -83,7 +83,8 @@ protected:
 	UBoatWidget* BoatWidget;
 	
 	/* ---- TIMERS ---- */
-	FTimerHandle FireTimerHandle;
+	FTimerHandle FireTimerHandleLeft;
+	FTimerHandle FireTimerHandleRight;
 	FTimerHandle CooldownTimerHandle;
 
 	/* ---- ARRAYS ----*/
@@ -99,6 +100,10 @@ protected:
 	float FireDelay = 0.5f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Cannons")
 	float ShootCooldown = 1;
+	UPROPERTY(EditAnywhere, Category="Movement")
+	float ScurryCooldown = 1;
+	UPROPERTY(EditAnywhere, Category="Movement")
+	float ScurryLength = 0.5;
 	UPROPERTY(BlueprintReadWrite, Category = "Interaction")
 	bool bIsInteracting;
 
@@ -121,10 +126,13 @@ private:
 	void OnShootRightCompleted();
 	void AddCannonsInOrder(float Count, USceneComponent* Cannon);
 	void ResetScurrySpeed();
+	void ResetScurryCooldown();
 
 	/* ---- VARIABLES ----*/
 	float OriginalMaxWalkSpeed; // To store the original speed
 	FTimerHandle ScurryTimerHandle; // Timer handle for scurry
+	FTimerHandle ScurryCooldownTimerHandle;
+	bool bScurryOnCooldown;
 	int32 CurrentCannonIndex = 0;
 	bool bShootLeft;
 	
