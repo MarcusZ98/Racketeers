@@ -26,6 +26,7 @@ void APS_Base::BeginPlay()
 void APS_Base::OverrideWith(APlayerState* PlayerState)
 {
 	Super::OverrideWith(PlayerState);
+	PlayerState->SetIsOnlyASpectator(bIsSpectator);
 }
 
 void APS_Base::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -41,11 +42,7 @@ void APS_Base::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetime
 void APS_Base::DamagePlayerBoat_Implementation(APlayerState* PS, int Amount)
 {
 	APS_Base* PSBase = Cast<APS_Base>(PS);
-	if(PSBase == nullptr) return;
-	if(PSBase->BoatHealth <= 0)
-	{
-		return;
-	}
+	if(PSBase->BoatHealth <= 0 || PSBase == nullptr) return;
 	//UE_LOG(LogTemp, Display, TEXT("Health: %f"), MaxBoatHealth);
 	GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Red, "Health:" + FString::FromInt(PSBase->MaxBoatHealth));
 

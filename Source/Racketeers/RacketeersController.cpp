@@ -194,7 +194,10 @@ void ARacketeersController::SetPlayerSpectator()
 	{
 		return;
 	}
-	GetPawn()->Destroy();
+	if(GetPawn())
+	{
+		GetPawn()->Destroy();
+	}
 	PlayerState->SetIsSpectator(true);
 	ChangeState(NAME_Spectating);
 	bPlayerIsWaiting = true;

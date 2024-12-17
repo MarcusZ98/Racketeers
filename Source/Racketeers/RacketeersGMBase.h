@@ -26,8 +26,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUnloadWidget);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUnloadingMap);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnloadedMap);
 
-
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRoundFinish);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoadTransitionMap);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoadEndGame);
 
 #define MAXTOTALROUNDS 8
 
@@ -36,6 +37,15 @@ class RACKETEERS_API ARacketeersGMBase : public AGM_Base
 {
 	GENERATED_BODY()
 public:
+
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FOnLoadTransitionMap OnLoadTransitionMap;
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FOnLoadEndGame OnLoadEndGame;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FOnRoundFinish OnRoundFinish;
 
 	ARacketeersGMBase();
 	FTimerDynamicDelegate OnPlayerControllerConstructed;
@@ -123,7 +133,9 @@ public:
 
 
 	
-
+	UFUNCTION(Blueprintable, BlueprintCallable)
+	virtual void EndGame();
+	
 	UFUNCTION(BlueprintCallable)
 	void RespawnPlayer(APlayerState* PState);
 	UFUNCTION(BlueprintCallable)
@@ -132,17 +144,16 @@ public:
 	void DecreaseTotalRounds();
 	UFUNCTION(BlueprintCallable)
 	void RoundCompletion();
-
 	UFUNCTION(BlueprintCallable)
 	void TravelToLevel();
 	UFUNCTION(BlueprintCallable)
 	void Transition();
-	
 	void BroadcastOnPlayerPressed(ETeams Team);
 	void IncrementPlayerCounter();
 	int8 GetTotalRounds();
 	TEnumAsByte<EPhaseState> SwitchIncomingState();
 	void SetPackage();
+	void SetSpectatingPlayersToPlayers();
 	UFUNCTION(BlueprintCallable)
 	void MakeControllerSpectator(APlayerController* PC);
 	
@@ -150,6 +161,8 @@ public:
 
 	//Create one phase1 GameMode, one phase 2 GameMode and one Phase3 GameMode
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Phase Data")
+	float TransitionTimer;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Phase Data")
 	TEnumAsByte<EPhaseState> State;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Phase Data")
@@ -184,8 +197,10 @@ private:
 	bool CheckIfGameIsOver();
 	bool LoadTransitionStats();
 	bool CheckWinnerOfRound();
-	bool EndGame();
+
 	void SwitchState();
+	void LoadEndLevel();
+	void LoadTransitionLevel();
 	
 	UFUNCTION(BlueprintCallable)
 	void AllStagesFinished();

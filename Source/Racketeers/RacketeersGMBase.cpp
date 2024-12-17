@@ -49,6 +49,7 @@ class APS_Base;
 ARacketeersGMBase::ARacketeersGMBase()
 {
 	UE_LOG(LogTemp, Warning, TEXT("AGM_Base::AGM_Base"));
+	TransitionTimer = 5;
 }
 
 void ARacketeersGMBase::PlayerControllerConstructed()
@@ -310,6 +311,8 @@ void ARacketeersGMBase::BeginPlay()
 
 	TransitionComponent->OnFinished.AddDynamic(this, &ARacketeersGMBase::TravelToLevel);
 	TransitionComponent->GameState = GetGameState<ARacketeersGameStateBase>();
+
+	OnRoundFinish.AddDynamic(this, &ARacketeersGMBase::EndGame);
 	
 }
 
@@ -361,7 +364,6 @@ void ARacketeersGMBase::RoundCompletion()
 	{
 		//if(GEngine)
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "End Game");
-		EndGame();
 		return;
 	}
 	//if(GEngine)
@@ -458,6 +460,16 @@ void ARacketeersGMBase::SwitchState()
 	GS->OnRep_PhaseChange();
 }
 
+void ARacketeersGMBase::LoadEndLevel()
+{
+	ProcessServerTravel("VictoryMap_GamePlay");
+}
+
+void ARacketeersGMBase::LoadTransitionLevel()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "LOAD TRANSITION LEVEL");
+	ProcessServerTravel("StatsTransitionMap",true);
+}
 
 void ARacketeersGMBase::Transition()
 {
@@ -474,7 +486,9 @@ void ARacketeersGMBase::Transition()
 
 	}
 	SetPackage();
-	ProcessServerTravel("StatsTransitionMap",true);
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Transition");
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, this,  &ARacketeersGMBase::LoadTransitionLevel, TransitionTimer, false);
 	//TransitionComponent->AddWidgetsToPlayers(GetGameState<ARacketeersGameStateBase>());
 
 	
@@ -595,6 +609,7 @@ bool ARacketeersGMBase::CheckIfGameIsOver()
 		if(Leader.RoundsWon > AvailibleRounds)
 		{
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "LEADER WINS");
+			OnRoundFinish.Broadcast();
 			return true;
 		}
 	}
@@ -617,14 +632,15 @@ bool ARacketeersGMBase::LoadTransitionStats()
 	return true;
 	
 }
-
-bool ARacketeersGMBase::EndGame()
+void ARacketeersGMBase::EndGame()
 {
-
 	SetPackage();
-	ProcessServerTravel("VictoryMap_GamePlay");
+	//Stop Players
 
-	return true;
+	//Transition
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, this,  &ARacketeersGMBase::LoadEndLevel, TransitionTimer, false);
+	//ProcessServerTravel("VictoryMap_GamePlay");
 }
 
 void ARacketeersGMBase::IncreaseTotalRounds()
@@ -724,6 +740,28 @@ void ARacketeersGMBase::SetPackage()
 	Data.LevelToLoad = LevelToLoad;
 	BI->SetGameModeData(Data);
 	BI->SetDataToTransfer(Package);
+	
+}
+
+void ARacketeersGMBase::SetSpectatingPlayersToPlayers()
+{
+	AGameStateBase* GS = GetGameState<AGameState>();
+	if(GS == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Game State is Nullptr, ARacketeersGMBase::SetSpectatingPlayersToPlayers "));
+	}
+	for (APlayerState* PlayerState : GS->PlayerArray)
+	{
+		if(PlayerState && PlayerState->IsOnlyASpectator())
+		{
+			PlayerState->SetIsOnlyASpectator(false);
+			ARacketeersController* AC = Cast<ARacketeersController>(PlayerState->GetPlayerController());
+			if(AC)
+			{
+				AC->SetPlayerPlay();
+			}
+		}	
+	}
 	
 }
 
