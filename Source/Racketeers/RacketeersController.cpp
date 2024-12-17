@@ -187,11 +187,11 @@ void ARacketeersController::SetPlayerSpectator()
 	{
 		return;
 	}
-	GetPawn()->Destroy();
+	//GetPawn()->Destroy();
 	PlayerState->SetIsSpectator(true);
-	ChangeState(NAME_Spectating);
+	//ChangeState(NAME_Spectating);
 	bPlayerIsWaiting = true;
-	ClientGotoState(NAME_Spectating);
+	//ClientGotoState(NAME_Spectating);
 }
 
 void ARacketeersController::SetPlayerPlay()
