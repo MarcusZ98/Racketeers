@@ -239,6 +239,8 @@ void ABoatCharacter::ResetScurryCooldown()
 
 void ABoatCharacter::OnShootLeftStarted()
 {
+	if(bIsHoldingShoot) return;
+	
 	bIsHoldingShoot = true;
 	bIsShootingLeft = true;
 	ServerHoldShoot();
@@ -252,6 +254,8 @@ void ABoatCharacter::OnShootLeftCompleted()
 
 void ABoatCharacter::OnShootRightStarted()
 {
+	if(bIsHoldingShoot) return;
+
 	bIsHoldingShoot = true;
 	bIsShootingLeft = false;
 	ServerHoldShoot();

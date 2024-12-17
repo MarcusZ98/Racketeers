@@ -83,8 +83,7 @@ protected:
 	UBoatWidget* BoatWidget;
 	
 	/* ---- TIMERS ---- */
-	FTimerHandle FireTimerHandleLeft;
-	FTimerHandle FireTimerHandleRight;
+	FTimerHandle FireTimerHandle;
 	FTimerHandle CooldownTimerHandle;
 
 	/* ---- ARRAYS ----*/
@@ -177,7 +176,7 @@ public:
 	bool bIsHoldingShoot = false;
 	UPROPERTY(BlueprintReadOnly, Replicated)
 	bool bIsShootingLeft = false;
-	UPROPERTY(Replicated)
+	UPROPERTY(BlueprintReadOnly, Replicated)
 	bool bCanShoot = true;
 	UPROPERTY(Replicated)
 	bool bIsShooting = false;
