@@ -12,6 +12,7 @@
 #include "GameFramework/GameSession.h"
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/Widget.h"
 
 
 
@@ -156,6 +157,14 @@ void ARacketeersController::BeginPlay()
 	FInputModeGameOnly InputMode;
 	SetInputMode(InputMode);
 	OnBeginPlayerEvent.Broadcast();
+	PauseMenuWidget = CreateWidget(this,PauseWidgetClass,"PauseMenu");
+}
+
+void ARacketeersController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+	InputComponent->BindAction("Pause", IE_Pressed, this, &ARacketeersController::OpenPauseMenu);
+	//EnhancedInputComponent->BindAction(
 }
 
 void ARacketeersController::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -204,6 +213,23 @@ void ARacketeersController::SetPlayerPlay()
 	ChangeState(NAME_Playing);
 	bPlayerIsWaiting = false;
 	ClientGotoState(NAME_Playing);
+}
+
+void ARacketeersController::OpenPauseMenu(){
+	if(PauseMenuWidget == nullptr && PauseMenuWidget != nullptr	)
+	{
+		PauseMenuWidget = CreateWidget(this,PauseWidgetClass,"PauseMenu");
+	}
+	// if(PauseMenuWidget->IsInViewport() && PauseMenuWidget!=nullptr)
+	// {
+	// 	PauseMenuWidget->RemoveFromParent();
+	// 	SetInputMode(FInputModeGameOnly());
+	// }
+	else
+	{
+		PauseMenuWidget->AddToViewport();
+		SetInputMode(FInputModeUIOnly());
+	}
 }
 
 void ARacketeersController::ClientUnLoadLevel_Implementation(const FString& LevelPath)
@@ -403,23 +429,3 @@ void ARacketeersController::SetServerTimeSeconds_Implementation(ARacketeersContr
 	
 }
 
-/*void ARacketeersController::Client_TogglePauseGame_Implementation()
-{
-	if(PauseWidget == nullptr)
-	{
-		return;
-	}
-	
-	if(PauseWidget->IsInViewport())
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "REMOVE FROM PARENT");
-		PauseWidget->RemoveFromParent();
-		SetInputMode(FInputModeGameOnly());
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "ADD TO VIEWPORT");
-		PauseWidget->AddToViewport();
-		SetInputMode(FInputModeUIOnly());
-	}
-}*/
