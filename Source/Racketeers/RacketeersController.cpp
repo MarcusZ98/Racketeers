@@ -163,7 +163,7 @@ void ARacketeersController::BeginPlay()
 void ARacketeersController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
-	InputComponent->BindAction("Pause", IE_Pressed, this, &ARacketeersController::TogglePauseMenu);
+	InputComponent->BindAction("Pause", IE_Pressed, this, &ARacketeersController::OpenPauseMenu);
 	//EnhancedInputComponent->BindAction(
 }
 
@@ -215,18 +215,16 @@ void ARacketeersController::SetPlayerPlay()
 	ClientGotoState(NAME_Playing);
 }
 
-void ARacketeersController::TogglePauseMenu(){
-	GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Red, "ARacketeersController::TogglePauseMenu");
+void ARacketeersController::OpenPauseMenu(){
 	if(PauseMenuWidget == nullptr && PauseMenuWidget != nullptr	)
 	{
-		
 		PauseMenuWidget = CreateWidget(this,PauseWidgetClass,"PauseMenu");
 	}
-	if(PauseMenuWidget->IsInViewport() && PauseMenuWidget!=nullptr)
-	{
-		PauseMenuWidget->RemoveFromParent();
-		SetInputMode(FInputModeGameOnly());
-	}
+	// if(PauseMenuWidget->IsInViewport() && PauseMenuWidget!=nullptr)
+	// {
+	// 	PauseMenuWidget->RemoveFromParent();
+	// 	SetInputMode(FInputModeGameOnly());
+	// }
 	else
 	{
 		PauseMenuWidget->AddToViewport();

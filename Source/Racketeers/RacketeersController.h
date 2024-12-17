@@ -122,7 +122,7 @@ class RACKETEERS_API ARacketeersController : public APlayerController
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void SetPlayerPlay();
 
-	void TogglePauseMenu();
+	void OpenPauseMenu();
 };
 
 
