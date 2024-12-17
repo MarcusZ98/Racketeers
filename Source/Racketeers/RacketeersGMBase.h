@@ -26,8 +26,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUnloadWidget);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUnloadingMap);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnloadedMap);
 
-
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRoundFinish);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoadTransitionMap);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoadEndGame);
 
 #define MAXTOTALROUNDS 8
 
@@ -36,6 +37,15 @@ class RACKETEERS_API ARacketeersGMBase : public AGM_Base
 {
 	GENERATED_BODY()
 public:
+
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FOnLoadTransitionMap OnLoadTransitionMap;
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FOnLoadEndGame OnLoadEndGame;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FOnRoundFinish OnRoundFinish;
 
 	ARacketeersGMBase();
 	FTimerDynamicDelegate OnPlayerControllerConstructed;
@@ -123,7 +133,9 @@ public:
 
 
 	
-
+	UFUNCTION(Blueprintable, BlueprintCallable)
+	virtual void EndGame();
+	
 	UFUNCTION(BlueprintCallable)
 	void RespawnPlayer(APlayerState* PState);
 	UFUNCTION(BlueprintCallable)
@@ -132,17 +144,16 @@ public:
 	void DecreaseTotalRounds();
 	UFUNCTION(BlueprintCallable)
 	void RoundCompletion();
-
 	UFUNCTION(BlueprintCallable)
 	void TravelToLevel();
 	UFUNCTION(BlueprintCallable)
 	void Transition();
-	
 	void BroadcastOnPlayerPressed(ETeams Team);
 	void IncrementPlayerCounter();
 	int8 GetTotalRounds();
-	TEnumAsByte<EPhaseState> SwitchIncomingState();
+	EPhaseState SwitchIncomingState();
 	void SetPackage();
+	void SetSpectatingPlayersToPlayers();
 	UFUNCTION(BlueprintCallable)
 	void MakeControllerSpectator(APlayerController* PC);
 	
@@ -151,7 +162,9 @@ public:
 	//Create one phase1 GameMode, one phase 2 GameMode and one Phase3 GameMode
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Phase Data")
-	TEnumAsByte<EPhaseState> State;
+	float TransitionTimer;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Phase Data")
+	EPhaseState State;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Phase Data")
 	float TimeLimit;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -170,74 +183,25 @@ public:
 	FString MainParentLevel;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Phase Data")
 	FString StartPhaseName;
-
-
-
-	/*UFUNCTION(BlueprintCallable)
-	void InitializeBoatData();
-	UFUNCTION(BlueprintCallable)
-	void GetActivePlayers();
-
-protected:
-	//void SpawnBoat();
-	void SetBoatValues(ETeams MyTeamID, int32 MyPlayerID);
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team Data")
-	TMap<ETeams, FTeamParts> TeamData;
-	
-	//UPROPERTY()
-	//APlayerState* PlayerState;
-	UPROPERTY()
-	APS_Base* CustomPlayerState;
-	UPROPERTY()
-	APlayerController* PlayerController;
-	UPROPERTY()
-	ABoatCharacter* BoatCharacter;
-	UPROPERTY()
-	UMaterialInterface* Material;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Boats")
-	ABoatCharacter* BoatRaccoon;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Boats")
-	ABoatCharacter* BoatPanda;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Boat Materials")
-	UMaterialInterface* RaccoonHullMaterial;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Boat Materials")
-	UMaterialInterface* RaccoonSailMaterial;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Boat Materials")
-	UMaterialInterface* PandaHullMaterial;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Boat Materials")
-	UMaterialInterface* PandaSailMaterial;
-	
-	float PlayerIndex;
-	FPlayerInfo PlayerInfo;
-	ETeams TeamID;
-	int32 PlayerID;
-	*/
-
-	
 private:
-
-
+	
 	UPROPERTY()
 	float CurrentTime;
 
 	int GetNextPhaseNumber();
-	
-	//methods for progressing trough phases
 
 	UFUNCTION(BlueprintCallable)
 	bool CheckIfGameIsOver();
 	bool LoadTransitionStats();
 	bool CheckWinnerOfRound();
-	bool EndGame();
+
 	void SwitchState();
+	void LoadEndLevel();
+	void LoadTransitionLevel();
 	
-
-
 	UFUNCTION(BlueprintCallable)
 	void AllStagesFinished();
 	
