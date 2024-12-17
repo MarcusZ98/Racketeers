@@ -224,6 +224,7 @@ void ABoatCharacter::ResetScurrySpeed()
 void ABoatCharacter::OnShootLeftStarted()
 {
 	bIsHoldingShoot = true;
+	bIsShootingLeft = true;
 	ServerHoldShoot();
 }
 
@@ -236,6 +237,7 @@ void ABoatCharacter::OnShootLeftCompleted()
 void ABoatCharacter::OnShootRightStarted()
 {
 	bIsHoldingShoot = true;
+	bIsShootingLeft = false;
 	ServerHoldShoot();
 }
 
@@ -431,6 +433,8 @@ void ABoatCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(ABoatCharacter, bIsHoldingShoot);
 	DOREPLIFETIME(ABoatCharacter, bCanShoot);
 	DOREPLIFETIME(ABoatCharacter, bIsShooting);
+	DOREPLIFETIME(ABoatCharacter, bIsShootingLeft);
+
 
 }
 

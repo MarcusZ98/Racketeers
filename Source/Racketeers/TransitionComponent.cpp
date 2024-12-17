@@ -38,7 +38,7 @@ void UTransitionComponent::BeginPlay()
 void UTransitionComponent::IncrementPlayerReady(ETeams Team)
 {
 	
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "IncrementPlayerReady" );
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "IncrementPlayerReady" );
 		CountPlayer(Team);
 		AGameStateBase* GS = UGameplayStatics::GetGameState(GetWorld());
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "NUM: " + FString::FromInt(GS->PlayerArray.Num()) + " Current Player Count: " + FString::FromInt(CountPlayersReady) );
