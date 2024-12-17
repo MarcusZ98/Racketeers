@@ -101,7 +101,7 @@ protected:
 	float ShootCooldown = 1;
 	UPROPERTY(EditAnywhere, Category="Movement")
 	float ScurryCooldown = 1;
-	UPROPERTY(EditAnywhere, Category="Movement")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Movement")
 	float ScurryLength = 0.5;
 	UPROPERTY(BlueprintReadWrite, Category = "Interaction")
 	bool bIsInteracting;
