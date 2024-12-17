@@ -85,7 +85,7 @@ struct FTimer
 	
 };
 
-UENUM()
+UENUM(Blueprintable)
 enum EGameStats : uint8
 {
 	ALIVE = 0,

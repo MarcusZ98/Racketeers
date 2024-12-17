@@ -30,6 +30,7 @@ ABoatCharacter::ABoatCharacter()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 	bIsHoldingShoot = false;
+	bScurryOnCooldown = false;
 
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
@@ -181,21 +182,32 @@ void ABoatCharacter::Move(const FInputActionValue& Value)
 
 void ABoatCharacter::Scurry(const FInputActionValue& Value)
 {
+	if (bScurryOnCooldown || bScurryActive) // Check if on cooldown or already scurrying
+	{
+		return;
+	}
+
 	bool bIsScurrying = Value.Get<bool>();
 	ServerStartScurry(bIsScurrying);
 }
 
 void ABoatCharacter::ServerStartScurry_Implementation(bool bIsScurrying)
 {
-	if (bIsScurrying && !bScurryActive)
+	if (bIsScurrying && !bScurryActive && !bScurryOnCooldown)
 	{
 		bScurryActive = true;
+		bScurryOnCooldown = true; // Activate cooldown
+
 		OriginalMaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
 		GetCharacterMovement()->MaxWalkSpeed *= ScurryAmount;
 
 		PlayScurryEffects();
 
-		GetWorldTimerManager().SetTimer(ScurryTimerHandle, this, &ABoatCharacter::ResetScurrySpeed, 0.5f, false);
+		// Set timer to reset scurry speed
+		GetWorldTimerManager().SetTimer(ScurryTimerHandle, this, &ABoatCharacter::ResetScurrySpeed, ScurryLength, false);
+
+		// Set timer for cooldown reset
+		GetWorldTimerManager().SetTimer(ScurryCooldownTimerHandle, this, &ABoatCharacter::ResetScurryCooldown, ScurryCooldown, false);
 	}
 }
 
@@ -214,6 +226,10 @@ void ABoatCharacter::ResetScurrySpeed()
 	StopScurryEffects();
 }
 
+void ABoatCharacter::ResetScurryCooldown()
+{
+	bScurryOnCooldown = false;
+}
 
 
 
@@ -223,6 +239,8 @@ void ABoatCharacter::ResetScurrySpeed()
 
 void ABoatCharacter::OnShootLeftStarted()
 {
+	if(bIsHoldingShoot) return;
+	
 	bIsHoldingShoot = true;
 	bIsShootingLeft = true;
 	ServerHoldShoot();
@@ -236,6 +254,8 @@ void ABoatCharacter::OnShootLeftCompleted()
 
 void ABoatCharacter::OnShootRightStarted()
 {
+	if(bIsHoldingShoot) return;
+
 	bIsHoldingShoot = true;
 	bIsShootingLeft = false;
 	ServerHoldShoot();
