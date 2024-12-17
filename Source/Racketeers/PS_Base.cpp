@@ -26,6 +26,7 @@ void APS_Base::BeginPlay()
 void APS_Base::OverrideWith(APlayerState* PlayerState)
 {
 	Super::OverrideWith(PlayerState);
+	PlayerState->SetIsOnlyASpectator(PlayerState->IsSpectator());
 }
 
 void APS_Base::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -38,17 +39,22 @@ void APS_Base::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetime
 	DOREPLIFETIME(APS_Base, BoatHealth);
 }
 
-void APS_Base::DamagePlayerBoat_Implementation(APlayerState* PS, int Amount)
+void APS_Base::DamagePlayerBoat_Implementation(APlayerState* PS, int Amount, APlayerState* Other)
 {
 	APS_Base* PSBase = Cast<APS_Base>(PS);
-	if(PSBase == nullptr) return;
-	if(PSBase->BoatHealth <= 0)
-	{
-		return;
-	}
+	if(PSBase == nullptr  || PSBase->BoatHealth <= 0) return;
 	//UE_LOG(LogTemp, Display, TEXT("Health: %f"), MaxBoatHealth);
-	GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Red, "Health:" + FString::FromInt(PSBase->MaxBoatHealth));
-
+	GEngine->AddOnScreenDebugMessage(-1, 1000.0f, FColor::Red, "Health:" + FString::FromInt(PSBase->BoatHealth));
+	
+	if(Other)
+	{
+		APS_Base* InstigatorBase = Cast<APS_Base>(Other);
+		if(InstigatorBase)
+		{
+			InstigatorBase->PlayerStats.TotalDamage += Amount;
+		}
+	}
+	
 	PSBase->BoatHealth -= Amount;
 	if(PSBase->BoatHealth <= 0)
 	{
@@ -70,7 +76,7 @@ void APS_Base::DamagePlayerBoat_Implementation(APlayerState* PS, int Amount)
 	}
 }
 
-bool APS_Base::DamagePlayerBoat_Validate(APlayerState* PS, int Amount)
+bool APS_Base::DamagePlayerBoat_Validate(APlayerState* PS, int Amount,  APlayerState* Other)
 {
 	return true;
 }

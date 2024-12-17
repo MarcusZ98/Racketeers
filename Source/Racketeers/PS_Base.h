@@ -42,6 +42,16 @@ struct FPlayerInfo
 	}
 	
 };
+
+
+USTRUCT(BlueprintType)
+struct FPlayerStats
+{
+	GENERATED_BODY()
+	UPROPERTY(BlueprintReadWrite, Category = "PlayerStats")
+	float TotalDamage;
+};
+
 USTRUCT(BlueprintType)
 struct FPlayerNetworkData
 {
@@ -72,9 +82,11 @@ public:
 	FPlayerInfo PlayerInfo;
 	UPROPERTY(BlueprintReadWrite, Category = "PlayerInfo")
 	FPlayerNetworkData PlayerNetworkData;
+	UPROPERTY(Replicated, BlueprintReadWrite, Category = "PlayerInfo")
+	FPlayerStats PlayerStats;
 	
 	UFUNCTION(Server, Reliable, WithValidation,BlueprintCallable )
-	void DamagePlayerBoat(APlayerState* PS,int Amount);
+	void DamagePlayerBoat(APlayerState* PS,int Amount, APlayerState* Other = nullptr);
 
 	virtual void OverrideWith(APlayerState* PlayerState) override;
 
@@ -82,6 +94,7 @@ public:
 	float BoatHealth;
 	UPROPERTY(Replicated, BlueprintReadWrite, Category = "PlayerInfo", EditAnywhere)
 	float MaxBoatHealth;
+	
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	

@@ -181,7 +181,14 @@ void ARacketeersController::ServerPlayerLeave_Implementation(APlayerController* 
 {
 	if(PC)
 	{
+		if(PC->GetLocalRole() == ROLE_Authority)
+		{
+			UGameplayStatics::GetGameMode(GetWorld())->GameSession->Destroy();
+			return;
+		}
 		UGameplayStatics::GetGameMode(GetWorld())->GameSession->KickPlayer(PC, FText::GetEmpty());
+		PC->Destroy();
+		
 	}
 }
 
@@ -196,6 +203,12 @@ void ARacketeersController::SetPlayerSpectator()
 	{
 		return;
 	}
+	/*
+	if(GetPawn())
+	{
+		GetPawn()->Destroy();
+	}
+	*/
 	//GetPawn()->Destroy();
 	PlayerState->SetIsSpectator(true);
 	//ChangeState(NAME_Spectating);

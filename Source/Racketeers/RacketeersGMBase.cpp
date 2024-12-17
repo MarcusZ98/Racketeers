@@ -49,6 +49,7 @@ class APS_Base;
 ARacketeersGMBase::ARacketeersGMBase()
 {
 	UE_LOG(LogTemp, Warning, TEXT("AGM_Base::AGM_Base"));
+	TransitionTimer = 5;
 }
 
 void ARacketeersGMBase::PlayerControllerConstructed()
@@ -310,6 +311,8 @@ void ARacketeersGMBase::BeginPlay()
 
 	TransitionComponent->OnFinished.AddDynamic(this, &ARacketeersGMBase::TravelToLevel);
 	TransitionComponent->GameState = GetGameState<ARacketeersGameStateBase>();
+
+	OnRoundFinish.AddDynamic(this, &ARacketeersGMBase::EndGame);
 	
 }
 
@@ -361,7 +364,6 @@ void ARacketeersGMBase::RoundCompletion()
 	{
 		//if(GEngine)
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "End Game");
-		EndGame();
 		return;
 	}
 	//if(GEngine)
@@ -449,7 +451,7 @@ void ARacketeersGMBase::SwitchState()
 		CurrentPhase = Phases[0];
 	}else
 	{
-		CurrentPhase = Phases[CurrentPhase->State+1];	
+		CurrentPhase = Phases[(int8)CurrentPhase->State + 1];	
 	}
 
 	ARacketeersGameStateBase* GS = GetGameState<ARacketeersGameStateBase>();
@@ -458,6 +460,16 @@ void ARacketeersGMBase::SwitchState()
 	GS->OnRep_PhaseChange();
 }
 
+void ARacketeersGMBase::LoadEndLevel()
+{
+	ProcessServerTravel("VictoryMap_GamePlay");
+}
+
+void ARacketeersGMBase::LoadTransitionLevel()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "LOAD TRANSITION LEVEL");
+	ProcessServerTravel("StatsTransitionMap",true);
+}
 
 void ARacketeersGMBase::Transition()
 {
@@ -474,7 +486,9 @@ void ARacketeersGMBase::Transition()
 
 	}
 	SetPackage();
-	ProcessServerTravel("StatsTransitionMap",true);
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Transition");
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, this,  &ARacketeersGMBase::LoadTransitionLevel, TransitionTimer, false);
 	//TransitionComponent->AddWidgetsToPlayers(GetGameState<ARacketeersGameStateBase>());
 
 	
@@ -564,7 +578,7 @@ int ARacketeersGMBase::GetNextPhaseNumber()
 	}
 	else
 	{
-		return CurrentPhase->State+1;
+		return (int8)CurrentPhase->State + (int8)1;
 	}
 	
 }
@@ -595,6 +609,7 @@ bool ARacketeersGMBase::CheckIfGameIsOver()
 		if(Leader.RoundsWon > AvailibleRounds)
 		{
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "LEADER WINS");
+			OnRoundFinish.Broadcast();
 			return true;
 		}
 	}
@@ -617,14 +632,15 @@ bool ARacketeersGMBase::LoadTransitionStats()
 	return true;
 	
 }
-
-bool ARacketeersGMBase::EndGame()
+void ARacketeersGMBase::EndGame()
 {
-
 	SetPackage();
-	ProcessServerTravel("VictoryMap_GamePlay");
+	//Stop Players
 
-	return true;
+	//Transition
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, this,  &ARacketeersGMBase::LoadEndLevel, TransitionTimer, false);
+	//ProcessServerTravel("VictoryMap_GamePlay");
 }
 
 void ARacketeersGMBase::IncreaseTotalRounds()
@@ -652,15 +668,15 @@ int8 ARacketeersGMBase::GetTotalRounds()
 	return TotalRounds;
 }
 
-TEnumAsByte<EPhaseState> ARacketeersGMBase::SwitchIncomingState()
+EPhaseState ARacketeersGMBase::SwitchIncomingState()
 {
-	TEnumAsByte<EPhaseState> NewPhase = CurrentPhase->State;
+	EPhaseState NewPhase = CurrentPhase->State;
 	if(NewPhase == EPhaseState::Phase_3)
 	{
 		NewPhase = EPhaseState::Phase_1;
 	}else
 	{
-		NewPhase = Phases[CurrentPhase->State+1]->State;
+		NewPhase = Phases[(int8)CurrentPhase->State + (int8)1]->State;
 	}
 	ARacketeersGameStateBase* GS = GetGameState<ARacketeersGameStateBase>();
 	GS->IncomingPhase = NewPhase;
@@ -673,6 +689,22 @@ void ARacketeersGMBase::SetPackage()
 {
 	UBaseGameInstance* BI = Cast<UBaseGameInstance>(GetGameInstance());
 	ARacketeersGameStateBase* GS = GetGameState<ARacketeersGameStateBase>();
+
+	int32 ExpectedRaccoons = 0;
+	int32 ExpecedPandas = 0;
+	for (APlayerState* PlayerState : GetGameState<AGameState>()->PlayerArray)
+	{
+		APS_Base* APS = Cast<APS_Base>(PlayerState);
+		if(APS)
+		{
+			if(APS->PlayerInfo.Team == ETeams::TeamRaccoon)
+			{
+				ExpectedRaccoons++;
+				continue;
+			}
+			ExpecedPandas++;
+		}
+	}
 	
 	FGameStatsPackage Package{
 		GS->RacconResource,
@@ -685,7 +717,8 @@ void ARacketeersGMBase::SetPackage()
 		GS->RedPandasBoatHealth,
 		GS->PandasParts,
 		GS->PandaCraftingProgress,
-		GS->PlayerArray.Num()
+		ExpectedRaccoons,
+		ExpecedPandas
 	};
 
 	if(Package.RacconsRoundsWon > Package.RedPandasRoundsWon)
@@ -705,8 +738,31 @@ void ARacketeersGMBase::SetPackage()
 	if(BI == nullptr) return;
 	FGameModeData Data;
 	Data.LevelToLoad = LevelToLoad;
+	Data.Phase = State;
 	BI->SetGameModeData(Data);
 	BI->SetDataToTransfer(Package);
+	
+}
+
+void ARacketeersGMBase::SetSpectatingPlayersToPlayers()
+{
+	AGameStateBase* GS = GetGameState<AGameState>();
+	if(GS == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Game State is Nullptr, ARacketeersGMBase::SetSpectatingPlayersToPlayers "));
+	}
+	for (APlayerState* PlayerState : GS->PlayerArray)
+	{
+		if(PlayerState && PlayerState->IsOnlyASpectator())
+		{
+			PlayerState->SetIsOnlyASpectator(false);
+			ARacketeersController* AC = Cast<ARacketeersController>(PlayerState->GetPlayerController());
+			if(AC)
+			{
+				AC->SetPlayerPlay();
+			}
+		}	
+	}
 	
 }
 
