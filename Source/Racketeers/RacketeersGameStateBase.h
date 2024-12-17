@@ -50,7 +50,7 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 	FGameStatsPackage TempPackage;
 	
 	UFUNCTION(BlueprintCallable)
-	void ChangeCurrentPhase(TEnumAsByte<EPhaseState> NewPhase);
+	void ChangeCurrentPhase(EPhaseState NewPhase);
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SetMaxHealth(ETeams Team, int32 MaxHealth);
 	UFUNCTION(BlueprintCallable)
@@ -103,9 +103,9 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 	UPROPERTY(ReplicatedUsing=OnRep_PickUp, BlueprintReadWrite)
 	FResources RedPandasResource;
 	UPROPERTY(ReplicatedUsing=OnRep_PhaseChange, BlueprintReadWrite)
-	TEnumAsByte<EPhaseState> CurrentPhase;
+	EPhaseState CurrentPhase;
 	UPROPERTY(ReplicatedUsing=OnRep_IncomingPhaseChange, BlueprintReadWrite)
-	TEnumAsByte<EPhaseState> IncomingPhase;
+	EPhaseState IncomingPhase;
 
 	UPROPERTY(Replicated, BlueprintReadWrite)
 	FTeamGameStats RaccoonsGameStats;

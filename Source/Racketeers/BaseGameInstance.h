@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AdvancedFriendsGameInstance.h"
 #include "GameModeStructs.h"
+#include "Phase.h"
 #include "BaseGameInstance.generated.h"
 
 /**
@@ -73,6 +74,8 @@ struct FGameModeData
 	GENERATED_BODY()
 	UPROPERTY(BlueprintReadWrite)
 	FString LevelToLoad = "";
+	UPROPERTY(BlueprintReadWrite)
+	EPhaseState Phase;
 };
 
 

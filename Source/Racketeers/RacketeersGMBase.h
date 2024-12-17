@@ -151,7 +151,7 @@ public:
 	void BroadcastOnPlayerPressed(ETeams Team);
 	void IncrementPlayerCounter();
 	int8 GetTotalRounds();
-	TEnumAsByte<EPhaseState> SwitchIncomingState();
+	EPhaseState SwitchIncomingState();
 	void SetPackage();
 	void SetSpectatingPlayersToPlayers();
 	UFUNCTION(BlueprintCallable)
@@ -164,7 +164,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Phase Data")
 	float TransitionTimer;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Phase Data")
-	TEnumAsByte<EPhaseState> State;
+	EPhaseState State;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Phase Data")
 	float TimeLimit;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

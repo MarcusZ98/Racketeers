@@ -451,7 +451,7 @@ void ARacketeersGMBase::SwitchState()
 		CurrentPhase = Phases[0];
 	}else
 	{
-		CurrentPhase = Phases[CurrentPhase->State+1];	
+		CurrentPhase = Phases[(int8)CurrentPhase->State + 1];	
 	}
 
 	ARacketeersGameStateBase* GS = GetGameState<ARacketeersGameStateBase>();
@@ -578,7 +578,7 @@ int ARacketeersGMBase::GetNextPhaseNumber()
 	}
 	else
 	{
-		return CurrentPhase->State+1;
+		return (int8)CurrentPhase->State + (int8)1;
 	}
 	
 }
@@ -668,15 +668,15 @@ int8 ARacketeersGMBase::GetTotalRounds()
 	return TotalRounds;
 }
 
-TEnumAsByte<EPhaseState> ARacketeersGMBase::SwitchIncomingState()
+EPhaseState ARacketeersGMBase::SwitchIncomingState()
 {
-	TEnumAsByte<EPhaseState> NewPhase = CurrentPhase->State;
+	EPhaseState NewPhase = CurrentPhase->State;
 	if(NewPhase == EPhaseState::Phase_3)
 	{
 		NewPhase = EPhaseState::Phase_1;
 	}else
 	{
-		NewPhase = Phases[CurrentPhase->State+1]->State;
+		NewPhase = Phases[(int8)CurrentPhase->State + (int8)1]->State;
 	}
 	ARacketeersGameStateBase* GS = GetGameState<ARacketeersGameStateBase>();
 	GS->IncomingPhase = NewPhase;
@@ -717,8 +717,8 @@ void ARacketeersGMBase::SetPackage()
 		GS->RedPandasBoatHealth,
 		GS->PandasParts,
 		GS->PandaCraftingProgress,
-		GS->ExpectedRaccoons,
-		GS->ExpectedPandas
+		ExpectedRaccoons,
+		ExpecedPandas
 	};
 
 	if(Package.RacconsRoundsWon > Package.RedPandasRoundsWon)
@@ -738,6 +738,7 @@ void ARacketeersGMBase::SetPackage()
 	if(BI == nullptr) return;
 	FGameModeData Data;
 	Data.LevelToLoad = LevelToLoad;
+	Data.Phase = State;
 	BI->SetGameModeData(Data);
 	BI->SetDataToTransfer(Package);
 	

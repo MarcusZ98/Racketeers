@@ -11,7 +11,7 @@ UPhase::UPhase()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 	TimeLimit = 0;
-	State = Phase_1;
+	State = EPhaseState::Phase_1;
 }
 
 

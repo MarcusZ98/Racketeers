@@ -55,7 +55,6 @@ void ARacketeersGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 void ARacketeersGameStateBase::BeginPlay()
 {
 	Super::BeginPlay();
-
 	/*
 	if(GetLocalRole() == ROLE_Authority)
 	{
@@ -129,14 +128,13 @@ void ARacketeersGameStateBase::BeginPlay()
 	*/
 }
 
-void ARacketeersGameStateBase::ChangeCurrentPhase(TEnumAsByte<EPhaseState> NewPhase)
+void ARacketeersGameStateBase::ChangeCurrentPhase(EPhaseState NewPhase)
 {
 	CurrentPhase = NewPhase;
 	if(GetLocalRole() == ROLE_Authority)
 	{
 		OnRep_PhaseChange();
 	}
-
 }
 
 
@@ -220,6 +218,7 @@ void ARacketeersGameStateBase::UpdateHealth()
 
 bool ARacketeersGameStateBase::CheckTeamAlive(ETeams Team)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 1000.0f, FColor::Red, "Get Team Stats Alive:  " + FString::FromInt(GetTeamStats(Team).TeamAlive) );
 	if(GetTeamStats(Team).TeamAlive <= 0)
 	{
 		return false;
