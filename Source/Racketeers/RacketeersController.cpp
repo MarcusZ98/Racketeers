@@ -242,6 +242,13 @@ void ARacketeersController::OpenPauseMenu(){
 	{
 		PauseMenuWidget->AddToViewport();
 		SetInputMode(FInputModeUIOnly());
+		
+		// Set input mode to UI and allow the widget to accept input
+		FInputModeUIOnly InputModeData;
+		InputModeData.SetWidgetToFocus(PauseMenuWidget->TakeWidget());
+		InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		SetInputMode(InputModeData);
+
 		SetShowMouseCursor(true);
 	}
 }
