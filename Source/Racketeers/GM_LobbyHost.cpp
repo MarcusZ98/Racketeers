@@ -180,6 +180,7 @@ void AGM_LobbyHost::StartTheMatch()
 // Function to handle server travel after delay
 void AGM_LobbyHost::StartMatchTravel()
 {
+	
 	ProcessServerTravel(MapName);
 }
 
