@@ -242,6 +242,7 @@ void ARacketeersController::OpenPauseMenu(){
 	{
 		PauseMenuWidget->AddToViewport();
 		SetInputMode(FInputModeUIOnly());
+		SetShowMouseCursor(true);
 	}
 }
 
