@@ -185,26 +185,26 @@ void ARacketeersGameStateBase::UpdateTeamAlive()
 	RaccoonsAlive.Empty();
 	PandasAlive.Empty();
 	
-	if(GetLocalRole() == ROLE_Authority)
-	{
-		for (APlayerState* PS : PlayerArray)
-		{
-			if (PS == nullptr) return; 
-			APS_Base* PSBase = Cast<APS_Base>(PS);
-			if (PSBase == nullptr) return;
 
-			if(PSBase->PlayerInfo.Team == ETeams::TeamRaccoon)
-			{
-				AddToStats(1, EGameStats::ALIVE, ETeams::TeamRaccoon);
-				RaccoonsAlive.Add(PS);
-				continue;
-			}
-			if(PSBase->PlayerInfo.Team == ETeams::TeamPanda)
-			{
-				AddToStats(1, EGameStats::ALIVE, ETeams::TeamPanda);
-				PandasAlive.Add(PS);
-				continue;
-			}
+	for (APlayerState* PS : PlayerArray)
+	{
+		if (PS == nullptr) return; 
+		APS_Base* PSBase = Cast<APS_Base>(PS);
+		if (PSBase == nullptr) return;
+		
+		if(GetLocalRole() == ROLE_Authority)
+		{
+			AddToStats(1, EGameStats::ALIVE, PSBase->PlayerInfo.Team);
+		}
+		if(PSBase->PlayerInfo.Team == ETeams::TeamRaccoon)
+		{
+			RaccoonsAlive.Add(PS);
+			continue;
+		}
+		if(PSBase->PlayerInfo.Team == ETeams::TeamPanda)
+		{
+			PandasAlive.Add(PS);
+			continue;
 		}
 	}
 }
