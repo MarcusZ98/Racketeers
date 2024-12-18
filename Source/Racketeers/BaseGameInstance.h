@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AdvancedFriendsGameInstance.h"
 #include "GameModeStructs.h"
+#include "Phase.h"
 #include "BaseGameInstance.generated.h"
 
 /**
@@ -57,7 +58,9 @@ struct FGameStatsPackage{
 	UPROPERTY(BlueprintReadWrite)
 	FTeamCraftingProgress RedPandasCraftingProgress;
 	UPROPERTY(BlueprintReadWrite)
-	int ExpectedPlayers = 0;
+	int32 ExpectedRaccoons = 0;
+	UPROPERTY(BlueprintReadWrite)
+	int32 ExpectedPandas = 0;
 	UPROPERTY(BlueprintReadWrite)
 	ETeams WonTeam = ETeams::NONE;
 	
@@ -71,6 +74,8 @@ struct FGameModeData
 	GENERATED_BODY()
 	UPROPERTY(BlueprintReadWrite)
 	FString LevelToLoad = "";
+	UPROPERTY(BlueprintReadWrite)
+	EPhaseState Phase;
 };
 
 

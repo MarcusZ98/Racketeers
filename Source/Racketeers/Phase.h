@@ -32,12 +32,12 @@
 	 */
 
 UENUM(BlueprintType)
-enum EPhaseState
+enum class EPhaseState : uint8
 {
-	Phase_1,
-	Phase_2,
-	Phase_3,
-	Phase_NONE
+	Phase_1 = 0,
+	Phase_2 = 1,
+	Phase_3 = 2,
+	Phase_NONE = 3
 };
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable, BlueprintType)
@@ -54,7 +54,7 @@ public:
 	UPROPERTY()
 	float TimeLimit;
 	UPROPERTY(BlueprintReadWrite, Category= "Phase Data")
-	TEnumAsByte<EPhaseState> State;
+	EPhaseState State;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category= "Phase Data")
 	FString LevelToLoad;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category= "Phase Data")
