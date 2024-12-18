@@ -3,6 +3,7 @@
 
 #include "GM_LobbyHost.h"
 #include "AdvancedSessionsLibrary.h"
+#include "BaseGameInstance.h"
 #include "GS_Lobby.h"
 #include "LobbySpawnPoint.h"
 #include "PC_Lobby.h"
@@ -163,6 +164,34 @@ void AGM_LobbyHost::UpdateIfEnoughPlayersToStart() const
 void AGM_LobbyHost::StartTheMatch()
 {
 	SetPlayerIDs();
+
+	int NumPandaPlayers = 0;
+	int NumRaccoonPlayers = 0;
+
+	for (const auto SP : SpawnPositions)
+	{
+		if (const ALobbySpawnPoint* SpawnPoint = Cast<ALobbySpawnPoint>(SP))
+		{
+			if (SpawnPoint->IsOccupied())
+			{
+				if (SpawnPoint->Team == ETeams::TeamPanda)
+				{
+					NumPandaPlayers++;
+				}
+				else if (SpawnPoint->Team == ETeams::TeamRaccoon)
+				{
+					NumRaccoonPlayers++;
+				}
+			}
+		}
+	}
+	
+	FGameStatsPackage GameStats;
+	GameStats.ExpectedPandas = NumPandaPlayers;
+	GameStats.ExpectedRaccoons = NumRaccoonPlayers;
+
+	
+	Cast<UBaseGameInstance>(GetGameInstance())->SetDataToTransfer(GameStats);
 
 	for (const auto Player : Players)
 	{
