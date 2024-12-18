@@ -161,7 +161,6 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 	UPROPERTY(Replicated, BlueprintReadWrite)
 	float Phase2RandomNumber;
 
-
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void RemovePlayerAlive(APlayerState* PS);
 	
