@@ -73,9 +73,9 @@ struct FGameModeData
 {
 	GENERATED_BODY()
 	UPROPERTY(BlueprintReadWrite)
-	FString LevelToLoad = "";
+	FString LevelToLoad = "Phase1_GamePlay";
 	UPROPERTY(BlueprintReadWrite)
-	EPhaseState Phase;
+	EPhaseState Phase = EPhaseState::Phase_NONE;
 };
 
 

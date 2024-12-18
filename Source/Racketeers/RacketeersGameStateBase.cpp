@@ -166,7 +166,7 @@ FTeamShipParts ARacketeersGameStateBase::GetTeamShipParts(ETeams Teams) const
 int32 ARacketeersGameStateBase::GetPartLevel(FTeamShipParts TeamShipParts , EPartSpacing Part) const
 {
 	int Space = (int)Part;
-	int32* ShipType = (int32*)((&TeamShipParts.Cannon) + Space);
+	uint8* ShipType = (uint8*)((&TeamShipParts.Hull) + Space);
 	return *ShipType;
 }
 
