@@ -49,7 +49,7 @@ struct FPlayerStats
 {
 	GENERATED_BODY()
 	UPROPERTY(BlueprintReadWrite, Category = "PlayerStats")
-	float TotalDamage;
+	float TotalDamage = 0;
 };
 
 USTRUCT(BlueprintType)
