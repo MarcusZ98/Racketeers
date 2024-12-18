@@ -62,6 +62,10 @@ public:
 
 	virtual void AddInactivePlayer(APlayerState* PlayerState, APlayerController* PC) override;
 
+	void FreezePlayers();
+
+	void UnFreezePlayers();
+	
 	UPROPERTY()
 	TArray<APlayerController*> JoiningPlayersControllers;
 	UPROPERTY()

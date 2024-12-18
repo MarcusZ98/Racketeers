@@ -27,6 +27,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", Replicated)
 	UWidgetComponent* LobbyInfoWidget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", Replicated)
+	UChildActorComponent* MissingPlayer;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	int TeamID = -1;
@@ -85,6 +88,9 @@ private:
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void Multicast_SpawnVFX();
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void Multicast_ToggleMissingPlayerVisible(bool bVisible);
 
 
 protected:

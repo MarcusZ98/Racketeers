@@ -143,6 +143,36 @@ void ARacketeersGMBase::AddInactivePlayer(APlayerState* PlayerState, APlayerCont
 	Super::AddInactivePlayer(PlayerState, PC);
 }
 
+void ARacketeersGMBase::FreezePlayers()
+{
+	AGameState* GS = GetGameState<AGameState>();
+	for (APlayerState* PlayerState : GS->PlayerArray)
+	{
+		APlayerController* PC = PlayerState->GetPlayerController();
+		if(PC)
+		{
+			PC->DisableInput(PC);
+			PC->ChangeState(NAME_Inactive);
+			PC->ClientGotoState(NAME_Inactive);
+		}
+	}
+}
+
+void ARacketeersGMBase::UnFreezePlayers()
+{
+	AGameState* GS = GetGameState<AGameState>();
+	for (APlayerState* PlayerState : GS->PlayerArray)
+	{
+		APlayerController* PC = PlayerState->GetPlayerController();
+		if(PC)
+		{
+			PC->EnableInput(PC);
+			PC->ChangeState(NAME_Playing);
+			PC->ClientGotoState(NAME_Playing);
+		}
+	}
+}
+
 AActor* ARacketeersGMBase::ChoosePlayerStart_Implementation(AController* Player)
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "ARacketeersGMBase::ChoosePlayerStart_Implementation");
@@ -384,6 +414,7 @@ void ARacketeersGMBase::TravelToLevel()
 	//SwitchState();
 	OnloadedMap.Broadcast();
 	SetPackage();
+	UnFreezePlayers();
 	ProcessServerTravel(LevelToLoad, false);
 
 }
@@ -486,6 +517,7 @@ void ARacketeersGMBase::Transition()
 
 	}
 	SetPackage();
+	FreezePlayers();
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Transition");
 	FTimerHandle TimerHandle;
 	GetWorldTimerManager().SetTimer(TimerHandle, this,  &ARacketeersGMBase::LoadTransitionLevel, TransitionTimer, false);

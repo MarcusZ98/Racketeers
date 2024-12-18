@@ -5,7 +5,6 @@
 #include "WidgetLobbyInfo.h"
 #include "NiagaraFunctionLibrary.h"
 #include "PS_Lobby.h"
-#include "RacketeersCharacter.h"
 #include "Net/UnrealNetwork.h"
 
 // Sets default values
@@ -21,15 +20,21 @@ ALobbySpawnPoint::ALobbySpawnPoint()
 	PlayerSpawnPoint = CreateDefaultSubobject<UArrowComponent>(TEXT("ArrowComponent"));
 	LobbyInfoWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));
 
+	// Create the Missing Player Component
+	MissingPlayer = CreateDefaultSubobject<UChildActorComponent>(TEXT("MissingPlayer"));
+	
 	// Attach the Arrow Component to the Root Component
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	PlayerSpawnPoint->SetupAttachment(RootComponent);
 	LobbyInfoWidget->SetupAttachment(RootComponent);
+	MissingPlayer->SetupAttachment(RootComponent);
 
 
 	// Optional: Customize Arrow Appearance
 	PlayerSpawnPoint->ArrowColor = FColor::Green;
 	PlayerSpawnPoint->SetRelativeScale3D(FVector(1.0f));
+	
+
 }
 
 
@@ -55,6 +60,7 @@ void ALobbySpawnPoint::Server_SpawnPlayer_Implementation()
 		}
 
 		Multicast_SpawnVFX();
+		Multicast_ToggleMissingPlayerVisible(false);
 	}
 }
 
@@ -93,6 +99,8 @@ void ALobbySpawnPoint::Server_RemovePlayer_Implementation()
 		Player->Destroy();
 		LobbyInfoWidget->SetVisibility(false);
 		PlayerController = nullptr;
+
+		Multicast_ToggleMissingPlayerVisible(true);
 	}
 }
 
@@ -104,6 +112,13 @@ void ALobbySpawnPoint::Multicast_ToggleReady_Implementation(bool bReady)
 	}
 }
 
+void ALobbySpawnPoint::Multicast_ToggleMissingPlayerVisible_Implementation(const bool bIsMissing)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Missing Player"));
+	MissingPlayer->SetVisibility(bIsMissing);
+}
+
+
 
 void ALobbySpawnPoint::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -111,6 +126,7 @@ void ALobbySpawnPoint::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	
 	DOREPLIFETIME(ALobbySpawnPoint, Player);
 	DOREPLIFETIME(ALobbySpawnPoint, LobbyInfoWidget);
+	DOREPLIFETIME(ALobbySpawnPoint, MissingPlayer);
 }
 
 
