@@ -75,6 +75,7 @@ class RACKETEERS_API ARacketeersController : public APlayerController
 
 	UFUNCTION(Client, Reliable , BlueprintCallable, Blueprintable)
 	void SetTimeSeconds(float Seconds, bool SetIsActive);
+	
 	UFUNCTION(Client, Reliable , BlueprintCallable, Blueprintable)
 	void SetTime_Analog(ATimerInfo* Timer ,int32 Minutes, int32 Seconds, bool SetIsActive);
 
