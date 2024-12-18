@@ -22,7 +22,7 @@ ALobbySpawnPoint::ALobbySpawnPoint()
 
 	// Create the Missing Player Component
 	MissingPlayer = CreateDefaultSubobject<UChildActorComponent>(TEXT("MissingPlayer"));
-	MissingPlayer->SetChildActorClass(APS_Lobby::StaticClass());
+	MissingPlayer->SetChildActorClass(AActor::StaticClass());
 	
 	// Attach the Arrow Component to the Root Component
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
