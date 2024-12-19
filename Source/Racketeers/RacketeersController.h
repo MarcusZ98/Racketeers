@@ -122,7 +122,11 @@ class RACKETEERS_API ARacketeersController : public APlayerController
 	void SetPlayerSpectator();
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void SetPlayerPlay();
-
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void SetPlayerInactive();
+	UFUNCTION(BlueprintCallable)
+	void SetSelfInactive();
+	
 	void OpenPauseMenu();
 };
 
