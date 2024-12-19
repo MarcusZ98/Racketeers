@@ -533,6 +533,11 @@ void ARacketeersGameStateBase::RemovePlayerAlive(APlayerState* PS)
 	PandasAlive.Remove(PSBase);
 }
 
+void ARacketeersGameStateBase::MultiCastRoundEnded_Implementation()
+{
+	OnClientRoundFinished.Broadcast();	
+}
+
 inline void ARacketeersGameStateBase::CheckOnRepHealthChanged()
 {
 	if(UGameplayStatics::GetPlayerController(GetWorld(),0)->GetLocalRole()  == ENetRole::ROLE_Authority)

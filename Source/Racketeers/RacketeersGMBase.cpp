@@ -520,6 +520,13 @@ void ARacketeersGMBase::Transition()
 	FreezePlayers();
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Transition");
 	FTimerHandle TimerHandle;
+
+
+	ARacketeersGameStateBase* GS = GetGameState<ARacketeersGameStateBase>();
+	if(GS)
+	{
+		GS->MultiCastRoundEnded();	
+	}
 	GetWorldTimerManager().SetTimer(TimerHandle, this,  &ARacketeersGMBase::LoadTransitionLevel, TransitionTimer, false);
 	//TransitionComponent->AddWidgetsToPlayers(GetGameState<ARacketeersGameStateBase>());
 
