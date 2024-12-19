@@ -528,7 +528,7 @@ void ARacketeersGMBase::Transition()
 
 	}
 	SetPackage();
-	FreezePlayers();
+	//FreezePlayers();
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Transition");
 	FTimerHandle TimerHandle;
 
