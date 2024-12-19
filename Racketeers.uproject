@@ -12,7 +12,8 @@
 				"Engine",
 				"AdvancedSessions",
 				"CoreUObject",
-				"UMG"
+				"UMG",
+				"PCG"
 			]
 		}
 	],
