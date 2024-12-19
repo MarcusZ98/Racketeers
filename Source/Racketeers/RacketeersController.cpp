@@ -228,6 +228,22 @@ void ARacketeersController::SetPlayerPlay()
 	ClientGotoState(NAME_Playing);
 }
 
+void ARacketeersController::SetPlayerInactive()
+{
+	if(!HasAuthority())
+	{
+		return;
+	}
+	ChangeState(NAME_Inactive);
+	ClientGotoState(NAME_Inactive);
+}
+
+void ARacketeersController::SetSelfInactive()
+{
+	ChangeState(NAME_Inactive);
+	ClientGotoState(NAME_Inactive);
+}
+
 void ARacketeersController::OpenPauseMenu(){
 	if(PauseMenuWidget == nullptr && PauseMenuWidget != nullptr	)
 	{
