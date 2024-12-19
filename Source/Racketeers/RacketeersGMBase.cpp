@@ -463,20 +463,24 @@ bool ARacketeersGMBase::CheckWinnerOfRound()
 			if(RaccoonTotalTeamHealth > PandasTotalTeamHealth)
 			{
 				GS->RacconsRoundsWon++;
+				GS->RoundTeamWinner = ETeams::TeamRaccoon;
 				return true;
 			}
 			GS->RedPandasRoundsWon++;
+			GS->RoundTeamWinner = ETeams::TeamPanda;
 			return true;
 		}
 		
 		if(GS->GetTeamStats(ETeams::TeamRaccoon).TeamAlive > GS->GetTeamStats(ETeams::TeamPanda).TeamAlive)
 		{
 			GS->RacconsRoundsWon++;
+			GS->RoundTeamWinner = ETeams::TeamRaccoon;
 			return true;
 		}
 		if(GS->GetTeamStats(ETeams::TeamPanda).TeamAlive > GS->GetTeamStats(ETeams::TeamRaccoon).TeamAlive)
 		{
 			GS->RedPandasRoundsWon++;
+			GS->RoundTeamWinner = ETeams::TeamPanda;
 			return true;
 		}
 		
@@ -528,7 +532,7 @@ void ARacketeersGMBase::Transition()
 
 	}
 	SetPackage();
-	//FreezePlayers();
+	FreezePlayers();
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Transition");
 	FTimerHandle TimerHandle;
 
