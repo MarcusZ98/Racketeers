@@ -157,7 +157,11 @@ public:
 	void StopScurryEffects();
 	UFUNCTION(BlueprintImplementableEvent, Category = "Scurry Effects")
 	void PlayCannonEffects(USceneComponent* Cannon, UNiagaraComponent* NiagaraComponent);
-
+	UFUNCTION(BlueprintImplementableEvent, Category = "Water Effects")
+	void PlayWakeEffect();
+	UFUNCTION(BlueprintImplementableEvent, Category = "Water Effects")
+	void StopWakeEffect();
+	
 	/* ---- COMPONENTS ----*/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
