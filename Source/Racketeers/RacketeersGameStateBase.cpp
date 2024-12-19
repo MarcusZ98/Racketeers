@@ -50,6 +50,7 @@ void ARacketeersGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 	DOREPLIFETIME(ARacketeersGameStateBase, ExpectedRaccoons);
 
 	DOREPLIFETIME(ARacketeersGameStateBase, PlayersJoined);
+	DOREPLIFETIME(ARacketeersGameStateBase, RoundWonTeam);
 }
 
 void ARacketeersGameStateBase::BeginPlay()
@@ -127,7 +128,6 @@ void ARacketeersGameStateBase::BeginPlay()
 
 	*/
 }
-
 void ARacketeersGameStateBase::ChangeCurrentPhase(EPhaseState NewPhase)
 {
 	CurrentPhase = NewPhase;

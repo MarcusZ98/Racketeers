@@ -11,11 +11,13 @@
 #include "FrameTypes.h"
 #include "HeadMountedDisplayTypes.h"
 #include "PS_Base.h"
+#include "RacketeersCharacter.h"
 #include "RacketeersController.h"
 #include "RacketeersGameStateBase.h"
 #include "TransitionComponent.h"
 #include "WidgetSubsystem.h"
 #include "Engine/LevelStreamingDynamic.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/GameStateBase.h"
 #include "GameFramework/PlayerStart.h"
 #include "GameFramework/PlayerState.h"
@@ -146,8 +148,23 @@ void ARacketeersGMBase::AddInactivePlayer(APlayerState* PlayerState, APlayerCont
 void ARacketeersGMBase::FreezePlayers()
 {
 	AGameState* GS = GetGameState<AGameState>();
+	if(GS == nullptr) return;
 	for (APlayerState* PlayerState : GS->PlayerArray)
 	{
+
+		APlayerController* PC = PlayerState->GetPlayerController();
+		if(PC == nullptr) return;
+		APawn* Pawn = PC->GetPawn();
+		if(Pawn == nullptr) return;
+		ARacketeersCharacter* AC = Cast<ARacketeersCharacter>(Pawn);
+		if(AC == nullptr) return;
+		UCharacterMovementComponent* CMC = Cast<UCharacterMovementComponent>(AC->GetCharacterMovement());
+		if(CMC)
+		{
+			CMC->SetMovementMode(MOVE_None);
+		}
+		
+		/*
 		APlayerController* PC = PlayerState->GetPlayerController();
 		if(PC)
 		{
@@ -155,14 +172,29 @@ void ARacketeersGMBase::FreezePlayers()
 			PC->ChangeState(NAME_Inactive);
 			PC->ClientGotoState(NAME_Inactive);
 		}
+		*/
 	}
 }
 
 void ARacketeersGMBase::UnFreezePlayers()
 {
 	AGameState* GS = GetGameState<AGameState>();
+	if(GS == nullptr) return;
 	for (APlayerState* PlayerState : GS->PlayerArray)
 	{
+		
+		APlayerController* PC = PlayerState->GetPlayerController();
+		if(PC == nullptr) return;
+		APawn* Pawn = PC->GetPawn();
+		if(Pawn == nullptr) return;
+		ARacketeersCharacter* AC = Cast<ARacketeersCharacter>(Pawn);
+		if(AC == nullptr) return;
+		UCharacterMovementComponent* CMC = Cast<UCharacterMovementComponent>(AC->GetCharacterMovement());
+		if(CMC)
+		{
+			CMC->SetMovementMode(MOVE_Walking);
+		}
+		/*
 		APlayerController* PC = PlayerState->GetPlayerController();
 		if(PC)
 		{
@@ -170,6 +202,7 @@ void ARacketeersGMBase::UnFreezePlayers()
 			PC->ChangeState(NAME_Playing);
 			PC->ClientGotoState(NAME_Playing);
 		}
+		*/
 	}
 }
 
@@ -342,7 +375,7 @@ void ARacketeersGMBase::BeginPlay()
 	TransitionComponent->OnFinished.AddDynamic(this, &ARacketeersGMBase::TravelToLevel);
 	TransitionComponent->GameState = GetGameState<ARacketeersGameStateBase>();
 
-	OnRoundFinish.AddDynamic(this, &ARacketeersGMBase::EndGame);
+	OnGameEnded.AddDynamic(this, &ARacketeersGMBase::EndGame);
 	
 }
 
@@ -452,20 +485,24 @@ bool ARacketeersGMBase::CheckWinnerOfRound()
 			if(RaccoonTotalTeamHealth > PandasTotalTeamHealth)
 			{
 				GS->RacconsRoundsWon++;
+				GS->RoundWonTeam = ETeams::TeamRaccoon;
 				return true;
 			}
 			GS->RedPandasRoundsWon++;
+			GS->RoundWonTeam = ETeams::TeamPanda;
 			return true;
 		}
 		
 		if(GS->GetTeamStats(ETeams::TeamRaccoon).TeamAlive > GS->GetTeamStats(ETeams::TeamPanda).TeamAlive)
 		{
 			GS->RacconsRoundsWon++;
+			GS->RoundWonTeam = ETeams::TeamRaccoon;
 			return true;
 		}
 		if(GS->GetTeamStats(ETeams::TeamPanda).TeamAlive > GS->GetTeamStats(ETeams::TeamRaccoon).TeamAlive)
 		{
 			GS->RedPandasRoundsWon++;
+			GS->RoundWonTeam = ETeams::TeamPanda;
 			return true;
 		}
 		
@@ -517,7 +554,7 @@ void ARacketeersGMBase::Transition()
 
 	}
 	SetPackage();
-	//FreezePlayers();
+	FreezePlayers();
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Transition");
 	FTimerHandle TimerHandle;
 
@@ -648,7 +685,7 @@ bool ARacketeersGMBase::CheckIfGameIsOver()
 		if(Leader.RoundsWon > AvailibleRounds)
 		{
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "LEADER WINS");
-			OnRoundFinish.Broadcast();
+			OnGameEnded.Broadcast();
 			return true;
 		}
 	}

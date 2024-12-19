@@ -50,7 +50,6 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 	void BeginPlay() override;
 
 	FGameStatsPackage TempPackage;
-	
 	UFUNCTION(BlueprintCallable)
 	void ChangeCurrentPhase(EPhaseState NewPhase);
 	UFUNCTION(Server, Reliable, BlueprintCallable)
@@ -113,6 +112,9 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 	FTeamGameStats RaccoonsGameStats;
 	UPROPERTY(Replicated, BlueprintReadWrite)
 	FTeamGameStats RedPandasGameStats;
+
+	UPROPERTY(Replicated, BlueprintReadWrite)
+	ETeams RoundWonTeam;
 
 	UPROPERTY(Replicated, BlueprintReadWrite)
 	FGameStats TeamStats;

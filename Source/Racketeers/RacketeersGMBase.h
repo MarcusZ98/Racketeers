@@ -25,11 +25,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUnloadWidget);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUnloadingMap);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnloadedMap);
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRoundFinish);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoadTransitionMap);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoadEndGame);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGameEnded);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRoundFinished);
 
 #define MAXTOTALROUNDS 8
@@ -39,17 +37,15 @@ class RACKETEERS_API ARacketeersGMBase : public AGM_Base
 {
 	GENERATED_BODY()
 public:
-	
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FOnGameEnded OnGameEnded;
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FOnRoundFinished OnRoundFinished;
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FOnLoadTransitionMap OnLoadTransitionMap;
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FOnLoadEndGame OnLoadEndGame;
-
-	UPROPERTY(BlueprintAssignable, BlueprintCallable)
-	FOnRoundFinish OnRoundFinish;
-
+	
 	ARacketeersGMBase();
 	FTimerDynamicDelegate OnPlayerControllerConstructed;
 
