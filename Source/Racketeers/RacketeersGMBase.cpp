@@ -16,6 +16,7 @@
 #include "TransitionComponent.h"
 #include "WidgetSubsystem.h"
 #include "Engine/LevelStreamingDynamic.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/GameStateBase.h"
 #include "GameFramework/PlayerStart.h"
 #include "GameFramework/PlayerState.h"
@@ -149,11 +150,16 @@ void ARacketeersGMBase::FreezePlayers()
 	for (APlayerState* PlayerState : GS->PlayerArray)
 	{
 		APlayerController* PC = PlayerState->GetPlayerController();
-		if(PC)
+		UCharacterMovementComponent* CMC = PC->GetCharacter()->GetCharacterMovement();
+		if(PC && CMC)
 		{
+
+			CMC->SetMovementMode(MOVE_None);
+			/*
 			PC->DisableInput(PC);
 			PC->ChangeState(NAME_Inactive);
 			PC->ClientGotoState(NAME_Inactive);
+			*/
 		}
 	}
 }
@@ -164,11 +170,16 @@ void ARacketeersGMBase::UnFreezePlayers()
 	for (APlayerState* PlayerState : GS->PlayerArray)
 	{
 		APlayerController* PC = PlayerState->GetPlayerController();
-		if(PC)
+		UCharacterMovementComponent* CMC = PC->GetCharacter()->GetCharacterMovement();
+		if(PC && CMC)
 		{
-			PC->EnableInput(PC);
+
+			CMC->SetMovementMode(MOVE_Walking);
+			/*
+			PC->DisableInput(PC);
 			PC->ChangeState(NAME_Playing);
 			PC->ClientGotoState(NAME_Playing);
+			*/
 		}
 	}
 }

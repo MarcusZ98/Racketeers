@@ -192,10 +192,7 @@ void AGM_LobbyHost::StartTheMatch()
 		FGameStatsPackage GameStats;
 		GameStats.ExpectedPandas = NumPandaPlayers;
 		GameStats.ExpectedRaccoons = NumRaccoonPlayers;
-
-		FGameModeData GameModeData;
-		GameModeData.Phase = EPhaseState::Phase_NONE;
-		GameModeData.LevelToLoad = MapName;
+		GameInstance->SetDataToTransfer(GameStats);
 	}
 
 	for (const auto Player : Players)
