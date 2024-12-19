@@ -377,7 +377,7 @@ void ARacketeersGMBase::Tick(float DeltaSeconds)
 		return;
 	}
 	//CurrentTime >= CurrentPhase->TimeLimit
-	if(!TimerInfo->GetIsActive())
+	if(TimerInfo == nullptr && !TimerInfo->GetIsActive())
 	{
 		return;
 	}
