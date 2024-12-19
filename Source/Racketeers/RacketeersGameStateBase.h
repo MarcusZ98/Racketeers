@@ -141,6 +141,9 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 
 
 	UPROPERTY(Replicated, BlueprintReadWrite)
+	ETeams RoundTeamWinner;
+
+	UPROPERTY(Replicated, BlueprintReadWrite)
 	int32 RacconsRoundsWon;
 
 	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere)
