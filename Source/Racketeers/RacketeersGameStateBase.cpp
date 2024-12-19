@@ -50,6 +50,7 @@ void ARacketeersGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 	DOREPLIFETIME(ARacketeersGameStateBase, ExpectedRaccoons);
 
 	DOREPLIFETIME(ARacketeersGameStateBase, PlayersJoined);
+	DOREPLIFETIME(ARacketeersGameStateBase, RoundTeamWinner);
 }
 
 void ARacketeersGameStateBase::BeginPlay()
@@ -470,6 +471,8 @@ void ARacketeersGameStateBase::AddToStats_Implementation(int Amount, EGameStats 
 	int32* Stats = ((&TeamGameStats->TeamAlive + StatSpace));
 	if(Stats == nullptr) return; 
 	Stats[0] += Amount;
+
+	
 }
 
 //Callas på clienten sen på servern
@@ -531,6 +534,11 @@ void ARacketeersGameStateBase::RemovePlayerAlive(APlayerState* PS)
 		RaccoonsAlive.Remove(PSBase);
 	}
 	PandasAlive.Remove(PSBase);
+}
+
+void ARacketeersGameStateBase::MultiCastRoundEnded_Implementation()
+{
+	OnClientRoundFinished.Broadcast();	
 }
 
 inline void ARacketeersGameStateBase::CheckOnRepHealthChanged()

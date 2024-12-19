@@ -16,6 +16,7 @@
 #include "TransitionComponent.h"
 #include "WidgetSubsystem.h"
 #include "Engine/LevelStreamingDynamic.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/GameStateBase.h"
 #include "GameFramework/PlayerStart.h"
 #include "GameFramework/PlayerState.h"
@@ -149,11 +150,16 @@ void ARacketeersGMBase::FreezePlayers()
 	for (APlayerState* PlayerState : GS->PlayerArray)
 	{
 		APlayerController* PC = PlayerState->GetPlayerController();
-		if(PC)
+		UCharacterMovementComponent* CMC = PC->GetCharacter()->GetCharacterMovement();
+		if(PC && CMC)
 		{
+
+			CMC->SetMovementMode(MOVE_None);
+			/*
 			PC->DisableInput(PC);
 			PC->ChangeState(NAME_Inactive);
 			PC->ClientGotoState(NAME_Inactive);
+			*/
 		}
 	}
 }
@@ -164,11 +170,16 @@ void ARacketeersGMBase::UnFreezePlayers()
 	for (APlayerState* PlayerState : GS->PlayerArray)
 	{
 		APlayerController* PC = PlayerState->GetPlayerController();
-		if(PC)
+		UCharacterMovementComponent* CMC = PC->GetCharacter()->GetCharacterMovement();
+		if(PC && CMC)
 		{
-			PC->EnableInput(PC);
+
+			CMC->SetMovementMode(MOVE_Walking);
+			/*
+			PC->DisableInput(PC);
 			PC->ChangeState(NAME_Playing);
 			PC->ClientGotoState(NAME_Playing);
+			*/
 		}
 	}
 }
@@ -452,20 +463,24 @@ bool ARacketeersGMBase::CheckWinnerOfRound()
 			if(RaccoonTotalTeamHealth > PandasTotalTeamHealth)
 			{
 				GS->RacconsRoundsWon++;
+				GS->RoundTeamWinner = ETeams::TeamRaccoon;
 				return true;
 			}
 			GS->RedPandasRoundsWon++;
+			GS->RoundTeamWinner = ETeams::TeamPanda;
 			return true;
 		}
 		
 		if(GS->GetTeamStats(ETeams::TeamRaccoon).TeamAlive > GS->GetTeamStats(ETeams::TeamPanda).TeamAlive)
 		{
 			GS->RacconsRoundsWon++;
+			GS->RoundTeamWinner = ETeams::TeamRaccoon;
 			return true;
 		}
 		if(GS->GetTeamStats(ETeams::TeamPanda).TeamAlive > GS->GetTeamStats(ETeams::TeamRaccoon).TeamAlive)
 		{
 			GS->RedPandasRoundsWon++;
+			GS->RoundTeamWinner = ETeams::TeamPanda;
 			return true;
 		}
 		
@@ -520,6 +535,13 @@ void ARacketeersGMBase::Transition()
 	FreezePlayers();
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Transition");
 	FTimerHandle TimerHandle;
+
+
+	ARacketeersGameStateBase* GS = GetGameState<ARacketeersGameStateBase>();
+	if(GS)
+	{
+		GS->MultiCastRoundEnded();	
+	}
 	GetWorldTimerManager().SetTimer(TimerHandle, this,  &ARacketeersGMBase::LoadTransitionLevel, TransitionTimer, false);
 	//TransitionComponent->AddWidgetsToPlayers(GetGameState<ARacketeersGameStateBase>());
 
