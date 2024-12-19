@@ -22,7 +22,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnIncomingPhaseOneActive);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnIncomingPhaseTwoActive);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnIncomingPhaseThreeActive);
 
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnClientRoundFinished);
 UCLASS()
 class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 {
@@ -35,6 +35,8 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 	FOnPhaseTwoActive OnPhaseTwoActive;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable)
 	FOnPhaseThreeActive OnPhaseThreeActive;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable)
+	FOnClientRoundFinished OnClientRoundFinished;
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable)
 	FOnIncomingPhaseOneActive OnIncomingPhaseOneActive;
@@ -176,6 +178,10 @@ class RACKETEERS_API ARacketeersGameStateBase : public AGS_Base
 	
 	UPROPERTY(Replicated, BlueprintReadWrite)
 	int32 Phase3RandomNumber;
+
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void MultiCastRoundEnded();
 private:
 	void CheckOnRepHealthChanged();
 };

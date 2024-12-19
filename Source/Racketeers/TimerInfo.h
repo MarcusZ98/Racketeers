@@ -35,7 +35,7 @@ class RACKETEERS_API ATimerInfo : public AInfo
 	UFUNCTION(BlueprintCallable, Blueprintable)
 	int32 GetSeconds();
 	
-	UFUNCTION(Server, reliable)
+	UFUNCTION(Server, reliable, BlueprintCallable)
 	void ServerMultiCastActivateTimer();
 	
 	UFUNCTION(NetMulticast, reliable, BlueprintCallable)
