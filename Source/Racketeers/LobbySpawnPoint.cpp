@@ -60,7 +60,12 @@ void ALobbySpawnPoint::Server_SpawnPlayer_Implementation()
 		}
 
 		Multicast_SpawnVFX();
-		Multicast_ToggleMissingPlayerVisible(false);
+		bShowMissingPlayer = false;
+
+		if(GetNetMode() == NM_ListenServer && HasAuthority())
+		{
+			MissingPlayer->SetVisibility(bShowMissingPlayer);
+		}
 	}
 }
 
@@ -100,7 +105,12 @@ void ALobbySpawnPoint::Server_RemovePlayer_Implementation()
 		LobbyInfoWidget->SetVisibility(false);
 		PlayerController = nullptr;
 
-		Multicast_ToggleMissingPlayerVisible(true);
+		bShowMissingPlayer = true;
+
+		if(GetNetMode() == NM_ListenServer && HasAuthority())
+		{
+			MissingPlayer->SetVisibility(bShowMissingPlayer);
+		}
 	}
 }
 
@@ -112,10 +122,9 @@ void ALobbySpawnPoint::Multicast_ToggleReady_Implementation(bool bReady)
 	}
 }
 
-void ALobbySpawnPoint::Multicast_ToggleMissingPlayerVisible_Implementation(const bool bIsMissing)
+void ALobbySpawnPoint::OnRep_bShowMissingPlayer()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Missing Player"));
-	MissingPlayer->SetVisibility(bIsMissing);
+	MissingPlayer->SetVisibility(bShowMissingPlayer);
 }
 
 
@@ -127,6 +136,7 @@ void ALobbySpawnPoint::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(ALobbySpawnPoint, Player);
 	DOREPLIFETIME(ALobbySpawnPoint, LobbyInfoWidget);
 	DOREPLIFETIME(ALobbySpawnPoint, MissingPlayer);
+	DOREPLIFETIME(ALobbySpawnPoint, bShowMissingPlayer);
 }
 
 
