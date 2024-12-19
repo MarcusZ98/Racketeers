@@ -30,6 +30,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", Replicated)
 	UChildActorComponent* MissingPlayer;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_bShowMissingPlayer)
+	bool bShowMissingPlayer = true;
+	
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	int TeamID = -1;
@@ -84,13 +88,13 @@ public:
 
 	bool IsOccupied() const { return PlayerController != nullptr; }
 
+	UFUNCTION()
+	void OnRep_bShowMissingPlayer();
+
 private:
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void Multicast_SpawnVFX();
-
-	UFUNCTION(NetMulticast, Unreliable)
-	void Multicast_ToggleMissingPlayerVisible(bool bVisible);
 
 
 protected:
