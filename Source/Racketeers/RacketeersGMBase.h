@@ -30,6 +30,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRoundFinish);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoadTransitionMap);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoadEndGame);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRoundFinished);
+
 #define MAXTOTALROUNDS 8
 
 UCLASS()
@@ -37,8 +39,9 @@ class RACKETEERS_API ARacketeersGMBase : public AGM_Base
 {
 	GENERATED_BODY()
 public:
-
-
+	
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FOnRoundFinished OnRoundFinished;
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FOnLoadTransitionMap OnLoadTransitionMap;
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
