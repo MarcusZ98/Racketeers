@@ -151,7 +151,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void TravelToLevel();
 	UFUNCTION(BlueprintCallable)
-	void Transition();
+	virtual void Transition();
 	void BroadcastOnPlayerPressed(ETeams Team);
 	void IncrementPlayerCounter();
 	int8 GetTotalRounds();
