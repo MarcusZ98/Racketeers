@@ -185,13 +185,18 @@ void AGM_LobbyHost::StartTheMatch()
 			}
 		}
 	}
-	
-	FGameStatsPackage GameStats;
-	GameStats.ExpectedPandas = NumPandaPlayers;
-	GameStats.ExpectedRaccoons = NumRaccoonPlayers;
 
-	
-	Cast<UBaseGameInstance>(GetGameInstance())->SetDataToTransfer(GameStats);
+	UBaseGameInstance* GameInstance = Cast<UBaseGameInstance>(GetGameInstance());
+	if(GameInstance)
+	{
+		FGameStatsPackage GameStats;
+		GameStats.ExpectedPandas = NumPandaPlayers;
+		GameStats.ExpectedRaccoons = NumRaccoonPlayers;
+
+		FGameModeData GameModeData;
+		GameModeData.Phase = EPhaseState::Phase_NONE;
+		GameModeData.LevelToLoad = MapName;
+	}
 
 	for (const auto Player : Players)
 	{
