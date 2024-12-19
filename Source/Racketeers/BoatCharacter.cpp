@@ -73,6 +73,20 @@ void ABoatCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// Check if there is any movement input
+	FVector Velocity = GetVelocity();
+	bool bIsMoving = !Velocity.IsNearlyZero();
+
+	// Play or stop the wake effect based on movement
+	if (bIsMoving)
+	{
+		PlayWakeEffect(); // Start or continue playing the wake effect
+	}
+	else
+	{
+		StopWakeEffect(); // Stop the wake effect
+	}
+
 	if (!bIsShooting && bCanShoot && ShootTime < 3)
 	{
 		ShootTime += DeltaTime;
